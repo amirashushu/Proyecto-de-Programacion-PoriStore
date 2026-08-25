@@ -167,10 +167,11 @@ public class VistaPrincipal extends BaseFrame {
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void jLabel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MouseClicked
-        // TODO add your handling code here:
+
         Dashboard vistaDashboard = new Dashboard(st);
-        vistaDashboard.setVisible(true);
         this.dispose();
+        vistaDashboard.setVisible(true);
+        vistaDashboard.setLocationRelativeTo(null);
     }//GEN-LAST:event_jLabel8MouseClicked
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -1,6 +1,8 @@
 package entidades;
 
-public class Producto {
+import java.io.Serializable;
+
+public class Producto implements Serializable{
 
     private int id;
     private String nombre;
@@ -66,7 +68,5 @@ public class Producto {
     public void setCategoria(Categorias categoria) {
         this.categoria = categoria;
     }
-    
-    
 
 }

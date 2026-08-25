@@ -1,7 +1,7 @@
 package vistas;
 
 import entidades.Categorias;
-import entidades.Inventario;
+import logica.SistemaTienda;
 import entidades.Producto;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -12,13 +12,13 @@ import logica.SistemaTienda;
 
 public class Dashboard extends BaseFrame {
 
-    private Inventario inventario;
+    private SistemaTienda inventario;
     private DefaultTableModel modeloTabla;
 
     public Dashboard(SistemaTienda st) {
     super(st);
     initComponents();
-    this.inventario = new Inventario();
+    this.inventario = new SistemaTienda();
     this.setLocationRelativeTo(null);
     this.modeloTabla = (DefaultTableModel) tblProductos.getModel();
     
