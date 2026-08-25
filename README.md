@@ -26,10 +26,10 @@ Seleccionar el archivo `ProyectoPori.java` o presionar `F6`.
 
 ## 👥 Integrantes
 
-* 🧩 **Amira Casanova**  
-* 🎨 **Hugo Muñoz**  
-* ⚙️ **Cristóbal Pacheco**  
-* 💻 **Gonzalo Reyes**
+* 🧩 **Amira Casanova** = @amirashushu 
+* 🎨 **Hugo Muñoz**  = @hugozinn99
+* ⚙️ **Cristóbal Pacheco**  = @Cristobal-1007
+* 💻 **Gonzalo Reyes** = @gvrfffff
 
 ## 📌 Enlaces
 
