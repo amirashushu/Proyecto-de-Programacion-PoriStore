@@ -12,13 +12,11 @@ import logica.SistemaTienda;
 
 public class Dashboard extends BaseFrame {
 
-    private SistemaTienda inventario;
     private DefaultTableModel modeloTabla;
 
     public Dashboard(SistemaTienda st) {
     super(st);
     initComponents();
-    this.inventario = new SistemaTienda();
     this.setLocationRelativeTo(null);
     this.modeloTabla = (DefaultTableModel) tblProductos.getModel();
     
@@ -40,7 +38,7 @@ public class Dashboard extends BaseFrame {
         }
     });
 
-    actualizarTabla(inventario.getProductos());
+    actualizarTabla(st.getProductos());
 }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -137,6 +135,11 @@ public class Dashboard extends BaseFrame {
         jLabel9.setText("ID:");
 
         btnGuardar.setText("Guardar");
+        btnGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnGuardarMouseClicked(evt);
+            }
+        });
         btnGuardar.addActionListener(this::btnGuardarActionPerformed);
 
         btnLimpiar.setText("Limpiar");
@@ -363,14 +366,14 @@ public class Dashboard extends BaseFrame {
                 return;
             }
 
-            int nuevoId = inventario.generarSiguienteId();
+            int nuevoId = st.generarSiguienteId();
             Producto nuevo = new Producto(nuevoId, nombre, desc, precio, stock, cat);
 
-            if (inventario.agregarProducto(nuevo)) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Producto guardado con éxito.");
-                actualizarTabla(inventario.getProductos());
-                limpiarCampos();
-            }
+            st.agregarProducto(nuevo);
+            javax.swing.JOptionPane.showMessageDialog(this, "Producto guardado con éxito.");
+            actualizarTabla(st.getProductos());
+            limpiarCampos();
+
         } catch (NumberFormatException e) {
             javax.swing.JOptionPane.showMessageDialog(this, "Precio y Stock deben ser números válidos.", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
@@ -396,9 +399,9 @@ public class Dashboard extends BaseFrame {
                 return;
             }
 
-            if (inventario.actualizarProducto(id, nombre, desc, precio, stock, cat)) {
+            if (st.actualizarProducto(id, nombre, desc, precio, stock, cat)) {
                 javax.swing.JOptionPane.showMessageDialog(this, "Producto actualizado correctamente.");
-                actualizarTabla(inventario.getProductos());
+                actualizarTabla(st.getProductos());
                 limpiarCampos();
             }
         } catch (NumberFormatException e) {
@@ -422,15 +425,15 @@ public class Dashboard extends BaseFrame {
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         String criterio = txtBuscar.getText().trim();
         if (criterio.isEmpty()) {
-            actualizarTabla(inventario.getProductos());
+            actualizarTabla(st.getProductos());
         } else {
-            actualizarTabla(inventario.buscarPorNombre(criterio));
+            actualizarTabla(st.buscarPorNombre(criterio));
         }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnRestablecerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestablecerActionPerformed
         txtBuscar.setText("");
-        actualizarTabla(inventario.getProductos());
+        actualizarTabla(st.getProductos());
     }//GEN-LAST:event_btnRestablecerActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
@@ -445,12 +448,16 @@ public class Dashboard extends BaseFrame {
 
         int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro de eliminar el producto \"" + nombre + "\"?", "Confirmar Eliminación", javax.swing.JOptionPane.YES_NO_OPTION);
         if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
-            inventario.eliminarProducto(id);
-            actualizarTabla(inventario.getProductos());
+            st.eliminarProducto(id);
+            actualizarTabla(st.getProductos());
             limpiarCampos();
         }
     
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnGuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnGuardarMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnGuardarMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -28,13 +28,9 @@ public class SistemaTienda implements Serializable{
         return maxId + 1;
     }
 
-    // CRUD en memoria
-    public boolean agregarProducto(Producto p) {
-        if (buscarPorId(p.getId()) != null) {
-            return false;
-        }
+    //Agregar producto a inventario
+    public void agregarProducto(Producto p){
         inventario.add(p);
-        return true;
     }
 
     public Producto buscarPorId(int id) {
