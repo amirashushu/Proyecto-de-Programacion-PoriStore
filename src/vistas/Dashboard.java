@@ -1,7 +1,6 @@
 package vistas;
 
 import entidades.Categorias;
-import logica.SistemaTienda;
 import entidades.Producto;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -26,18 +25,6 @@ public class Dashboard extends BaseFrame {
     // Llenar JComboBox con la enumeración o valores de Categorias
     cbCategoria.setModel(new javax.swing.DefaultComboBoxModel(Categorias.values()));
 
-    // Escuchador para cargar datos al hacer clic en una fila de la tabla
-    tblProductos.addMouseListener(new java.awt.event.MouseAdapter() {
-        @Override
-        public void mouseClicked(java.awt.event.MouseEvent evt) {
-            tblProductosMouseClicked(evt);
-        }
-
-        private void tblProductosMouseClicked(MouseEvent evt) {
-            throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        }
-    });
-
     actualizarTabla(st.getProductos());
 }
     @SuppressWarnings("unchecked")
@@ -47,6 +34,7 @@ public class Dashboard extends BaseFrame {
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
+        jFrame1 = new javax.swing.JFrame();
         Formulario = new javax.swing.JPanel();
         txtId = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -91,6 +79,17 @@ public class Dashboard extends BaseFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 100, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jFrame1Layout = new javax.swing.GroupLayout(jFrame1.getContentPane());
+        jFrame1.getContentPane().setLayout(jFrame1Layout);
+        jFrame1Layout.setHorizontalGroup(
+            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        jFrame1Layout.setVerticalGroup(
+            jFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 300, Short.MAX_VALUE)
         );
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -365,15 +364,26 @@ public class Dashboard extends BaseFrame {
                 javax.swing.JOptionPane.showMessageDialog(this, "El precio y stock no pueden ser negativos.", "Error de Validación", javax.swing.JOptionPane.ERROR_MESSAGE);
                 return;
             }
-
-            int nuevoId = st.generarSiguienteId();
-            Producto nuevo = new Producto(nuevoId, nombre, desc, precio, stock, cat);
-
-            st.agregarProducto(nuevo);
-            javax.swing.JOptionPane.showMessageDialog(this, "Producto guardado con éxito.");
-            actualizarTabla(st.getProductos());
+            if (txtId.getText().equals("Auto")){
+                st.crearProducto(nombre, desc, stock, stock, cat);
+                javax.swing.JOptionPane.showMessageDialog(this, "Producto guardado con éxito.");
+                actualizarTabla(st.getProductos());
+                
+            }else{
+                String strId = txtId.getText();
+                int id = Integer.parseInt(strId);
+                int filaSeleccionada = tblProductos.getSelectedRow();
+                st.actualizarProducto(nombre, desc, precio, stock, cat, id);
+                modeloTabla.setValueAt(nombre, filaSeleccionada, 1);
+                modeloTabla.setValueAt(desc, filaSeleccionada, 2);
+                modeloTabla.setValueAt(precio, filaSeleccionada, 3);
+                modeloTabla.setValueAt(stock, filaSeleccionada, 4);
+                modeloTabla.setValueAt(cat, filaSeleccionada, 5);
+                javax.swing.JOptionPane.showMessageDialog(this, "Producto actualizado correctamente.");
+                actualizarTabla(st.getProductos());
+            }
+            
             limpiarCampos();
-
         } catch (NumberFormatException e) {
             javax.swing.JOptionPane.showMessageDialog(this, "Precio y Stock deben ser números válidos.", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
@@ -381,19 +391,30 @@ public class Dashboard extends BaseFrame {
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-    if (txtId.getText().equals("Auto") || txtId.getText().isEmpty()) {
+        
+        int filaSeleccionada = tblProductos.getSelectedRow();
+        
+        if (filaSeleccionada == -1) {
             javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para actualizar.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
-
-        try {
-            int id = Integer.parseInt(txtId.getText());
-            String nombre = txtNombre.getText().trim();
-            String desc = txtDescripcion.getText().trim();
-            double precio = Double.parseDouble(txtPrecio.getText().trim());
-            int stock = Integer.parseInt(txtStock.getText().trim());
-            Categorias cat = (Categorias) cbCategoria.getSelectedItem();
-
+        String id = modeloTabla.getValueAt(filaSeleccionada, 0).toString();
+        String nombre = modeloTabla.getValueAt(filaSeleccionada, 1).toString();
+        String desc = modeloTabla.getValueAt(filaSeleccionada, 2).toString();
+        String precio = modeloTabla.getValueAt(filaSeleccionada, 3).toString();
+        String stock = modeloTabla.getValueAt(filaSeleccionada, 4).toString();
+        Categorias cat = (Categorias) modeloTabla.getValueAt(filaSeleccionada, 5);
+        
+        txtId.setText(id);
+        txtNombre.setText(nombre);
+        txtDescripcion.setText(desc);
+        txtPrecio.setText(precio);
+        txtStock.setText(stock);
+        cbCategoria.setSelectedItem(cat);
+        
+        
+        /*try {
+            
             if (precio < 0 || stock < 0) {
                 javax.swing.JOptionPane.showMessageDialog(this, "El precio y stock no pueden ser negativos.", "Error de Validación", javax.swing.JOptionPane.ERROR_MESSAGE);
                 return;
@@ -407,7 +428,7 @@ public class Dashboard extends BaseFrame {
         } catch (NumberFormatException e) {
             javax.swing.JOptionPane.showMessageDialog(this, "Precio y Stock deben ser números válidos.", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
-    
+    */
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
@@ -469,6 +490,7 @@ public class Dashboard extends BaseFrame {
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnRestablecer;
     private javax.swing.JComboBox<String> cbCategoria;
+    private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -503,7 +525,7 @@ public class Dashboard extends BaseFrame {
                 p.getDescripcion(),
                 p.getPrecio(),
                 p.getStock(),
-                p.getCategoria()
+                p.getCategoria()    
             });
         }
     }

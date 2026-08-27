@@ -42,7 +42,7 @@ public class SistemaTienda implements Serializable{
         return null;
     }
 
-    public boolean actualizarProducto(int id, String nombre, String descripcion, double precio, int stock, Categorias categoria) {
+    public boolean actualizarProducto(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id) {
         Producto p = buscarPorId(id);
         if (p != null) {
             p.setNombre(nombre);
@@ -72,5 +72,10 @@ public class SistemaTienda implements Serializable{
             }
         }
         return resultado;
+    }
+    public void crearProducto(String nombre, String descrip, int precio, int stock, Categorias cat){
+        int nuevoId = this.generarSiguienteId();
+        Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
+        this.agregarProducto(nuevo);
     }
 }
