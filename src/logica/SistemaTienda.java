@@ -3,6 +3,11 @@ package logica;
 import entidades.Administrador;
 import entidades.Categorias;
 import entidades.Producto;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
@@ -72,5 +77,33 @@ public class SistemaTienda implements Serializable{
             }
         }
         return resultado;
+    }
+    
+    public void guardarDatos() { //serializar, guardar datos
+    try {
+        ObjectOutputStream salida = new ObjectOutputStream(
+                new FileOutputStream("datosPoriStore.dat"));
+
+        salida.writeObject(this);
+        salida.close();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    }
+    
+    public static SistemaTienda cargarDatos() {  //cargar datos
+    try {
+        ObjectInputStream entrada = new ObjectInputStream(
+                new FileInputStream("datosPoriStore.dat"));
+
+        SistemaTienda sistema = (SistemaTienda) entrada.readObject();
+
+        entrada.close();
+        return sistema;
+
+    } catch (Exception e) {
+        return new SistemaTienda(); 
+    }
     }
 }

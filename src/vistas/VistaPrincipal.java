@@ -42,13 +42,18 @@ public class VistaPrincipal extends BaseFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Pori Store");
         setBackground(new java.awt.Color(255, 0, 51));
         setBounds(new java.awt.Rectangle(0, 0, 0, 0));
         setPreferredSize(new java.awt.Dimension(1280, 690));
         setResizable(false);
         setSize(new java.awt.Dimension(1280, 720));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(0, 0, 0));
@@ -173,6 +178,11 @@ public class VistaPrincipal extends BaseFrame {
         vistaDashboard.setVisible(true);
         vistaDashboard.setLocationRelativeTo(null);
     }//GEN-LAST:event_jLabel8MouseClicked
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        st.guardarDatos();
+        System.exit(0);
+    }//GEN-LAST:event_formWindowClosing
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
