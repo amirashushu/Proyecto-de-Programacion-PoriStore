@@ -73,9 +73,92 @@ public class SistemaTienda implements Serializable{
         }
         return resultado;
     }
-    public void crearProducto(String nombre, String descrip, int precio, int stock, Categorias cat){
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
         int nuevoId = this.generarSiguienteId();
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
         this.agregarProducto(nuevo);
+    }
+
+// Calculos
+
+    public double calcularPrecioPromedio(String categoria) {
+        List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
+        if (productosDeCategoria.isEmpty()) {
+            return 0.0;
+        }
+        double sumaPrecios = 0;
+        for (Producto producto : productosDeCategoria) {
+            sumaPrecios += producto.getPrecio();
+        }
+        int cantidad = productosDeCategoria.size();
+        return sumaPrecios / cantidad;
+    }
+
+
+    public Producto obtenerProductoMenorStock(String categoria) {
+        List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
+        if (productosDeCategoria.isEmpty()) {
+            return null;
+        }
+        Producto productoMenorStock = productosDeCategoria.get(0);
+
+        for (Producto producto : productosDeCategoria) {
+            if (producto.getStock() < productoMenorStock.getStock()) {
+                productoMenorStock = producto; 
+            }
+        }
+        return productoMenorStock;
+    }
+
+
+    public double calcularValorTotalInventario() {
+        double total = 0;
+        for (Producto producto : inventario) {
+            double valorProducto = producto.getPrecio() * producto.getStock();
+            total += valorProducto;
+        }
+        return total;
+    }
+
+
+    private List<Producto> filtrarPorCategoria(String categoria) {
+        if (categoria.equals("Todas")) {
+            return new ArrayList<>(inventario);
+        }
+        List<Producto> productosFiltrados = new ArrayList<>();
+        Categorias categoriaEnum = Categorias.valueOf(categoria);
+
+        for (Producto producto : inventario) {
+            if (producto.getCategoria() == categoriaEnum) {
+                productosFiltrados.add(producto);
+            }
+        }
+
+        return productosFiltrados;
+    }
+
+
+    public List<Producto> filtrarPorPrecio(double precioMin, double precioMax) {
+        List<Producto> productosFiltrados = new ArrayList<>();
+
+        for (Producto producto : inventario) {
+            double precio = producto.getPrecio();
+
+            boolean dentroDeLimites = true;
+
+            if (precioMin > 0 && precio < precioMin) {
+                dentroDeLimites = false;
+            }
+
+            if (precioMax > 0 && precio > precioMax) {
+                dentroDeLimites = false;
+            }
+
+            if (dentroDeLimites) {
+                productosFiltrados.add(producto);
+            }
+        }
+
+        return productosFiltrados;
     }
 }
