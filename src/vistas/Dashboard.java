@@ -24,7 +24,7 @@ public class Dashboard extends BaseFrame {
 
     // Llenar JComboBox con la enumeración o valores de Categorias
     cbCategoria.setModel(new javax.swing.DefaultComboBoxModel(Categorias.values()));
-
+    
     actualizarTabla(st.getProductos());
 }
     @SuppressWarnings("unchecked")
@@ -262,7 +262,7 @@ public class Dashboard extends BaseFrame {
                 return canEdit [columnIndex];
             }
         });
-        tblProductos.setColumnSelectionAllowed(true);
+        tblProductos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(tblProductos);
         tblProductos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
@@ -413,22 +413,6 @@ public class Dashboard extends BaseFrame {
         cbCategoria.setSelectedItem(cat);
         
         
-        /*try {
-            
-            if (precio < 0 || stock < 0) {
-                javax.swing.JOptionPane.showMessageDialog(this, "El precio y stock no pueden ser negativos.", "Error de Validación", javax.swing.JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
-            if (st.actualizarProducto(id, nombre, desc, precio, stock, cat)) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Producto actualizado correctamente.");
-                actualizarTabla(st.getProductos());
-                limpiarCampos();
-            }
-        } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Precio y Stock deben ser números válidos.", "Error de Formato", javax.swing.JOptionPane.ERROR_MESSAGE);
-        }
-    */
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed

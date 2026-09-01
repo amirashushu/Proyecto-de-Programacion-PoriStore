@@ -6,11 +6,12 @@ import entidades.Producto;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
+import java.util.HashMap;
 
 public class SistemaTienda implements Serializable{
     private ArrayList<Producto> inventario;
     private Administrador admin;
-    
+    private HashMap<String,Administrador> cuentas = new HashMap<>();
     
 
     public SistemaTienda() {
@@ -77,5 +78,20 @@ public class SistemaTienda implements Serializable{
         int nuevoId = this.generarSiguienteId();
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
         this.agregarProducto(nuevo);
+    }
+    public boolean registrarse(String correo, String contraseña, String nombre){
+        if (cuentas.containsKey(correo)){
+           return false;  
+        }else{
+            Administrador admin = new Administrador(nombre, contraseña, correo);
+            cuentas.put(correo, admin);
+            return true;
+        }
+    }
+    public boolean iniciarSesion(String correo, String contraseña){
+        if (cuentas.containsKey(correo)){
+        return cuentas.get(correo).validarContraseña(contraseña);
+        }
+        return false;
     }
 }
