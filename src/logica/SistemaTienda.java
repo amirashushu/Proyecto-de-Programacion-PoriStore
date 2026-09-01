@@ -84,7 +84,6 @@ public class SistemaTienda implements Serializable{
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
         this.agregarProducto(nuevo);
     }
-<<<<<<< HEAD
     public boolean registrarse(String correo, String contraseña, String nombre){
         if (cuentas.containsKey(correo)){
            return false;  
@@ -99,7 +98,6 @@ public class SistemaTienda implements Serializable{
         return cuentas.get(correo).validarContraseña(contraseña);
         }
         return false;
-=======
 
 // Calculos
 
@@ -210,6 +208,5 @@ public class SistemaTienda implements Serializable{
     } catch (Exception e) {
         return new SistemaTienda(); 
     }
->>>>>>> b419411998a154007fa2d3e27e1f9ed81d0053fe
     }
 }
