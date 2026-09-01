@@ -1000,6 +1000,26 @@ public class Dashboard extends BaseFrame {
         int totalProductos = st.getProductos().size();
         jLabel21.setText("Total Productos: " + totalProductos);
     }
+    
+    // Actualizar paneles superiores con estadisticas en tiempo real
+    private void actualizarPanelesSuperiores() {
+        // Panel 1 Total de productos
+        int totalProductos = st.getProductos().size();
+        jLabel22.setText(String.valueOf(totalProductos));
+
+        // Panel 2 Valor total del inventario
+        String valorTotal = st.obtenerValorTotalFormateado();
+        jLabel24.setText(valorTotal);
+
+        // Panel 3 Productos con stock critico (menos de 10 unidades)
+        int stockCritico = 0;
+        for (Producto p : st.getProductos()) {
+            if (p.getStock() < 10) {
+                stockCritico++;
+            }
+        }
+        jLabel27.setText(String.valueOf(stockCritico));
+    }
 
     public void actualizarTabla(List<Producto> lista) {
         modeloTabla.setRowCount(0);
@@ -1014,5 +1034,7 @@ public class Dashboard extends BaseFrame {
             });
         }
         actualizarReportes();
+        actualizarPanelesSuperiores();
+
     }
 }
