@@ -23,15 +23,11 @@ public class Dashboard extends BaseFrame {
     txtId.setEditable(false); // ID autogenerado, no editable por el usuario
 
     cbCategoria.setModel(new javax.swing.DefaultComboBoxModel(Categorias.values()));
-<<<<<<< HEAD
-    
-=======
 
     cargarCategoriasEnReportes();
 
     cbReportCategoria.addActionListener(evt -> actualizarReportes());
 
->>>>>>> b419411998a154007fa2d3e27e1f9ed81d0053fe
     actualizarTabla(st.getProductos());
     actualizarReportes();
 }
@@ -479,15 +475,14 @@ public class Dashboard extends BaseFrame {
                 return canEdit [columnIndex];
             }
         });
-<<<<<<< HEAD
+
         tblProductos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-=======
         tblProductos.setColumnSelectionAllowed(true);
         tblProductos.setGridColor(new java.awt.Color(60, 60, 60));
         tblProductos.setRowHeight(30);
         tblProductos.setSelectionBackground(new java.awt.Color(255, 0, 51));
         tblProductos.setSelectionForeground(new java.awt.Color(255, 255, 255));
->>>>>>> b419411998a154007fa2d3e27e1f9ed81d0053fe
+
         jScrollPane1.setViewportView(tblProductos);
         tblProductos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
@@ -805,11 +800,7 @@ public class Dashboard extends BaseFrame {
         txtPrecio.setText(precio);
         txtStock.setText(stock);
         cbCategoria.setSelectedItem(cat);
-<<<<<<< HEAD
-        
-        
-=======
->>>>>>> b419411998a154007fa2d3e27e1f9ed81d0053fe
+
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed

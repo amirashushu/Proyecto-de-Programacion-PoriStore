@@ -98,8 +98,9 @@ public class SistemaTienda implements Serializable{
         return cuentas.get(correo).validarContraseña(contraseña);
         }
         return false;
-
+    }
 // Calculos
+
 
     public double calcularPrecioPromedio(String categoria) {
         List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
