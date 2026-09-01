@@ -3,6 +3,11 @@ package logica;
 import entidades.Administrador;
 import entidades.Categorias;
 import entidades.Producto;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
@@ -74,11 +79,12 @@ public class SistemaTienda implements Serializable{
         }
         return resultado;
     }
-    public void crearProducto(String nombre, String descrip, int precio, int stock, Categorias cat){
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
         int nuevoId = this.generarSiguienteId();
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
         this.agregarProducto(nuevo);
     }
+<<<<<<< HEAD
     public boolean registrarse(String correo, String contraseña, String nombre){
         if (cuentas.containsKey(correo)){
            return false;  
@@ -93,5 +99,117 @@ public class SistemaTienda implements Serializable{
         return cuentas.get(correo).validarContraseña(contraseña);
         }
         return false;
+=======
+
+// Calculos
+
+    public double calcularPrecioPromedio(String categoria) {
+        List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
+        if (productosDeCategoria.isEmpty()) {
+            return 0.0;
+        }
+        double sumaPrecios = 0;
+        for (Producto producto : productosDeCategoria) {
+            sumaPrecios += producto.getPrecio();
+        }
+        int cantidad = productosDeCategoria.size();
+        return sumaPrecios / cantidad;
+    }
+
+
+    public Producto obtenerProductoMenorStock(String categoria) {
+        List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
+        if (productosDeCategoria.isEmpty()) {
+            return null;
+        }
+        Producto productoMenorStock = productosDeCategoria.get(0);
+
+        for (Producto producto : productosDeCategoria) {
+            if (producto.getStock() < productoMenorStock.getStock()) {
+                productoMenorStock = producto; 
+            }
+        }
+        return productoMenorStock;
+    }
+
+
+    public double calcularValorTotalInventario() {
+        double total = 0;
+        for (Producto producto : inventario) {
+            double valorProducto = producto.getPrecio() * producto.getStock();
+            total += valorProducto;
+        }
+        return total;
+    }
+
+
+    private List<Producto> filtrarPorCategoria(String categoria) {
+        if (categoria.equals("Todas")) {
+            return new ArrayList<>(inventario);
+        }
+        List<Producto> productosFiltrados = new ArrayList<>();
+        Categorias categoriaEnum = Categorias.valueOf(categoria);
+
+        for (Producto producto : inventario) {
+            if (producto.getCategoria() == categoriaEnum) {
+                productosFiltrados.add(producto);
+            }
+        }
+
+        return productosFiltrados;
+    }
+
+
+    public List<Producto> filtrarPorPrecio(double precioMin, double precioMax) {
+        List<Producto> productosFiltrados = new ArrayList<>();
+
+        for (Producto producto : inventario) {
+            double precio = producto.getPrecio();
+
+            boolean dentroDeLimites = true;
+
+            if (precioMin > 0 && precio < precioMin) {
+                dentroDeLimites = false;
+            }
+
+            if (precioMax > 0 && precio > precioMax) {
+                dentroDeLimites = false;
+            }
+
+            if (dentroDeLimites) {
+                productosFiltrados.add(producto);
+            }
+        }
+
+        return productosFiltrados;
+    }
+    
+    public void guardarDatos() { //serializar, guardar datos
+    try {
+        ObjectOutputStream salida = new ObjectOutputStream(
+                new FileOutputStream("datosPoriStore.dat"));
+
+        salida.writeObject(this);
+        salida.close();
+
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    }
+    
+    public static SistemaTienda cargarDatos() {  //cargar datos
+    try {
+        ObjectInputStream entrada = new ObjectInputStream(
+                new FileInputStream("datosPoriStore.dat"));
+
+        SistemaTienda sistema = (SistemaTienda) entrada.readObject();
+
+        entrada.close();
+        return sistema;
+
+    } catch (Exception e) {
+        return new SistemaTienda(); 
+    }
+>>>>>>> b419411998a154007fa2d3e27e1f9ed81d0053fe
     }
 }

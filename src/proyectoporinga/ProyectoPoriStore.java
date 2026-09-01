@@ -6,7 +6,7 @@ import vistas.VistaPrincipal;
 public class ProyectoPoriStore {
 
     public static void main(String[] args) {
-        SistemaTienda sistema = new SistemaTienda();
+        SistemaTienda sistema = SistemaTienda.cargarDatos();
         java.awt.EventQueue.invokeLater(() -> {
             VistaPrincipal vista = new VistaPrincipal(sistema);
             vista.setLocationRelativeTo(null); 
