@@ -11,7 +11,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
+import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class SistemaTienda implements Serializable{
     private ArrayList<Producto> inventario;
@@ -84,6 +86,8 @@ public class SistemaTienda implements Serializable{
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
         this.agregarProducto(nuevo);
     }
+   
+    
     public boolean registrarse(String correo, String contraseña, String nombre){
         if (cuentas.containsKey(correo)){
            return false;  
@@ -101,7 +105,13 @@ public class SistemaTienda implements Serializable{
     }
 // Calculos
 
-
+    
+    public String obtenerValorTotalFormateado() {
+        double total = calcularValorTotalInventario();
+        NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(new Locale("es", "CL"));
+        return formatoMoneda.format(total);
+    }
+    
     public double calcularPrecioPromedio(String categoria) {
         List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
         if (productosDeCategoria.isEmpty()) {
@@ -142,7 +152,7 @@ public class SistemaTienda implements Serializable{
     }
 
 
-    private List<Producto> filtrarPorCategoria(String categoria) {
+    public List<Producto> filtrarPorCategoria(String categoria) {
         if (categoria.equals("Todas")) {
             return new ArrayList<>(inventario);
         }
@@ -183,6 +193,7 @@ public class SistemaTienda implements Serializable{
         return productosFiltrados;
     }
     
+    
     public void guardarDatos() { //serializar, guardar datos
     try {
         ObjectOutputStream salida = new ObjectOutputStream(
@@ -210,4 +221,5 @@ public class SistemaTienda implements Serializable{
         return new SistemaTienda(); 
     }
     }
+    
 }

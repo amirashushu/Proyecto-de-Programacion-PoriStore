@@ -68,5 +68,5 @@ public class Producto implements Serializable{
     public void setCategoria(Categorias categoria) {
         this.categoria = categoria;
     }
-
+    
 }
