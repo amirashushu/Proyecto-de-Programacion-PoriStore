@@ -142,6 +142,16 @@ public class SistemaTienda implements Serializable{
         }
         return total;
     }
+    
+    public int calcularTotalProductos(){
+        int cant = 0;
+        if(inventario.isEmpty()){
+            return cant;
+        } else {
+            cant = inventario.size();
+            return cant;
+        }
+    }
 
 
     public List<Producto> filtrarPorCategoria(String categoria) {
@@ -159,6 +169,7 @@ public class SistemaTienda implements Serializable{
 
         return productosFiltrados;
     }
+    
 
 
     public List<Producto> filtrarPorPrecio(double precioMin, double precioMax) {
