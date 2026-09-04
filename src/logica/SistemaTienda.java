@@ -86,6 +86,8 @@ public class SistemaTienda implements Serializable{
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
         this.agregarProducto(nuevo);
     }
+   
+    
     public boolean registrarse(String correo, String contraseña, String nombre){
         if (cuentas.containsKey(correo)){
            return false;  
@@ -150,7 +152,7 @@ public class SistemaTienda implements Serializable{
     }
 
 
-    private List<Producto> filtrarPorCategoria(String categoria) {
+    public List<Producto> filtrarPorCategoria(String categoria) {
         if (categoria.equals("Todas")) {
             return new ArrayList<>(inventario);
         }
@@ -219,4 +221,5 @@ public class SistemaTienda implements Serializable{
         return new SistemaTienda(); 
     }
     }
+    
 }
