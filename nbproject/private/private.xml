@@ -4,8 +4,10 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/cristobal/Desktop/ICC/Semestre%204/Proyecto%20De%20Programación/Proyecto-de-Programacion-PoriStore/src/entidades/Administrador.java</file>
-            <file>file:/Users/cristobal/Desktop/ICC/Semestre%204/Proyecto%20De%20Programación/Proyecto-de-Programacion-PoriStore/src/vistas/VistaLogin.java</file>
             <file>file:/Users/cristobal/Desktop/ICC/Semestre%204/Proyecto%20De%20Programación/Proyecto-de-Programacion-PoriStore/src/vistas/Dashboard.java</file>
+            <file>file:/Users/cristobal/Desktop/ICC/Semestre%204/Proyecto%20De%20Programación/Proyecto-de-Programacion-PoriStore/src/logica/SistemaTienda.java</file>
+            <file>file:/Users/cristobal/Desktop/ICC/Semestre%204/Proyecto%20De%20Programación/Proyecto-de-Programacion-PoriStore/src/vistas/VistaLogin.java</file>
+            <file>file:/Users/cristobal/Desktop/ICC/Semestre%204/Proyecto%20De%20Programación/Proyecto-de-Programacion-PoriStore/src/entidades/Producto.java</file>
         </group>
     </open-files>
 </project-private>
