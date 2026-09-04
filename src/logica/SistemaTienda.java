@@ -97,7 +97,7 @@ public class SistemaTienda implements Serializable{
     }
     public boolean iniciarSesion(String correo, String contraseña){
         if (cuentas.containsKey(correo)){
-        return cuentas.get(correo).validarContraseña(contraseña);
+            return cuentas.get(correo).validarContraseña(contraseña);
         }
         return false;
     }

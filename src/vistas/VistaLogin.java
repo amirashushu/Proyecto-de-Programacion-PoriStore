@@ -232,8 +232,13 @@ public class VistaLogin extends BaseFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Por favor complete todos los campos.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
-        st.iniciarSesion(correo, contraseña);
-        javax.swing.JOptionPane.showMessageDialog(this, "Iniciando sesion...");
+        
+        if (st.iniciarSesion(correo, contraseña)){
+            javax.swing.JOptionPane.showMessageDialog(this, "Iniciando sesion...");
+        }else{
+            javax.swing.JOptionPane.showMessageDialog(this, "Contraseña o correo incorrecto", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+        
         
     }//GEN-LAST:event_btnEntrarActionPerformed
 
