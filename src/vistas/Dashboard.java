@@ -2,34 +2,36 @@ package vistas;
 
 import entidades.Categorias;
 import entidades.Producto;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.List;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import logica.SistemaTienda;
 
 
-public class Dashboard extends BaseFrame {
+public final class Dashboard extends BaseFrame {
 
-    private DefaultTableModel modeloTabla;
-
+    private final DefaultTableModel modeloTabla;
     public Dashboard(SistemaTienda st) {
-    super(st);
-    initComponents();
-    this.setLocationRelativeTo(null);
-    this.modeloTabla = (DefaultTableModel) tblProductos.getModel();
-
-    txtId.setText("Auto");
-    txtId.setEditable(false); // ID autogenerado, no editable por el usuario
-
-    cbCategoria.setModel(new javax.swing.DefaultComboBoxModel(Categorias.values()));
-
-    cargarCategoriasEnReportes();
-
-    cbReportCategoria.addActionListener(evt -> actualizarReportes());
-
-    actualizarTabla(st.getProductos());
-    actualizarReportes();
+        super(st);
+        initComponents();
+        this.setLocationRelativeTo(null);
+        this.modeloTabla = (DefaultTableModel) tblProductos.getModel();
+        txtId.setText("Auto");
+        txtId.setEditable(false); // ID autogenerado, no editable por el usuario
+        cbCategoria.setModel(new javax.swing.DefaultComboBoxModel(Categorias.values()));
+        cargarCategoriasEnReportes();
+        cbReportCategoria.addActionListener(evt -> actualizarReportes());
+        cargarCategoriasEnOrden();
+        deshabilitarCategorias();
+        actualizarTabla(st.getProductos());
+        actualizarReportes();
 }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -93,6 +95,9 @@ public class Dashboard extends BaseFrame {
         jLabel21 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
+        jLabel26 = new javax.swing.JLabel();
+        cbOrden = new javax.swing.JComboBox<>();
+        btnFiltroCat = new javax.swing.JButton();
 
         jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 0, 51));
@@ -175,7 +180,7 @@ public class Dashboard extends BaseFrame {
                 .addComponent(jLabel23)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         jPanel7.setBackground(new java.awt.Color(30, 30, 30));
@@ -209,7 +214,7 @@ public class Dashboard extends BaseFrame {
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel24)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel8.setBackground(new java.awt.Color(30, 30, 30));
@@ -243,7 +248,7 @@ public class Dashboard extends BaseFrame {
                 .addComponent(jLabel28)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel27)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
@@ -475,14 +480,11 @@ public class Dashboard extends BaseFrame {
                 return canEdit [columnIndex];
             }
         });
-
-        tblProductos.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tblProductos.setColumnSelectionAllowed(true);
         tblProductos.setGridColor(new java.awt.Color(60, 60, 60));
         tblProductos.setRowHeight(30);
         tblProductos.setSelectionBackground(new java.awt.Color(255, 0, 51));
         tblProductos.setSelectionForeground(new java.awt.Color(255, 255, 255));
-
         jScrollPane1.setViewportView(tblProductos);
         tblProductos.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
@@ -514,7 +516,7 @@ public class Dashboard extends BaseFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(29, Short.MAX_VALUE))
+                .addContainerGap(63, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -579,10 +581,10 @@ public class Dashboard extends BaseFrame {
         jLabel16.setText("Seleccionar Categoría:");
 
         cbReportCategoria.setBackground(new java.awt.Color(30, 30, 30));
-        cbReportCategoria.setEditable(true);
         cbReportCategoria.setForeground(new java.awt.Color(240, 240, 240));
         cbReportCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         cbReportCategoria.setPreferredSize(new java.awt.Dimension(72, 30));
+        cbReportCategoria.addActionListener(this::cbReportCategoriaActionPerformed);
 
         jLabel17.setBackground(new java.awt.Color(220, 20, 60));
         jLabel17.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
@@ -610,15 +612,38 @@ public class Dashboard extends BaseFrame {
 
         jSeparator2.setForeground(new java.awt.Color(50, 50, 50));
 
+        jLabel26.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
+        jLabel26.setForeground(new java.awt.Color(255, 0, 51));
+        jLabel26.setText("Filtrar por Categoria");
+
+        cbOrden.setBackground(new java.awt.Color(30, 30, 30));
+        cbOrden.setForeground(new java.awt.Color(240, 240, 240));
+        cbOrden.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbOrden.addActionListener(this::cbOrdenActionPerformed);
+
+        btnFiltroCat.setBackground(new java.awt.Color(139, 0, 0));
+        btnFiltroCat.setFont(new java.awt.Font("Helvetica Neue", 1, 12)); // NOI18N
+        btnFiltroCat.setForeground(new java.awt.Color(255, 255, 255));
+        btnFiltroCat.setText("Aplicar Filtro");
+        btnFiltroCat.addActionListener(this::btnFiltroCatActionPerformed);
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSeparator1)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(jPanel4Layout.createSequentialGroup()
+                    .addComponent(jLabel12)
+                    .addComponent(jLabel20)
+                    .addComponent(jLabel21)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel26)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(btnFiltroCat, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(cbOrden, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel4Layout.createSequentialGroup()
                             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel13)
                                 .addComponent(txtPrecioMin, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -626,19 +651,14 @@ public class Dashboard extends BaseFrame {
                             .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jLabel14)
                                 .addComponent(txtPrecioMax, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addComponent(btnFiltrarPrecio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel16)
-                        .addComponent(jLabel15)
-                        .addComponent(jLabel17)
-                        .addComponent(jLabel18)
-                        .addComponent(cbReportCategoria, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel19))
-                    .addComponent(jLabel12)
-                    .addComponent(jLabel20)
-                    .addComponent(jLabel21)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(22, Short.MAX_VALUE))
+                        .addComponent(btnFiltrarPrecio, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel16, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel17, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel18, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(cbReportCategoria, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel19, javax.swing.GroupLayout.Alignment.LEADING)))
+                .addContainerGap(123, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -655,36 +675,42 @@ public class Dashboard extends BaseFrame {
                     .addComponent(txtPrecioMax, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnFiltrarPrecio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(53, 53, 53)
+                .addGap(18, 18, 18)
+                .addComponent(jLabel26)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cbOrden, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(12, 12, 12)
+                .addComponent(btnFiltroCat, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(22, 22, 22)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel15)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel16)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(cbReportCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel17)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel18)
-                .addGap(48, 48, 48)
+                .addGap(18, 18, 18)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel12)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel20)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel21)
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(71, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1616, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1711, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap(46, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(Formulario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -696,9 +722,9 @@ public class Dashboard extends BaseFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 680, Short.MAX_VALUE)
                     .addComponent(Formulario, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(53, 53, 53))
@@ -710,7 +736,7 @@ public class Dashboard extends BaseFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 1616, Short.MAX_VALUE)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 1711, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -884,6 +910,19 @@ public class Dashboard extends BaseFrame {
         }
     }//GEN-LAST:event_btnFiltrarPrecioActionPerformed
 
+    private void cbReportCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbReportCategoriaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbReportCategoriaActionPerformed
+
+    private void cbOrdenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbOrdenActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbOrdenActionPerformed
+
+    private void btnFiltroCatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltroCatActionPerformed
+        List<Producto> productosFiltrados = st.filtrarPorCategoria(cbOrden.getSelectedItem().toString());
+        actualizarTabla(productosFiltrados);
+    }//GEN-LAST:event_btnFiltroCatActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Formulario;
@@ -891,10 +930,12 @@ public class Dashboard extends BaseFrame {
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnFiltrarPrecio;
+    private javax.swing.JButton btnFiltroCat;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnRestablecer;
     private javax.swing.JComboBox<String> cbCategoria;
+    private javax.swing.JComboBox<String> cbOrden;
     private javax.swing.JComboBox<String> cbReportCategoria;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;
@@ -915,6 +956,7 @@ public class Dashboard extends BaseFrame {
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
+    private javax.swing.JLabel jLabel26;
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel3;
@@ -959,7 +1001,18 @@ public class Dashboard extends BaseFrame {
         }
         cbReportCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(opcionesReporte));
     }
-
+    
+    private void cargarCategoriasEnOrden() {
+        Categorias[] todasLasCategorias = Categorias.values();
+        int cantidadCategorias = todasLasCategorias.length;
+        String[] opcionesReporte = new String[cantidadCategorias + 1];
+        opcionesReporte[0] = "Todas";
+        for (int i = 0; i < cantidadCategorias; i++) {
+            String nombreCategoria = todasLasCategorias[i].toString();
+            opcionesReporte[i + 1] = nombreCategoria;
+        }
+        cbOrden.setModel(new javax.swing.DefaultComboBoxModel<>(opcionesReporte));
+    }
     private void limpiarCampos() {
         txtId.setText("Auto");
         txtNombre.setText("");
@@ -1014,5 +1067,54 @@ public class Dashboard extends BaseFrame {
             });
         }
         actualizarReportes();
+    }
+    private boolean revisarStock(String nombreCategoria){
+        if (nombreCategoria.equals("Todos")){
+            return true;
+        }
+        List<Producto> productos = st.filtrarPorCategoria(nombreCategoria);
+        for (Producto p: productos){
+            if (p.getStock()!= 0){
+                return true;
+            }
+        }
+        return false;
+    }
+    private void deshabilitarCategorias(){
+        cbOrden.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus){
+                Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value != null) {
+                    String nombreCategoria = value.toString();
+                    if (!"Todas".equals(nombreCategoria) && !revisarStock(nombreCategoria) ){
+                        c.setForeground(Color.LIGHT_GRAY);
+                        c.setBackground(Color.DARK_GRAY);
+                        ((JLabel) c).setText(nombreCategoria + " (Sin stock)");
+                    }else{
+                        c.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
+                        c.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+                        ((JLabel) c).setText(nombreCategoria);
+                    }
+                } 
+                return c;      
+            }
+        });
+        cbOrden.addActionListener(e -> {
+            Object item = cbOrden.getSelectedItem();
+            if (item == null) return;
+            String nombreCategoria= item.toString();
+
+            if (!"Todas".equals(nombreCategoria) && !revisarStock(nombreCategoria) ){
+                cbOrden.setSelectedIndex(0);
+                javax.swing.JOptionPane.showMessageDialog(
+                this,
+                "La categoría '" + nombreCategoria + "' no tiene stock disponible.",
+                "Categoría sin stock",
+                javax.swing.JOptionPane.WARNING_MESSAGE
+                );
+            }
+            
+        });
     }
 }

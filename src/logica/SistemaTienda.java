@@ -144,7 +144,7 @@ public class SistemaTienda implements Serializable{
     }
 
 
-    private List<Producto> filtrarPorCategoria(String categoria) {
+    public List<Producto> filtrarPorCategoria(String categoria) {
         if (categoria.equals("Todas")) {
             return new ArrayList<>(inventario);
         }
@@ -212,4 +212,5 @@ public class SistemaTienda implements Serializable{
         return new SistemaTienda(); 
     }
     }
+    
 }
