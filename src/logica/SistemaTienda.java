@@ -11,7 +11,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
+import java.text.NumberFormat;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class SistemaTienda implements Serializable{
     private ArrayList<Producto> inventario;
@@ -103,7 +105,13 @@ public class SistemaTienda implements Serializable{
     }
 // Calculos
 
-
+    
+    public String obtenerValorTotalFormateado() {
+        double total = calcularValorTotalInventario();
+        NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(new Locale("es", "CL"));
+        return formatoMoneda.format(total);
+    }
+    
     public double calcularPrecioPromedio(String categoria) {
         List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
         if (productosDeCategoria.isEmpty()) {
@@ -184,6 +192,7 @@ public class SistemaTienda implements Serializable{
 
         return productosFiltrados;
     }
+    
     
     public void guardarDatos() { //serializar, guardar datos
     try {
