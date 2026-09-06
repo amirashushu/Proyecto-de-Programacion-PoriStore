@@ -5,8 +5,10 @@ import entidades.Producto;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -32,6 +34,8 @@ public final class Dashboard extends BaseFrame {
         deshabilitarCategorias();
         actualizarTabla(st.getProductos());
         actualizarReportes();
+        configurarTabla();
+        configurarBusquedaEnTiempoReal();
 }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -787,15 +791,17 @@ public final class Dashboard extends BaseFrame {
                 return;
             }
             if (txtId.getText().equals("Auto")){
-                st.crearProducto(nombre, desc, precio, stock, cat); // FIX: precio, no stock
+                st.crearProducto(nombre, desc, precio, stock, cat);
+                st.guardarDatos();
                 javax.swing.JOptionPane.showMessageDialog(this, "Producto guardado con éxito.");
                 actualizarTabla(st.getProductos());
-                
+
             }else{
                 String strId = txtId.getText();
                 int id = Integer.parseInt(strId);
                 int filaSeleccionada = tblProductos.getSelectedRow();
                 st.actualizarProducto(nombre, desc, precio, stock, cat, id);
+                st.guardarDatos(); // Guardado automatico
                 modeloTabla.setValueAt(nombre, filaSeleccionada, 1);
                 modeloTabla.setValueAt(desc, filaSeleccionada, 2);
                 modeloTabla.setValueAt(precio, filaSeleccionada, 3);
@@ -873,6 +879,7 @@ public final class Dashboard extends BaseFrame {
         int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro de eliminar el producto \"" + nombre + "\"?", "Confirmar Eliminación", javax.swing.JOptionPane.YES_NO_OPTION);
         if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
             st.eliminarProducto(id);
+            st.guardarDatos(); //Guardado automatico
             actualizarTabla(st.getProductos());
             limpiarCampos();
         }
@@ -1044,9 +1051,12 @@ public final class Dashboard extends BaseFrame {
             return;
         }
 
+        // Formateador de moneda chilena (CLP)
+        NumberFormat formatoCLP = NumberFormat.getCurrencyInstance(new Locale("es", "CL"));
+
         // Precio promedio
         double precioPromedio = st.calcularPrecioPromedio(categoriaSeleccionada);
-        jLabel17.setText(String.format("Precio Promedio: $%.2f", precioPromedio));
+        jLabel17.setText("Precio Promedio: " + formatoCLP.format(precioPromedio));
 
         // Encontrar producto con menor stock
         Producto productoMenorStock = st.obtenerProductoMenorStock(categoriaSeleccionada);
@@ -1065,21 +1075,52 @@ public final class Dashboard extends BaseFrame {
         // calculo total de inventario
         jLabel24.setText("$"+Double.toString(st.calcularValorTotalInventario()));
         jLabel20.setText("Valor Total Inventario: $" + Double.toString(st.calcularValorTotalInventario()));           
+        // Calcular total de inventario
+        double valorTotal = st.calcularValorTotalInventario();
+        jLabel20.setText("Valor Total Inventario: " + formatoCLP.format(valorTotal));
+
+        // Contar total de productos
+        int totalProductos = st.getProductos().size();
+        jLabel21.setText("Total Productos: " + totalProductos);
+    }
+    
+    // Actualizar paneles superiores con estadisticas en tiempo real
+    private void actualizarPanelesSuperiores() {
+        // Panel 1 Total de productos
+        int totalProductos = st.getProductos().size();
+        jLabel22.setText(String.valueOf(totalProductos));
+
+        // Panel 2 Valor total del inventario
+        String valorTotal = st.obtenerValorTotalFormateado();
+        jLabel24.setText(valorTotal);
+
+        // Panel 3 Productos con stock critico (menos de 10 unidades)
+        int stockCritico = 0;
+        for (Producto p : st.getProductos()) {
+            if (p.getStock() < 10) {
+                stockCritico++;
+            }
+        }
+        jLabel27.setText(String.valueOf(stockCritico));
     }
 
     public void actualizarTabla(List<Producto> lista) {
         modeloTabla.setRowCount(0);
+        NumberFormat formatoCLP = NumberFormat.getCurrencyInstance(new Locale("es", "CL"));
+
         for (Producto p : lista) {
             modeloTabla.addRow(new Object[]{
                 p.getId(),
                 p.getNombre(),
                 p.getDescripcion(),
-                p.getPrecio(),
+                formatoCLP.format(p.getPrecio()), 
                 p.getStock(),
                 p.getCategoria()
             });
         }
         actualizarReportes();
+        actualizarPanelesSuperiores();
+
     }
     private boolean revisarStock(String nombreCategoria){
         if (nombreCategoria.equals("Todos")){
@@ -1127,7 +1168,39 @@ public final class Dashboard extends BaseFrame {
                 javax.swing.JOptionPane.WARNING_MESSAGE
                 );
             }
-            
+
+        });
+    }
+    private void configurarTabla() {
+        // Habilitar ordenamiento por columnas
+        tblProductos.setAutoCreateRowSorter(true);
+    }
+
+    private void configurarBusquedaEnTiempoReal() {
+        txtBuscar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarEnTiempoReal();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarEnTiempoReal();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarEnTiempoReal();
+            }
+
+            private void filtrarEnTiempoReal() {
+                String criterio = txtBuscar.getText().trim();
+                if (criterio.isEmpty()) {
+                    actualizarTabla(st.getProductos());
+                } else {
+                    actualizarTabla(st.buscarPorNombre(criterio));
+                }
+            }
         });
     }
 }
