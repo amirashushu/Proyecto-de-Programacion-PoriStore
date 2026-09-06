@@ -34,6 +34,8 @@ public final class Dashboard extends BaseFrame {
         deshabilitarCategorias();
         actualizarTabla(st.getProductos());
         actualizarReportes();
+        configurarTabla();
+        configurarBusquedaEnTiempoReal();
 }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -782,8 +784,8 @@ public final class Dashboard extends BaseFrame {
                 return;
             }
             if (txtId.getText().equals("Auto")){
-                st.crearProducto(nombre, desc, precio, stock, cat); 
-                st.guardarDatos(); 
+                st.crearProducto(nombre, desc, precio, stock, cat);
+                st.guardarDatos();
                 javax.swing.JOptionPane.showMessageDialog(this, "Producto guardado con éxito.");
                 actualizarTabla(st.getProductos());
 
@@ -1084,12 +1086,14 @@ public final class Dashboard extends BaseFrame {
 
     public void actualizarTabla(List<Producto> lista) {
         modeloTabla.setRowCount(0);
+        NumberFormat formatoCLP = NumberFormat.getCurrencyInstance(new Locale("es", "CL"));
+
         for (Producto p : lista) {
             modeloTabla.addRow(new Object[]{
                 p.getId(),
                 p.getNombre(),
                 p.getDescripcion(),
-                p.getPrecio(),
+                formatoCLP.format(p.getPrecio()), 
                 p.getStock(),
                 p.getCategoria()
             });
@@ -1144,7 +1148,39 @@ public final class Dashboard extends BaseFrame {
                 javax.swing.JOptionPane.WARNING_MESSAGE
                 );
             }
-            
+
+        });
+    }
+    private void configurarTabla() {
+        // Habilitar ordenamiento por columnas
+        tblProductos.setAutoCreateRowSorter(true);
+    }
+
+    private void configurarBusquedaEnTiempoReal() {
+        txtBuscar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarEnTiempoReal();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarEnTiempoReal();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarEnTiempoReal();
+            }
+
+            private void filtrarEnTiempoReal() {
+                String criterio = txtBuscar.getText().trim();
+                if (criterio.isEmpty()) {
+                    actualizarTabla(st.getProductos());
+                } else {
+                    actualizarTabla(st.buscarPorNombre(criterio));
+                }
+            }
         });
     }
 }
