@@ -92,8 +92,8 @@ public class SistemaTienda implements Serializable{
         if (cuentas.containsKey(correo)){
            return false;  
         }else{
-            Administrador admin = new Administrador(nombre, contraseña, correo);
-            cuentas.put(correo, admin);
+            Administrador a = new Administrador(nombre, contraseña, correo);
+            cuentas.put(correo, a);
             return true;
         }
     }
