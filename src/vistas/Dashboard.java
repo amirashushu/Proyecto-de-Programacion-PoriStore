@@ -835,9 +835,10 @@ public final class Dashboard extends BaseFrame {
         String id = modeloTabla.getValueAt(filaSeleccionada, 0).toString();
         String nombre = modeloTabla.getValueAt(filaSeleccionada, 1).toString();
         String desc = modeloTabla.getValueAt(filaSeleccionada, 2).toString();
-        String precio = modeloTabla.getValueAt(filaSeleccionada, 3).toString();
+        String ConFormatoPrecio = modeloTabla.getValueAt(filaSeleccionada, 3).toString();
         String stock = modeloTabla.getValueAt(filaSeleccionada, 4).toString();
         Categorias cat = (Categorias) modeloTabla.getValueAt(filaSeleccionada, 5);
+        String precio = ConFormatoPrecio.replace("$", "").replace(".", "").trim();
         
         txtId.setText(id);
         txtNombre.setText(nombre);
