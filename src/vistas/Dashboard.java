@@ -770,6 +770,9 @@ public final class Dashboard extends BaseFrame {
     private void cbCategoriaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbCategoriaActionPerformed
     }//GEN-LAST:event_cbCategoriaActionPerformed
 
+    // Evento del botón Guardar: Crea productos nuevos o actualiza existentes según el valor de txtId
+    // Si txtId="Auto" -> Crea nuevo producto con ID autogenerado | Si txtId=número -> Actualiza producto existente
+    // Valida: campos completos, formato numérico correcto, valores no negativos. Persiste cambios automáticamente
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
         String nombre = txtNombre.getText().trim();
         String desc = txtDescripcion.getText().trim();
@@ -818,6 +821,9 @@ public final class Dashboard extends BaseFrame {
     
     }//GEN-LAST:event_btnGuardarActionPerformed
 
+    // Evento del botón Actualizar: Carga datos del producto seleccionado desde la tabla al formulario
+    // NO modifica el producto, solo prepara el formulario para edición. El guardado se hace con btnGuardar
+    // Muestra mensaje de advertencia si no hay producto seleccionado en la tabla
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
         
         int filaSeleccionada = tblProductos.getSelectedRow();
@@ -842,6 +848,7 @@ public final class Dashboard extends BaseFrame {
 
     }//GEN-LAST:event_btnActualizarActionPerformed
 
+    // Limpia todos los campos del formulario llamando al método limpiarCampos()
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
         limpiarCampos();
     }//GEN-LAST:event_btnLimpiarActionPerformed
@@ -852,6 +859,7 @@ public final class Dashboard extends BaseFrame {
     private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
     }//GEN-LAST:event_txtBuscarActionPerformed
 
+    // Evento del botón Buscar: Filtra productos por nombre usando coincidencia parcial (case-insensitive)
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
         String criterio = txtBuscar.getText().trim();
         if (criterio.isEmpty()) {
@@ -861,11 +869,16 @@ public final class Dashboard extends BaseFrame {
         }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+    // Evento del botón Restablecer: Quita todos los filtros y muestra el catálogo completo
+    // Limpia el campo de búsqueda y recarga todos los productos del inventario en la tabla
     private void btnRestablecerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRestablecerActionPerformed
         txtBuscar.setText("");
         actualizarTabla(st.getProductos());
     }//GEN-LAST:event_btnRestablecerActionPerformed
 
+    // Evento del botón Eliminar: Elimina permanentemente el producto seleccionado
+    // Solicita confirmación antes de eliminar. Persiste cambios, actualiza tabla y limpia formulario
+    // Si no hay producto seleccionado, muestra mensaje de advertencia
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         int fila = tblProductos.getSelectedRow();
         if (fila == -1) {
@@ -895,6 +908,8 @@ public final class Dashboard extends BaseFrame {
     private void txtPrecioMaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtPrecioMaxActionPerformed
     }//GEN-LAST:event_txtPrecioMaxActionPerformed
 
+    // Evento del botón Filtrar Precio: Muestra productos dentro del rango especificado [min, max]
+    // Campos vacíos se interpretan como 0 (sin límite). Valida formato numérico antes de filtrar
     private void btnFiltrarPrecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltrarPrecioActionPerformed
         // Obtener los valores de precio min y max
         String textoMin = txtPrecioMin.getText().trim();
@@ -932,6 +947,8 @@ public final class Dashboard extends BaseFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_cbOrdenActionPerformed
 
+    // Evento del botón Filtrar Categoría: Muestra solo productos de la categoría seleccionada
+    // Obtiene la categoría del ComboBox cbOrden y actualiza la tabla con los resultados filtrados
     private void btnFiltroCatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFiltroCatActionPerformed
         List<Producto> productosFiltrados = st.filtrarPorCategoria(cbOrden.getSelectedItem().toString());
         actualizarTabla(productosFiltrados);
@@ -1009,8 +1026,10 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JTextField txtStock;
     // End of variables declaration//GEN-END:variables
 
-// Metodos auxiliares
+// Métodos auxiliares
 
+    // Carga todas las categorías disponibles en el ComboBox del panel de reportes
+    // Agrega "Todas" como primera opción para mostrar el inventario completo
     private void cargarCategoriasEnReportes() {
         Categorias[] todasLasCategorias = Categorias.values();
         int cantidadCategorias = todasLasCategorias.length;
@@ -1022,7 +1041,9 @@ public final class Dashboard extends BaseFrame {
         }
         cbReportCategoria.setModel(new javax.swing.DefaultComboBoxModel<>(opcionesReporte));
     }
-    
+
+    // Carga todas las categorías disponibles en el ComboBox de filtrado por categoría
+    // Similar a cargarCategoriasEnReportes(), incluye "Todas" como primera opción
     private void cargarCategoriasEnOrden() {
         Categorias[] todasLasCategorias = Categorias.values();
         int cantidadCategorias = todasLasCategorias.length;
@@ -1034,6 +1055,8 @@ public final class Dashboard extends BaseFrame {
         }
         cbOrden.setModel(new javax.swing.DefaultComboBoxModel<>(opcionesReporte));
     }
+    // Resetea el formulario a su estado inicial para permitir crear un nuevo producto
+    // Vacía campos de texto, resetea txtId="Auto", deselecciona categoría y limpia selección de tabla
     private void limpiarCampos() {
         txtId.setText("Auto");
         txtNombre.setText("");
@@ -1044,6 +1067,9 @@ public final class Dashboard extends BaseFrame {
         tblProductos.clearSelection();
     }
 
+    // Actualiza panel de reportes laterales con estadísticas calculadas de la categoría seleccionada
+    // Calcula y muestra: precio promedio, producto con menor stock y valor total del inventario (formato CLP)
+    // Utiliza los métodos de cálculo matemático de SistemaTienda 
     private void actualizarReportes() {
         String categoriaSeleccionada = (String) cbReportCategoria.getSelectedItem();
 
@@ -1084,7 +1110,9 @@ public final class Dashboard extends BaseFrame {
         jLabel21.setText("Total Productos: " + totalProductos);
     }
     
-    // Actualizar paneles superiores con estadisticas en tiempo real
+    // Actualiza los 3 paneles KPIs del header con estadísticas dinámicas del inventario completo
+    // Panel 1: Total productos | Panel 2: Valor total CLP | Panel 3: Stock crítico (<10 unidades)
+    // Característica extra: KPIs en tiempo real que se actualizan con cada cambio en el inventario
     private void actualizarPanelesSuperiores() {
         // Panel 1 Total de productos
         int totalProductos = st.getProductos().size();
@@ -1104,6 +1132,9 @@ public final class Dashboard extends BaseFrame {
         jLabel27.setText(String.valueOf(stockCritico));
     }
 
+    // Método central de visualización: Actualiza la tabla con la lista de productos recibida
+    // Proceso: Limpia filas -> Agrega productos con precios en formato CLP ->  Refresca reportes y paneles
+    // Invocado automáticamente tras: crear, actualizar, eliminar, buscar o filtrar productos
     public void actualizarTabla(List<Producto> lista) {
         modeloTabla.setRowCount(0);
         NumberFormat formatoCLP = NumberFormat.getCurrencyInstance(new Locale("es", "CL"));
@@ -1122,6 +1153,8 @@ public final class Dashboard extends BaseFrame {
         actualizarPanelesSuperiores();
 
     }
+    // Verifica si una categoría tiene al menos un producto con stock disponible (stock > 0)
+    // Retorna true si "Todas" o si encuentra algún producto con stock. Retorna false si todos tienen stock=0
     private boolean revisarStock(String nombreCategoria){
         if (nombreCategoria.equals("Todos")){
             return true;
@@ -1134,6 +1167,9 @@ public final class Dashboard extends BaseFrame {
         }
         return false;
     }
+    // Configura el ComboBox de categorías para indicar visualmente cuáles no tienen stock disponible
+    // Categorías sin stock: se muestran en gris con texto "(Sin stock)" y no se pueden seleccionar
+    // Al intentar seleccionar una categoría vacía, muestra advertencia y vuelve a "Todas"
     private void deshabilitarCategorias(){
         cbOrden.setRenderer(new DefaultListCellRenderer(){
             @Override
@@ -1171,11 +1207,13 @@ public final class Dashboard extends BaseFrame {
 
         });
     }
+    // El usuario puede hacer clic en los encabezados para ordenar datos de forma ascendente o descendente
     private void configurarTabla() {
         // Habilitar ordenamiento por columnas
         tblProductos.setAutoCreateRowSorter(true);
     }
 
+    // Implementa búsqueda dinámica: filtra productos instantáneamente mientras el usuario escribe
     private void configurarBusquedaEnTiempoReal() {
         txtBuscar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
