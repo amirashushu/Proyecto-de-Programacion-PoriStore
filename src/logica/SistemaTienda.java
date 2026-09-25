@@ -160,6 +160,25 @@ public class SistemaTienda implements Serializable{
         }
         return false;
     }
+
+    // Eliminar producto del carrito por ID
+    public boolean eliminarProductoCarrito(int id) {
+        Producto productoAEliminar = null;
+        for (Producto p : carrito.keySet()) {
+            if (p.getId() == id) {
+                productoAEliminar = p;
+                break;
+            }
+        }
+        if (productoAEliminar != null) {
+            int cantidad = carrito.get(productoAEliminar);
+            productoAEliminar.setStock(productoAEliminar.getStock() + cantidad);  //  Restaura stock
+            carrito.remove(productoAEliminar);  // Elimina del carrito
+            return true;
+        }
+        return false;
+    }
+
     public void vaciarCarrito(){
         for (Map.Entry<Producto, Integer> entrada : carrito.entrySet()) {
             Producto p= entrada.getKey();
