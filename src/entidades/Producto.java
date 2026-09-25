@@ -10,14 +10,18 @@ public class Producto implements Serializable{
     private double precio;
     private int stock;
     private Categorias categoria;
+    private String rutaImagen;
 
-    public Producto(int id, String nombre, String descripcion, double precio, int stock, Categorias categoria) {
+
+    public Producto(int id, String nombre, String descripcion, double precio, int stock, Categorias categoria, String rutaImagen) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.stock = stock;
         this.categoria = categoria;
+        this.rutaImagen = "/fotos/producto.png"; 
+
     }
 
     public int getId() {
@@ -67,6 +71,14 @@ public class Producto implements Serializable{
 
     public void setCategoria(Categorias categoria) {
         this.categoria = categoria;
+    }
+    
+    public String getRutaImagen() {
+        return rutaImagen;
+    }
+
+    public void setRutaImagen(String rutaImagen) {
+        this.rutaImagen = rutaImagen;
     }
     
 }

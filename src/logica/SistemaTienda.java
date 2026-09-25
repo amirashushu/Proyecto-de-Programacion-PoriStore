@@ -72,6 +72,21 @@ public class SistemaTienda implements Serializable{
         return false;
     }
 
+    // Actualiza todos los atributos de un producto existente
+    public boolean actualizarProducto(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id, String rutaImagen) {
+        Producto p = buscarPorId(id);
+        if (p != null) {
+            p.setNombre(nombre);
+            p.setDescripcion(descripcion);
+            p.setPrecio(precio);
+            p.setStock(stock);
+            p.setCategoria(categoria);
+            p.setRutaImagen(rutaImagen);
+            return true;
+        }
+        return false;
+    }
+
     // Elimina un producto del inventario buscándolo por su ID
     // Retorna true si el producto fue encontrado y eliminado, false si el ID no existe
     public boolean eliminarProducto(int id) {
@@ -94,14 +109,18 @@ public class SistemaTienda implements Serializable{
         return resultado;
     }
 
-    // Crea un producto nuevo con ID autogenerado y lo agrega al inventario
-    // Genera el ID automáticamente, crea el objeto Producto y lo añade a la lista
+    // Crea un producto nuevo con ID autogenerado (usa imagen por defecto)
     public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
+        crearProducto(nombre, descrip, precio, stock, cat, "/fotos/producto.png");
+    }
+
+    // Crea un producto nuevo con ID autogenerado e imagen personalizada
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
         int nuevoId = this.generarSiguienteId();
-        Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat);
+        Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat, rutaImagen);
         this.agregarProducto(nuevo);
     }
-   
+
 
     // Registra un nuevo administrador en el sistema con sus credenciales
     // Retorna false si el correo ya está registrado, true si se creó la cuenta exitosamente
@@ -123,6 +142,9 @@ public class SistemaTienda implements Serializable{
         }
         return false;
     }
+    
+    // Logica Carrito 
+  
     //Agregar producto a carrito
     public boolean agregarProCarrito(Producto p, int cant){
         int s = p.getStock();
