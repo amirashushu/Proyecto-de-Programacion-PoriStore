@@ -6,4 +6,4 @@ package entidades;
  */
 public enum Categorias {
     Armas, Plantas, Polvito    
-}
+} 
