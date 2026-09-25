@@ -4,15 +4,27 @@ import entidades.Categorias;
 import entidades.Producto;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import logica.SistemaTienda;
 
@@ -36,6 +48,10 @@ public final class Dashboard extends BaseFrame {
         actualizarReportes();
         configurarTabla();
         configurarBusquedaEnTiempoReal();
+
+        // Configurar renderer de imagenes para la columna 0
+        tblProductos.getColumnModel().getColumn(0).setCellRenderer(new ImageRenderer());
+        tblProductos.getColumnModel().getColumn(0).setPreferredWidth(70);
 }
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -71,6 +87,10 @@ public final class Dashboard extends BaseFrame {
         jLabel6 = new javax.swing.JLabel();
         cbCategoria = new javax.swing.JComboBox<>();
         jLabel9 = new javax.swing.JLabel();
+        txtRutaImagen = new javax.swing.JTextField();
+        jLabelRutaImagen = new javax.swing.JLabel();
+        btnSeleccionarImagen = new javax.swing.JButton();
+        lblVistaPrevia = new javax.swing.JLabel();
         btnGuardar = new javax.swing.JButton();
         btnLimpiar = new javax.swing.JButton();
         btnActualizar = new javax.swing.JButton();
@@ -362,6 +382,29 @@ public final class Dashboard extends BaseFrame {
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
         jLabel9.setText("ID:");
 
+        txtRutaImagen.setBackground(new java.awt.Color(30, 30, 30));
+        txtRutaImagen.setForeground(new java.awt.Color(255, 255, 255));
+        txtRutaImagen.setCaretColor(new java.awt.Color(255, 0, 51));
+        txtRutaImagen.setPreferredSize(new java.awt.Dimension(64, 30));
+        txtRutaImagen.setText("/fotos/producto.png");
+
+        jLabelRutaImagen.setBackground(new java.awt.Color(255, 255, 255));
+        jLabelRutaImagen.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jLabelRutaImagen.setForeground(new java.awt.Color(255, 255, 255));
+        jLabelRutaImagen.setText("Imagen:");
+
+        btnSeleccionarImagen.setBackground(new java.awt.Color(60, 60, 60));
+        btnSeleccionarImagen.setForeground(new java.awt.Color(255, 255, 255));
+        btnSeleccionarImagen.setText("Seleccionar Imagen");
+        btnSeleccionarImagen.setPreferredSize(new java.awt.Dimension(150, 30));
+        btnSeleccionarImagen.addActionListener(this::btnSeleccionarImagenActionPerformed);
+
+        lblVistaPrevia.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblVistaPrevia.setText("Vista previa");
+        lblVistaPrevia.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)));
+        lblVistaPrevia.setPreferredSize(new java.awt.Dimension(150, 150));
+        lblVistaPrevia.setForeground(new java.awt.Color(150, 150, 150));
+
         btnGuardar.setBackground(new java.awt.Color(139, 0, 0));
         btnGuardar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
@@ -402,10 +445,13 @@ public final class Dashboard extends BaseFrame {
                     .addComponent(cbCategoria, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtPrecio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txtDescripcion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnSeleccionarImagen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblVistaPrevia, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(FormularioLayout.createSequentialGroup()
                         .addGroup(FormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel6)
+                            .addComponent(jLabelRutaImagen)
                             .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(FormularioLayout.createSequentialGroup()
                                 .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -444,6 +490,12 @@ public final class Dashboard extends BaseFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cbCategoria, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabelRutaImagen)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnSeleccionarImagen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblVistaPrevia, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(FormularioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnActualizar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -476,17 +528,17 @@ public final class Dashboard extends BaseFrame {
         tblProductos.setForeground(new java.awt.Color(255, 255, 255));
         tblProductos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID", "Nombre", "Descripción", "Precio", "Stock", "Categoria"
+                "Imagen", "ID", "Nombre", "Descripción", "Precio", "Stock", "Categoria"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -495,7 +547,7 @@ public final class Dashboard extends BaseFrame {
         });
         tblProductos.setColumnSelectionAllowed(true);
         tblProductos.setGridColor(new java.awt.Color(60, 60, 60));
-        tblProductos.setRowHeight(30);
+        tblProductos.setRowHeight(65); // Aumentado para mostrar imágenes
         tblProductos.setSelectionBackground(new java.awt.Color(255, 0, 51));
         tblProductos.setSelectionForeground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setViewportView(tblProductos);
@@ -778,11 +830,17 @@ public final class Dashboard extends BaseFrame {
         String desc = txtDescripcion.getText().trim();
         String strPrecio = txtPrecio.getText().trim();
         String strStock = txtStock.getText().trim();
+        String rutaImagen = txtRutaImagen.getText().trim();
         Categorias cat = (Categorias) cbCategoria.getSelectedItem();
 
         if (nombre.isEmpty() || desc.isEmpty() || strPrecio.isEmpty() || strStock.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "Por favor complete todos los campos.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
+        }
+
+        // Si rutaImagen esta vacia, usar imagen por defecto
+        if (rutaImagen.isEmpty()) {
+            rutaImagen = "/fotos/producto.png";
         }
 
         try {
@@ -794,7 +852,7 @@ public final class Dashboard extends BaseFrame {
                 return;
             }
             if (txtId.getText().equals("Auto")){
-                st.crearProducto(nombre, desc, precio, stock, cat);
+                st.crearProducto(nombre, desc, precio, stock, cat, rutaImagen);
                 st.guardarDatos();
                 javax.swing.JOptionPane.showMessageDialog(this, "Producto guardado con éxito.");
                 actualizarTabla(st.getProductos());
@@ -803,7 +861,7 @@ public final class Dashboard extends BaseFrame {
                 String strId = txtId.getText();
                 int id = Integer.parseInt(strId);
                 int filaSeleccionada = tblProductos.getSelectedRow();
-                st.actualizarProducto(nombre, desc, precio, stock, cat, id);
+                st.actualizarProducto(nombre, desc, precio, stock, cat, id, rutaImagen);
                 st.guardarDatos(); // Guardado automatico
                 modeloTabla.setValueAt(nombre, filaSeleccionada, 1);
                 modeloTabla.setValueAt(desc, filaSeleccionada, 2);
@@ -832,20 +890,29 @@ public final class Dashboard extends BaseFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para actualizar.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
-        String id = modeloTabla.getValueAt(filaSeleccionada, 0).toString();
-        String nombre = modeloTabla.getValueAt(filaSeleccionada, 1).toString();
-        String desc = modeloTabla.getValueAt(filaSeleccionada, 2).toString();
-        String ConFormatoPrecio = modeloTabla.getValueAt(filaSeleccionada, 3).toString();
-        String stock = modeloTabla.getValueAt(filaSeleccionada, 4).toString();
-        Categorias cat = (Categorias) modeloTabla.getValueAt(filaSeleccionada, 5);
+        String id = modeloTabla.getValueAt(filaSeleccionada, 1).toString(); // ID ahora en índice 1
+        String nombre = modeloTabla.getValueAt(filaSeleccionada, 2).toString();
+        String desc = modeloTabla.getValueAt(filaSeleccionada, 3).toString();
+        String ConFormatoPrecio = modeloTabla.getValueAt(filaSeleccionada, 4).toString();
+        String stock = modeloTabla.getValueAt(filaSeleccionada, 5).toString();
+        Categorias cat = (Categorias) modeloTabla.getValueAt(filaSeleccionada, 6);
         String precio = ConFormatoPrecio.replace("$", "").replace(".", "").trim();
-        
+
+        // Obtener producto completo para acceder a rutaImagen
+        int idProducto = Integer.parseInt(id);
+        Producto productoCompleto = st.buscarPorId(idProducto);
+        String rutaImagen = (productoCompleto != null) ? productoCompleto.getRutaImagen() : "/fotos/producto.png";
+
         txtId.setText(id);
         txtNombre.setText(nombre);
         txtDescripcion.setText(desc);
         txtPrecio.setText(precio);
         txtStock.setText(stock);
+        txtRutaImagen.setText(rutaImagen);
         cbCategoria.setSelectedItem(cat);
+
+        // Actualizar vista previa de imagen
+        actualizarVistaPrevia(rutaImagen);
 
     }//GEN-LAST:event_btnActualizarActionPerformed
 
@@ -887,8 +954,8 @@ public final class Dashboard extends BaseFrame {
             return;
         }
 
-        int id = (int) tblProductos.getValueAt(fila, 0);
-        String nombre = tblProductos.getValueAt(fila, 1).toString();
+        int id = (int) tblProductos.getValueAt(fila, 1); // ID ahora en índice 1
+        String nombre = tblProductos.getValueAt(fila, 2).toString();
 
         int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro de eliminar el producto \"" + nombre + "\"?", "Confirmar Eliminación", javax.swing.JOptionPane.YES_NO_OPTION);
         if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
@@ -962,6 +1029,150 @@ public final class Dashboard extends BaseFrame {
         vista.setLocationRelativeTo(null);
     }//GEN-LAST:event_formWindowClosing
 
+    // Evento del botón Seleccionar Imagen: Abre explorador para elegir imagen
+    private void btnSeleccionarImagenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSeleccionarImagenActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Seleccionar imagen del producto");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Imágenes (PNG, JPG, GIF)", "png", "jpg", "jpeg", "gif"));
+
+        int resultado = fileChooser.showOpenDialog(this);
+
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            File archivoSeleccionado = fileChooser.getSelectedFile();
+
+            // Copiar imagen a carpeta /fotos/ del proyecto
+            String rutaRelativa = copiarImagenAProyecto(archivoSeleccionado);
+
+            if (rutaRelativa != null) {
+                // Guardar ruta relativa
+                txtRutaImagen.setText(rutaRelativa);
+
+                // Actualizar vista previa con ruta relativa
+                actualizarVistaPrevia(rutaRelativa);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al copiar imagen", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_btnSeleccionarImagenActionPerformed
+
+    // Copia imagen a carpeta /fotos/ y retorna ruta relativa
+    private String copiarImagenAProyecto(File archivoOriginal) {
+        try {
+            // Crear carpeta /fotos/ si no existe
+            File carpetaFotos = new File("src/fotos");
+            if (!carpetaFotos.exists()) {
+                carpetaFotos.mkdirs();
+            }
+
+            // Generar nombre unico basado en timestamp
+            String extension = obtenerExtension(archivoOriginal.getName());
+            String nombreDestino = "prod_" + System.currentTimeMillis() + extension;
+
+            // Ruta de destino
+            Path destino = Paths.get("src/fotos/" + nombreDestino);
+
+            // Copiar archivo
+            Files.copy(archivoOriginal.toPath(), destino, StandardCopyOption.REPLACE_EXISTING);
+
+            // Retornar ruta RELATIVA (funciona en cualquier PC)
+            return "/fotos/" + nombreDestino;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    // Obtiene extensioon de archivo (.png, .jpg, etc.)
+    private String obtenerExtension(String nombreArchivo) {
+        int puntoIndex = nombreArchivo.lastIndexOf('.');
+        if (puntoIndex > 0) {
+            return nombreArchivo.substring(puntoIndex);
+        }
+        return ".png"; // Default
+    }
+
+    // Actualiza la vista previa con la imagen seleccionada
+    private void actualizarVistaPrevia(String rutaImagen) {
+        try {
+            // Convertir ruta relativa a absoluta
+            String rutaCompleta = "src" + rutaImagen;
+            File archivoImagen = new File(rutaCompleta);
+
+            if (archivoImagen.exists()) {
+                // Cargar imagen
+                ImageIcon iconoOriginal = new ImageIcon(archivoImagen.getAbsolutePath());
+
+                // Escalar imagen para que quepa en lblVistaPrevia 
+                Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(
+                    150, 150, Image.SCALE_SMOOTH
+                );
+
+                // Mostrar en vista previa
+                lblVistaPrevia.setIcon(new ImageIcon(imagenEscalada));
+                lblVistaPrevia.setText(""); // Quitar texto "Vista previa"
+            } else {
+                lblVistaPrevia.setIcon(null);
+                lblVistaPrevia.setText("Imagen no encontrada");
+            }
+
+        } catch (Exception e) {
+            lblVistaPrevia.setIcon(null);
+            lblVistaPrevia.setText("Error al cargar");
+        }
+    }
+
+    // Metodo helper para cargar imagen y escalarla
+    private ImageIcon cargarImagenMiniatura(String rutaImagen, int ancho, int alto) {
+        try {
+            // Convertir ruta relativa a absoluta
+            String rutaCompleta = "src" + rutaImagen;
+            File archivoImagen = new File(rutaCompleta);
+
+            if (archivoImagen.exists()) {
+                ImageIcon iconoOriginal = new ImageIcon(archivoImagen.getAbsolutePath());
+                Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(
+                    ancho, alto, Image.SCALE_SMOOTH
+                );
+                return new ImageIcon(imagenEscalada);
+            } else {
+                // Si no existe, intentar con imagen por defecto
+                File imagenDefault = new File("src/fotos/producto.png");
+                if (imagenDefault.exists()) {
+                    ImageIcon iconoDefault = new ImageIcon(imagenDefault.getAbsolutePath());
+                    Image imagenEscalada = iconoDefault.getImage().getScaledInstance(
+                        ancho, alto, Image.SCALE_SMOOTH
+                    );
+                    return new ImageIcon(imagenEscalada);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    // Renderer personalizado para mostrar imagenes en las tablas
+    class ImageRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int row, int column) {
+
+            JLabel label = new JLabel();
+            label.setHorizontalAlignment(JLabel.CENTER);
+
+            if (value instanceof ImageIcon) {
+                label.setIcon((ImageIcon) value);
+            }
+
+            if (isSelected) {
+                label.setBackground(table.getSelectionBackground());
+                label.setOpaque(true);
+            }
+
+            return label;
+        }
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Formulario;
@@ -973,6 +1184,7 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnRestablecer;
+    private javax.swing.JButton btnSeleccionarImagen;
     private javax.swing.JComboBox<String> cbCategoria;
     private javax.swing.JComboBox<String> cbOrden;
     private javax.swing.JComboBox<String> cbReportCategoria;
@@ -1005,6 +1217,8 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JLabel jLabelRutaImagen;
+    private javax.swing.JLabel lblVistaPrevia;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1025,6 +1239,7 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JTextField txtPrecioMax;
     private javax.swing.JTextField txtPrecioMin;
     private javax.swing.JTextField txtStock;
+    private javax.swing.JTextField txtRutaImagen;
     // End of variables declaration//GEN-END:variables
 
 // Métodos auxiliares
@@ -1064,8 +1279,12 @@ public final class Dashboard extends BaseFrame {
         txtDescripcion.setText("");
         txtPrecio.setText("");
         txtStock.setText("");
+        txtRutaImagen.setText("/fotos/producto.png");
         cbCategoria.setSelectedIndex(0);
         tblProductos.clearSelection();
+        // Limpiar vista previa
+        lblVistaPrevia.setIcon(null);
+        lblVistaPrevia.setText("Vista previa");
     }
 
     // Actualiza panel de reportes laterales con estadísticas calculadas de la categoría seleccionada
@@ -1141,11 +1360,15 @@ public final class Dashboard extends BaseFrame {
         NumberFormat formatoCLP = NumberFormat.getCurrencyInstance(new Locale("es", "CL"));
 
         for (Producto p : lista) {
+            // Cargar imagen en miniatura (60x60)
+            ImageIcon imagenProducto = cargarImagenMiniatura(p.getRutaImagen(), 60, 60);
+
             modeloTabla.addRow(new Object[]{
+                imagenProducto,  // Imagen
                 p.getId(),
                 p.getNombre(),
                 p.getDescripcion(),
-                formatoCLP.format(p.getPrecio()), 
+                formatoCLP.format(p.getPrecio()),
                 p.getStock(),
                 p.getCategoria()
             });
