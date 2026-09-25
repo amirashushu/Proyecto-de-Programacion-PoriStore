@@ -14,15 +14,19 @@ import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class SistemaTienda implements Serializable{
-    private ArrayList<Producto> inventario;
+    private final ArrayList<Producto> inventario;
+    private final HashMap<Producto,Integer> carrito;
     private Administrador admin;
-    private HashMap<String,Administrador> cuentas = new HashMap<>();
+    private final HashMap<String,Administrador> cuentas;
     
 
     public SistemaTienda() {
         this.inventario = new ArrayList<>();
+        this.carrito = new HashMap<>();
+        this.cuentas = new HashMap<>();
     }
 
     // Genera un ID único autogenerado para productos nuevos
@@ -118,6 +122,29 @@ public class SistemaTienda implements Serializable{
             return cuentas.get(correo).validarContraseña(contraseña);
         }
         return false;
+    }
+    //Agregar producto a carrito
+    public boolean agregarProCarrito(Producto p, int cant){
+        int s = p.getStock();
+        if (s >= cant){
+            if (!carrito.containsKey(p)){
+                carrito.put(p, cant);
+            }else{
+                Integer cAntiguo = carrito.get(p);
+                carrito.put(p, cAntiguo+cant);    
+            }
+            p.setStock(s-cant);
+            return true;
+        }
+        return false;
+    }
+    public void vaciarCarrito(){
+        for (Map.Entry<Producto, Integer> entrada : carrito.entrySet()) {
+            Producto p= entrada.getKey();
+            int c = entrada.getValue();
+            p.setStock(p.getStock()+c);
+            carrito.remove(p, c);
+        }
     }
 
 // ========== CÁLCULOS MATEMÁTICOS ==========
@@ -231,7 +258,7 @@ public class SistemaTienda implements Serializable{
 
         return productosFiltrados;
     }
-
+    
 // ========== PERSISTENCIA  ==========
 
     // Serializa y guarda todo el sistema (inventario + cuentas) en archivo binario datosPoriStore.dat
@@ -265,5 +292,5 @@ public class SistemaTienda implements Serializable{
         return new SistemaTienda();  // Si hay error, retorna instancia vacía
     }
     }
-    
+
 }
