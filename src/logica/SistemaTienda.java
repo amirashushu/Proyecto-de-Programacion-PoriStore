@@ -1,6 +1,7 @@
 package logica;
 
 import entidades.Administrador;
+import entidades.Carro;
 import entidades.Categorias;
 import entidades.Producto;
 import java.io.FileInputStream;
@@ -18,15 +19,14 @@ import java.util.Map;
 
 public class SistemaTienda implements Serializable{
     private final ArrayList<Producto> inventario;
-    private final HashMap<Producto,Integer> carrito;
     private Administrador admin;
+    private ArrayList<Carro> carritos;
     private final HashMap<String,Administrador> cuentas;
-    
-
+   
     public SistemaTienda() {
         this.inventario = new ArrayList<>();
-        this.carrito = new HashMap<>();
         this.cuentas = new HashMap<>();
+        this.carritos = new ArrayList<>();
     }
 
     // Genera un ID único autogenerado para productos nuevos
@@ -143,50 +143,6 @@ public class SistemaTienda implements Serializable{
         return false;
     }
     
-    // Logica Carrito 
-  
-    //Agregar producto a carrito
-    public boolean agregarProCarrito(Producto p, int cant){
-        int s = p.getStock();
-        if (s >= cant){
-            if (!carrito.containsKey(p)){
-                carrito.put(p, cant);
-            }else{
-                Integer cAntiguo = carrito.get(p);
-                carrito.put(p, cAntiguo+cant);    
-            }
-            p.setStock(s-cant);
-            return true;
-        }
-        return false;
-    }
-
-    // Eliminar producto del carrito por ID
-    public boolean eliminarProductoCarrito(int id) {
-        Producto productoAEliminar = null;
-        for (Producto p : carrito.keySet()) {
-            if (p.getId() == id) {
-                productoAEliminar = p;
-                break;
-            }
-        }
-        if (productoAEliminar != null) {
-            int cantidad = carrito.get(productoAEliminar);
-            productoAEliminar.setStock(productoAEliminar.getStock() + cantidad);  //  Restaura stock
-            carrito.remove(productoAEliminar);  // Elimina del carrito
-            return true;
-        }
-        return false;
-    }
-
-    public void vaciarCarrito(){
-        for (Map.Entry<Producto, Integer> entrada : carrito.entrySet()) {
-            Producto p= entrada.getKey();
-            int c = entrada.getValue();
-            p.setStock(p.getStock()+c);
-            carrito.remove(p, c);
-        }
-    }
 
 // ========== CÁLCULOS MATEMÁTICOS ==========
 
@@ -333,5 +289,16 @@ public class SistemaTienda implements Serializable{
         return new SistemaTienda();  // Si hay error, retorna instancia vacía
     }
     }
+    
+    //Confirmar y cancelar compra
+    public void confirmarCompra(Carro c){
+        c.setEstado("Pagado");
+    }
 
+    public void cancelarCompra(Carro c){
+        c.vaciarCarrito();
+        carritos.remove(c);
+    }
+    
+    
 }
