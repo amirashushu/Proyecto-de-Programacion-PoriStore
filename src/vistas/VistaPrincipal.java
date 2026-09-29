@@ -5,7 +5,9 @@
 package vistas;
 
 import logica.SistemaTienda;
-
+import javax.swing.*;
+import java.awt.*;
+import logica.SistemaTienda;
 /**
  *
  * @author garf2
@@ -216,5 +218,67 @@ public class VistaPrincipal extends BaseFrame {
     private javax.swing.JPanel jPanel2;
     // End of variables declaration//GEN-END:variables
 
+    public class PanelProducto extends JPanel {
+    
+    public PanelProducto(Producto p, SistemaTienda st, Runnable alAgregar) {
+        // CONFIGURACION DEL PANEL DE COMPRA
+        setBackground(Color.WHITE);
+        setBorder(BorderFactory.createLineBorder(new Color(230, 230, 230), 1));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setPreferredSize(new Dimension(220, 380));
+
+        // AGREGAR LA IMAGEN DE NUESTRO PORIPRODUCTO
+        JLabel lblImagen = new JLabel();
+        lblImagen.setAlignmentX(CENTER_ALIGNMENT);
+        // POR SI LA RUTA ESTA VACIA O FALLA
+        if (p.getImagen() != null && !p.getImagen().isEmpty()) {
+            lblImagen.setIcon(new ImageIcon(getClass().getResource(p.getImagen())));
+        }
+
+        // MARCA Y NOMBRE DE NUESTRO PRODUCTO
+        JLabel lblMarca = new JLabel(p.getMarca().toUpperCase());
+        lblMarca.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        
+        JLabel lblNombre = new JLabel("<html><body style='width: 180px'>" + p.getNombre() + "</body></html>");
+        lblNombre.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+
+        // PRECIO
+        JLabel lblPrecio = new JLabel("$" + String.format("%,d", p.getPrecio()));
+        lblPrecio.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        lblPrecio.setForeground(new Color(75, 0, 130)); // Color morado/púrpura similar a la foto
+
+        // BOTON PARA AGREGAR AL CARRITO
+        JButton btnAgregar = new JButton("Agregar al carrito");
+        btnAgregar.setBackground(new Color(255, 51, 51));
+        btnAgregar.setForeground(Color.WHITE);
+        btnAgregar.setFocusPainted(false);
+        
+        // EVENTO DE CLICK
+        btnAgregar.addActionListener(e -> {
+            st.agregarAlCarrito(p);
+            JOptionPane.showMessageDialog(this, p.getNombre() + " agregado al carrito.");
+            if (alAgregar != null) {
+                alAgregar.run(); // Avisa a la VistaPrincipal que actualice el contador/inicio
+            }
+        });
+
+        //COMPONENTES DE LA TARJETA
+        add(Box.createVerticalStrut(10));
+        add(lblImagen);
+        add(Box.createVerticalStrut(10));
+        add(lblMarca);
+        add(lblNombre);
+        add(Box.createVerticalStrut(10));
+        add(lblPrecio);
+        add(Box.createVerticalStrut(10));
+        add(btnAgregar);
+        add(Box.createVerticalStrut(10));
+    }
+}
+
+
+
+
+    
 }
 
