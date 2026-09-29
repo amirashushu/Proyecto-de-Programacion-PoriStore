@@ -2,6 +2,7 @@ package entidades;
 
 import java.io.Serializable;
 
+
 public class Producto implements Serializable{
 
     private int id;
@@ -72,7 +73,7 @@ public class Producto implements Serializable{
     public void setCategoria(Categorias categoria) {
         this.categoria = categoria;
     }
-    
+
     public String getRutaImagen() {
         return rutaImagen;
     }
@@ -81,4 +82,7 @@ public class Producto implements Serializable{
         this.rutaImagen = rutaImagen;
     }
     
+    public String getImagen() {
+    return this.rutaImagen;
+}
 }

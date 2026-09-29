@@ -300,5 +300,27 @@ public class SistemaTienda implements Serializable{
         carritos.remove(c);
     }
     
+    private List<Producto> productos = new ArrayList<>(); // Lista de catálogo
+    private List<Producto> carrito = new ArrayList<>();   // Lista de productos en carrito
+    
+    // LISTA DE PRODUCTOS
+    public ArrayList<Producto> getInventario() {
+    return this.inventario;
+}
+
+    // AGREGAR PRODUCTO SELECCIONADO
+public void agregarAlCarrito(Producto p) {
+    this.carrito.add(p);
+}
+
+// RETORNA PRODUCTOS ACTUALES
+public List<Producto> getCarrito() {
+    return this.carrito;
+}
+
+// CANTIDAD DE PRODUCTOS
+public int getCantidadCarrito() {
+    return this.carrito.size();
+}
     
 }
