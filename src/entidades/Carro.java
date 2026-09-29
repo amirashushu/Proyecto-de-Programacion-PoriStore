@@ -1,23 +1,26 @@
 
 package entidades;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-public class Carro {
-    private static int numero = 0;
+public class Carro implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private String idSesion;  // ID unico para identificar el carrito 
     private final HashMap<Producto,Integer> carritoProductos;
-    private String nombre;
-    private String run;
+    private Cliente cliente;  // Cliente dueño del carrito (null si es anónimo)
     private String estado;
-    
-    public Carro(String nombre, String run){
-        numero++;
+
+    // Carrito empieza anónimo por defecto
+    public Carro(){
+        this.idSesion = UUID.randomUUID().toString();
         this.carritoProductos = new HashMap<>();
-        this. nombre = nombre;
-        this.run = run;
+        this.cliente = null;  
         this.estado = "Por pagar";
     }
+
     //Logica carritoProductos
     public boolean agregarProCarrito(Producto p, int cant){
         int s = p.getStock();
@@ -26,7 +29,7 @@ public class Carro {
                 carritoProductos.put(p, cant);
             }else{
                 Integer cAntiguo = carritoProductos.get(p);
-                carritoProductos.put(p, cAntiguo+cant);    
+                carritoProductos.put(p, cAntiguo+cant);
             }
             p.setStock(s-cant);
             return true;
@@ -60,47 +63,57 @@ public class Carro {
             carritoProductos.remove(p, c);
         }
     }
-    
+
     //Calculos matemáticos
     private double calcularSubTotal(){
         double total = 0.0;
         for (Map.Entry<Producto, Integer> entry : carritoProductos.entrySet()) {
             Producto producto = entry.getKey();
             int cantidad = entry.getValue();
-        
+
             total += producto.getPrecio() * cantidad;
         }
         return total;
     }
-    
+
     private double calcularTotal(){
         double total = calcularSubTotal();
         total = total * 1.19;
         return total;
     }
 
-    public static int getNumero() {
-        return numero;
+    public String getIdSesion() {
+        return idSesion;
     }
 
-    public static void setNumero(int numero) {
-        Carro.numero = numero;
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    // Retorna true si es un carrito anon
+    public boolean esAnonimo() {
+        return cliente == null;
+    }
+
+    // Identificador completo del carrito para Admin
+    public String getIdentificador() {
+        if (cliente != null) {
+            return cliente.getNombre() + " (" + cliente.getCorreo() + ")";
+        } else {
+            return "Cliente Anónimo #" + idSesion.substring(0, 8);
+        }
     }
 
     public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+        return cliente != null ? cliente.getNombre() : "Anónimo";
     }
 
     public String getRun() {
-        return run;
-    }
-
-    public void setRun(String run) {
-        this.run = run;
+        return cliente != null ? cliente.getRut() : null;
     }
 
     public String getEstado() {
@@ -114,9 +127,12 @@ public class Carro {
     public HashMap<Producto, Integer> getCarritoProductos() {
         return carritoProductos;
     }
-    
-    
-    
 
-    
+    public double getSubTotal() {
+        return calcularSubTotal();
+    }
+
+    public double getTotal() {
+        return calcularTotal();
+    }
 }

@@ -21,7 +21,7 @@ public class Producto implements Serializable{
         this.precio = precio;
         this.stock = stock;
         this.categoria = categoria;
-        this.rutaImagen = "/fotos/producto.png"; 
+        this.rutaImagen = rutaImagen; 
 
     }
 
