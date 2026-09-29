@@ -21,14 +21,21 @@ public class SistemaTienda implements Serializable{
     private final ArrayList<Producto> inventario;
     private Administrador admin;
     private ArrayList<Carro> carritos;
+    private Carro temporal; //Carrito temporal, cuando el usuario confirme su compra este se agrega al arraylist de carritos
     private final HashMap<String,Administrador> cuentas;
    
     public SistemaTienda() {
         this.inventario = new ArrayList<>();
         this.cuentas = new HashMap<>();
         this.carritos = new ArrayList<>();
+        this.temporal = new Carro("-","-");
     }
 
+    public void crearCarrito(){
+        Carro c = new Carro("-","-");
+        carritos.add(c);
+    }
+    
     // Genera un ID único autogenerado para productos nuevos
     // Busca el ID mas alto en el inventario actual y retorna ese valor + 1
     public int generarSiguienteId() {
@@ -306,21 +313,28 @@ public class SistemaTienda implements Serializable{
     // LISTA DE PRODUCTOS
     public ArrayList<Producto> getInventario() {
     return this.inventario;
-}
+    }
 
-    // AGREGAR PRODUCTO SELECCIONADO
-public void agregarAlCarrito(Producto p) {
-    this.carrito.add(p);
-}
+    public ArrayList<Carro> getCarritos() {
+        return carritos;
+    }
 
-// RETORNA PRODUCTOS ACTUALES
-public List<Producto> getCarrito() {
-    return this.carrito;
-}
-
-// CANTIDAD DE PRODUCTOS
-public int getCantidadCarrito() {
-    return this.carrito.size();
-}
+    public Carro getTemporal() {
+        return temporal;
+    }
     
+    
+
+    public void agregarAlCarrito(Producto p) {
+        this.carrito.add(p);
+    }
+
+    public List<Producto> getCarrito() {
+        return this.carrito;
+    }
+
+    public int getCantidadCarrito() {
+        return this.carrito.size();
+    }
+
 }

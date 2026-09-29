@@ -15,9 +15,7 @@ import entidades.Producto;
 public class VistaPrincipal extends BaseFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaPrincipal.class.getName());
 
-    /**
-     * Creates new form VistaPrincipal
-     */
+    
     public VistaPrincipal(SistemaTienda st) {
         super(st);
         initComponents();
@@ -242,7 +240,6 @@ public class VistaPrincipal extends BaseFrame {
 
 
     public class PanelProducto extends JPanel {
-
            public PanelProducto(Producto p) {
            this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
            this.setBackground(new Color(30, 30, 30)); // Color de la tarjeta
@@ -300,6 +297,9 @@ public class VistaPrincipal extends BaseFrame {
             btnAgregar.setForeground(Color.WHITE);
             btnAgregar.setFocusPainted(false);
             btnAgregar.setAlignmentX(Component.CENTER_ALIGNMENT);
+            
+            //AGREGAR AL CARRITO
+
 
             // COMPONENTES PARA EL PANEL
             add(Box.createVerticalStrut(10));
@@ -311,6 +311,15 @@ public class VistaPrincipal extends BaseFrame {
             add(Box.createVerticalStrut(10));
             add(btnAgregar);
             add(Box.createVerticalStrut(10));
+            
+            //Agregar producto X al carrito temporal
+            btnAgregar.addActionListener(e -> {
+                if( st.getTemporal().agregarProCarrito(p, 1) ){
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Producto sin stock!", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+                
+                }
+            });
         }
     }
 

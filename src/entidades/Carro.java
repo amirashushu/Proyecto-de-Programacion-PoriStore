@@ -1,10 +1,11 @@
 
 package entidades;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Carro {
+public class Carro implements Serializable{
     private static int numero = 0;
     private final HashMap<Producto,Integer> carritoProductos;
     private String nombre;
