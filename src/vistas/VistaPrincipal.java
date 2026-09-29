@@ -3,15 +3,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vistas;
-
 import logica.SistemaTienda;
-
+import javax.swing.*;
+import java.awt.*;
+import logica.SistemaTienda;
+import entidades.Producto;
 /**
  *
  * @author garf2
  */
 public class VistaPrincipal extends BaseFrame {
-    
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaPrincipal.class.getName());
 
     /**
@@ -21,6 +22,7 @@ public class VistaPrincipal extends BaseFrame {
         super(st);
         initComponents();
         setLocationRelativeTo(null);
+        cargarCatalogoProductos();
     }
 
     /**
@@ -41,6 +43,7 @@ public class VistaPrincipal extends BaseFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
+        jPanel6 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Pori Store");
@@ -115,6 +118,17 @@ public class VistaPrincipal extends BaseFrame {
             }
         });
 
+        javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
+        jPanel6.setLayout(jPanel6Layout);
+        jPanel6Layout.setHorizontalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 213, Short.MAX_VALUE)
+        );
+        jPanel6Layout.setVerticalGroup(
+            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 208, Short.MAX_VALUE)
+        );
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -128,7 +142,7 @@ public class VistaPrincipal extends BaseFrame {
                 .addComponent(jLabel5)
                 .addGap(155, 155, 155)
                 .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 282, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 287, Short.MAX_VALUE)
                 .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -139,6 +153,10 @@ public class VistaPrincipal extends BaseFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(50, 50, 50)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,8 +177,12 @@ public class VistaPrincipal extends BaseFrame {
                             .addComponent(jLabel5))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(606, Short.MAX_VALUE))
+                .addGap(35, 35, 35)
+                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(363, Short.MAX_VALUE))
         );
+
+        jPanel6.getAccessibleContext().setAccessibleDescription("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -214,7 +236,104 @@ public class VistaPrincipal extends BaseFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel6;
     // End of variables declaration//GEN-END:variables
 
+
+
+    public class PanelProducto extends JPanel {
+
+           public PanelProducto(Producto p) {
+           this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+           this.setBackground(new Color(30, 30, 30)); // Color de la tarjeta
+           this.setOpaque(true); // <--- OBLIGATORIO PARA QUE PINTE EL FONDO OSCURO
+           this.setBorder(BorderFactory.createLineBorder(new Color(200, 0, 0), 1));
+           this.setMaximumSize(new Dimension(160, 210));
+           this.setPreferredSize(new Dimension(160, 210));
+
+            
+            JLabel lblImagen = new JLabel();
+            JLabel lblNombre;
+            JLabel lblPrecio;
+            JButton btnAgregar = new JButton("Agregar");
+
+            // IMAGEN
+            lblImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
+            lblImagen.setHorizontalAlignment(SwingConstants.CENTER);
+            boolean imagenCargada = false;
+
+            if (p.getRutaImagen() != null && !p.getRutaImagen().trim().isEmpty()) {
+                try {
+                    java.io.File file = new java.io.File(p.getRutaImagen());
+                    if (file.exists()) {
+                        ImageIcon icon = new ImageIcon(file.getAbsolutePath());
+                        Image img = icon.getImage().getScaledInstance(120, 90, Image.SCALE_SMOOTH);
+                        lblImagen.setIcon(new ImageIcon(img));
+                        imagenCargada = true;
+                    }
+                } catch (Exception e) {
+                    imagenCargada = false;
+                }
+            }
+
+            if (!imagenCargada) {
+                lblImagen.setText("Sin Imagen");
+                lblImagen.setForeground(Color.GRAY);
+            }
+
+            // NOMBRE DEL PRODUCTO
+            String textoNombre = (p.getNombre() != null && !p.getNombre().isEmpty()) ? p.getNombre().toUpperCase() : "PRODUCTO";
+            lblNombre = new JLabel(textoNombre);
+            lblNombre.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lblNombre.setForeground(Color.WHITE);
+            lblNombre.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // PRECIO
+            lblPrecio = new JLabel("$" + String.format("%.0f", p.getPrecio()));
+            lblPrecio.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            lblPrecio.setForeground(new Color(255, 50, 50));
+            lblPrecio.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // BOTON
+            btnAgregar.setFont(new Font("Segoe UI", Font.BOLD, 10));
+            btnAgregar.setBackground(new Color(180, 0, 0));
+            btnAgregar.setForeground(Color.WHITE);
+            btnAgregar.setFocusPainted(false);
+            btnAgregar.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // COMPONENTES PARA EL PANEL
+            add(Box.createVerticalStrut(10));
+            add(lblImagen);
+            add(Box.createVerticalStrut(10));
+            add(lblNombre);
+            add(Box.createVerticalStrut(10));
+            add(lblPrecio);
+            add(Box.createVerticalStrut(10));
+            add(btnAgregar);
+            add(Box.createVerticalStrut(10));
+        }
+    }
+
+public void cargarCatalogoProductos() {
+    jPanel6.removeAll(); //LIMPIA EL CATALOGO
+    jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 15, 15)); // ORGANIZA LAS TARJETAS
+    jPanel6.setBackground(new java.awt.Color(20, 20, 20)); // FONDO OSCURO
+
+    if (st != null && st.getInventario() != null) {
+        for (Producto p : st.getInventario()) {
+            PanelProducto card = new PanelProducto(p);
+            jPanel6.add(card);
+        }
+    }
+
+    jPanel6.revalidate();
+    jPanel6.repaint();
+}
+
+
+   
+    
+    
+    
 }
 
