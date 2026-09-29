@@ -245,7 +245,7 @@ public class VistaPrincipal extends BaseFrame {
         // PRECIO
         JLabel lblPrecio = new JLabel("$" + String.format("%,d", p.getPrecio()));
         lblPrecio.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        lblPrecio.setForeground(new Color(75, 0, 130)); // Color morado/púrpura similar a la foto
+        lblPrecio.setForeground(new Color(75, 0, 130)); // COLORES DE PRUEBA
 
         // BOTON PARA AGREGAR AL CARRITO
         JButton btnAgregar = new JButton("Agregar al carrito");
@@ -258,7 +258,7 @@ public class VistaPrincipal extends BaseFrame {
             st.agregarAlCarrito(p);
             JOptionPane.showMessageDialog(this, p.getNombre() + " agregado al carrito.");
             if (alAgregar != null) {
-                alAgregar.run(); // Avisa a la VistaPrincipal que actualice el contador/inicio
+                alAgregar.run();
             }
         });
 
