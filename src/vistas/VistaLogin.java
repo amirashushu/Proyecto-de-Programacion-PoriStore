@@ -249,17 +249,37 @@ public class VistaLogin extends BaseFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Por favor complete todos los campos.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
-        
-        if (st.iniciarSesion(correo, contraseña)){
-            javax.swing.JOptionPane.showMessageDialog(this, "Iniciando sesion...");
+
+        // Verificar si es admin
+        if (st.esAdmin(correo, contraseña)) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido Administrador");
+
+            // Redirigir a Dashboard (modo ADMIN)
+            Dashboard dashboard = new Dashboard(st);
+            this.dispose();
+            dashboard.setVisible(true);
+            dashboard.setLocationRelativeTo(null);
+        }
+        // Verificar si es cliente
+        else if (st.iniciarSesionCliente(correo, contraseña)) {
+            // Obtener el cliente que inició sesión
+            entidades.Cliente cliente = st.obtenerCliente(correo);
+
+            // Iniciar sesión en el gestor centralizado
+            logica.GestorSesion.iniciarSesion(cliente);
+
+            javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido " + cliente.getNombre() + "!");
+
+            // Redirigir a Vista Principal (la sesión está en GestorSesion)
             VistaPrincipal vista = new VistaPrincipal(st);
             this.dispose();
             vista.setVisible(true);
             vista.setLocationRelativeTo(null);
-        }else{
-            javax.swing.JOptionPane.showMessageDialog(this, "Correo o contraseña equivocada.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
         }
-        
+        else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Correo o contraseña incorrectos.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+        }
+
     }//GEN-LAST:event_btnEntrarActionPerformed
 
     private void jLabel12MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel12MouseClicked

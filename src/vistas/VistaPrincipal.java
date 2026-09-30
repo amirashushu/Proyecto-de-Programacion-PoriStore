@@ -8,6 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import logica.SistemaTienda;
 import entidades.Producto;
+import entidades.Cliente;
+
 /**
  *
  * @author garf2
@@ -42,7 +44,6 @@ public class VistaPrincipal extends BaseFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel8 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -109,15 +110,6 @@ public class VistaPrincipal extends BaseFrame {
         jLabel6.setForeground(new java.awt.Color(153, 153, 153));
         jLabel6.setText("Categorías");
 
-        jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/fotos/logo admin.jpg"))); // NOI18N
-        jLabel8.setText("jLabel1");
-        jLabel8.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jLabel8.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel8MouseClicked(evt);
-            }
-        });
-
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
@@ -142,9 +134,7 @@ public class VistaPrincipal extends BaseFrame {
                 .addComponent(jLabel5)
                 .addGap(155, 155, 155)
                 .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 287, Short.MAX_VALUE)
-                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 360, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(LblJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -167,8 +157,7 @@ public class VistaPrincipal extends BaseFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(LblJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(LblJoin, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -206,19 +195,48 @@ public class VistaPrincipal extends BaseFrame {
         setLocationRelativeTo(null);
     }//GEN-LAST:event_jLabel1MouseClicked
 
-    private void jLabel8MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel8MouseClicked
-
-        Dashboard vistaDashboard = new Dashboard(st);
-        this.dispose();
-        vistaDashboard.setVisible(true);
-        vistaDashboard.setLocationRelativeTo(null);
-    }//GEN-LAST:event_jLabel8MouseClicked
-
     private void LblJoinMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_LblJoinMouseClicked
-       VistaLogin login = new VistaLogin(st);
-       this.dispose();
-       login.setVisible(true);
-       login.setLocationRelativeTo(null);
+       // Si no hay sesión activa, abrir login
+       if (!logica.GestorSesion.haySesionActiva()) {
+           VistaLogin login = new VistaLogin(st);
+           this.dispose();
+           login.setVisible(true);
+           login.setLocationRelativeTo(null);
+       } else {
+           // Si ya hay sesión, mostrar menú con opciones
+           Cliente clienteActual = logica.GestorSesion.getClienteActual();
+           String[] opciones = {"Ver Perfil", "Cerrar Sesión"};
+           int opcion = javax.swing.JOptionPane.showOptionDialog(
+               this,
+               "Sesión activa: " + clienteActual.getNombre(),
+               "Mi Cuenta",
+               javax.swing.JOptionPane.DEFAULT_OPTION,
+               javax.swing.JOptionPane.INFORMATION_MESSAGE,
+               null,
+               opciones,
+               opciones[0]
+           );
+
+           if (opcion == 0) {
+               // Ver Perfil
+               javax.swing.JOptionPane.showMessageDialog(this,
+                   "Nombre: " + clienteActual.getNombre() + "\n" +
+                   "RUT: " + clienteActual.getRut() + "\n" +
+                   "Correo: " + clienteActual.getCorreo(),
+                   "Mi Perfil",
+                   javax.swing.JOptionPane.INFORMATION_MESSAGE
+               );
+           } else if (opcion == 1) {
+               // Cerrar Sesión con GestorSesion
+               logica.GestorSesion.cerrarSesion();
+               javax.swing.JOptionPane.showMessageDialog(this, "Sesión cerrada exitosamente");
+               // Recargar vista sin sesión
+               vistas.VistaPrincipal vista = new vistas.VistaPrincipal(st);
+               this.dispose();
+               vista.setVisible(true);
+               vista.setLocationRelativeTo(null);
+           }
+       }  
     }//GEN-LAST:event_LblJoinMouseClicked
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -233,7 +251,6 @@ public class VistaPrincipal extends BaseFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel6;
@@ -318,9 +335,10 @@ public void cargarCatalogoProductos() {
     jPanel6.removeAll(); //LIMPIA EL CATALOGO
     jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 15, 15)); // ORGANIZA LAS TARJETAS
     jPanel6.setBackground(new java.awt.Color(20, 20, 20)); // FONDO OSCURO
+    java.util.List<entidades.Producto> productos = st.getProductos();
 
-    if (st != null && st.getInventario() != null) {
-        for (Producto p : st.getInventario()) {
+    if (st != null && st.getProductos() != null) {
+        for (Producto p : st.getProductos()) {
             PanelProducto card = new PanelProducto(p);
             jPanel6.add(card);
         }

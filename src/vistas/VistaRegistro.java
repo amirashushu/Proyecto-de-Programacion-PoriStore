@@ -36,12 +36,14 @@ public class VistaRegistro extends BaseFrame {
         jLabel10 = new javax.swing.JLabel();
         txtNombre = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
-        txtCorreo = new javax.swing.JTextField();
+        txtRut = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         btnEntrar = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
-        txtContraseña = new javax.swing.JTextField();
+        txtCorreo = new javax.swing.JTextField();
         jLabel15 = new javax.swing.JLabel();
+        txtContraseña = new javax.swing.JTextField();
+        jLabel16 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -87,7 +89,7 @@ public class VistaRegistro extends BaseFrame {
         jLabel11.setText("Nombre y Apellidos");
         jLabel11.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
-        txtCorreo.addActionListener(this::txtCorreoActionPerformed);
+        txtRut.addActionListener(this::txtRutActionPerformed);
 
         jLabel12.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel12.setText("¿Ya tienes cuenta? Inicia sesión aquí");
@@ -105,14 +107,20 @@ public class VistaRegistro extends BaseFrame {
         btnEntrar.addActionListener(this::btnEntrarActionPerformed);
 
         jLabel13.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel13.setText("Correo Electrónico");
+        jLabel13.setText("Rut");
         jLabel13.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+
+        txtCorreo.addActionListener(this::txtCorreoActionPerformed);
+
+        jLabel15.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel15.setText("Correo Electrónico");
+        jLabel15.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         txtContraseña.addActionListener(this::txtContraseñaActionPerformed);
 
-        jLabel15.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel15.setText("Contraseña");
-        jLabel15.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        jLabel16.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel16.setText("Contraseña");
+        jLabel16.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -130,18 +138,19 @@ public class VistaRegistro extends BaseFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel16)
                     .addComponent(jLabel13)
                     .addComponent(jLabel11)
-                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(btnEntrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(txtCorreo)
-                        .addComponent(txtNombre)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                            .addGap(6, 6, 6)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 229, Short.MAX_VALUE))
-                        .addComponent(jLabel15)
-                        .addComponent(txtContraseña)))
+                    .addComponent(btnEntrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(txtRut)
+                    .addComponent(txtNombre)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
+                    .addComponent(jLabel15)
+                    .addComponent(txtCorreo)
+                    .addComponent(txtContraseña))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
@@ -162,16 +171,20 @@ public class VistaRegistro extends BaseFrame {
                 .addGap(5, 5, 5)
                 .addComponent(jLabel13)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtRut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel15)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtCorreo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel16)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(txtContraseña, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(15, 15, 15)
+                .addGap(18, 18, 18)
                 .addComponent(btnEntrar, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel12)
-                .addContainerGap(127, Short.MAX_VALUE))
+                .addContainerGap(70, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -185,7 +198,7 @@ public class VistaRegistro extends BaseFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(472, 472, 472)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(470, Short.MAX_VALUE))
+                .addContainerGap(482, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -200,7 +213,7 @@ public class VistaRegistro extends BaseFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(116, Short.MAX_VALUE)
+                .addContainerGap(107, Short.MAX_VALUE)
                 .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(71, 71, 71))
         );
@@ -229,21 +242,35 @@ public class VistaRegistro extends BaseFrame {
     }//GEN-LAST:event_jLabel12MouseClicked
 
     private void btnEntrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEntrarActionPerformed
-        String nombre = txtNombre.getText();
-        String correo = txtCorreo.getText();
-        String contraseña = txtContraseña.getText();
-        if (correo.isEmpty() || contraseña.isEmpty() || nombre.isEmpty()){
+        String nombre = txtNombre.getText().trim();
+        String rut = txtRut.getText().trim();
+        String correo = txtCorreo.getText().trim();
+        String contraseña = txtContraseña.getText().trim();
+
+        if (nombre.isEmpty() || rut.isEmpty() || correo.isEmpty() || contraseña.isEmpty()){
             javax.swing.JOptionPane.showMessageDialog(this, "Por favor complete todos los campos.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (st.registrarse(correo, contraseña, nombre)){
-            javax.swing.JOptionPane.showMessageDialog(this, "Cuenta creada con exito");
-            VistaLogin login = new VistaLogin(st);
+
+        // Registrar cliente con todos los campos correctos
+        if (st.registrarCliente(rut, nombre, correo, contraseña)){
+            st.guardarDatos(); // Guardar inmediatamente despues de registrar
+
+            // Obtener el cliente recién registrado e iniciar sesión automáticamente
+            entidades.Cliente cliente = st.obtenerCliente(correo);
+
+            // Iniciar sesión en el gestor centralizado
+            logica.GestorSesion.iniciarSesion(cliente);
+
+            javax.swing.JOptionPane.showMessageDialog(this, "¡Bienvenido " + cliente.getNombre() + "! Tu cuenta fue creada exitosamente");
+
+            // Ir directamente a Vista Principal (la sesión está en GestorSesion)
+            VistaPrincipal vista = new VistaPrincipal(st);
             this.dispose();
-            login.setVisible(true);
-            login.setLocationRelativeTo(null);
+            vista.setVisible(true);
+            vista.setLocationRelativeTo(null);
         }else{
-            javax.swing.JOptionPane.showMessageDialog(this, "Ese correo ya esta ligado a una cuenta existente.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            javax.swing.JOptionPane.showMessageDialog(this, "Ese correo ya está ligado a una cuenta existente.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
         }
 
     }//GEN-LAST:event_btnEntrarActionPerformed
@@ -258,6 +285,10 @@ public class VistaRegistro extends BaseFrame {
     private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtNombreActionPerformed
+
+    private void txtRutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRutActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRutActionPerformed
 
     private void txtCorreoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCorreoActionPerformed
         // TODO add your handling code here:
@@ -276,6 +307,7 @@ public class VistaRegistro extends BaseFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel15;
+    private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -285,6 +317,7 @@ public class VistaRegistro extends BaseFrame {
     private javax.swing.JTextField txtContraseña;
     private javax.swing.JTextField txtCorreo;
     private javax.swing.JTextField txtNombre;
+    private javax.swing.JTextField txtRut;
     // End of variables declaration//GEN-END:variables
 
     private static class st {
