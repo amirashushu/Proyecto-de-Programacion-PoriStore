@@ -60,8 +60,27 @@ public class Carro implements Serializable {
             Producto p= entrada.getKey();
             int c = entrada.getValue();
             p.setStock(p.getStock()+c);
-            carritoProductos.remove(p, c);
         }
+        carritoProductos.clear();
+    }
+
+    // Cambia la cantidad de un producto ajustando el stock por la diferencia (0 = eliminar)
+    public boolean actualizarCantidad(int id, int nuevaCantidad) {
+        for (Producto p : carritoProductos.keySet()) {
+            if (p.getId() == id) {
+                if (nuevaCantidad <= 0) {
+                    return eliminarProductoCarrito(id);
+                }
+                int diferencia = nuevaCantidad - carritoProductos.get(p);
+                if (diferencia > p.getStock()) {
+                    return false;
+                }
+                p.setStock(p.getStock() - diferencia);
+                carritoProductos.put(p, nuevaCantidad);
+                return true;
+            }
+        }
+        return false;
     }
 
     //Calculos matemáticos
@@ -134,5 +153,9 @@ public class Carro implements Serializable {
 
     public double getTotal() {
         return calcularTotal();
+    }
+
+    public double getIVA() {
+        return calcularSubTotal() * 0.19;
     }
 }

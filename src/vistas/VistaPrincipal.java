@@ -45,6 +45,10 @@ public class VistaPrincipal extends BaseFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jPanel6 = new javax.swing.JPanel();
+        Banner = new PanelImagen("/fotos/banner.png");
+        lblBannerTitulo = new javax.swing.JLabel();
+        lblBannerSubtitulo = new javax.swing.JLabel();
+        btnBannerVer = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Pori Store");
@@ -114,11 +118,54 @@ public class VistaPrincipal extends BaseFrame {
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 213, Short.MAX_VALUE)
+            .addGap(0, 217, Short.MAX_VALUE)
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 208, Short.MAX_VALUE)
+            .addGap(0, 285, Short.MAX_VALUE)
+        );
+
+        lblBannerTitulo.setBackground(new java.awt.Color(0, 0, 0));
+        lblBannerTitulo.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblBannerTitulo.setForeground(new java.awt.Color(255, 255, 255));
+        lblBannerTitulo.setText("OFERTAS DE LA SEMANA");
+
+        lblBannerSubtitulo.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblBannerSubtitulo.setForeground(new java.awt.Color(220, 220, 220));
+        lblBannerSubtitulo.setText("Armas, polvitos magicos y yerbas medicinales al mejor precio");
+
+        btnBannerVer.setBackground(new java.awt.Color(180, 0, 0));
+        btnBannerVer.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnBannerVer.setForeground(new java.awt.Color(255, 255, 255));
+        btnBannerVer.setText("Ver Productos");
+        btnBannerVer.setBorderPainted(false);
+        btnBannerVer.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnBannerVer.setFocusPainted(false);
+        btnBannerVer.setPreferredSize(new java.awt.Dimension(160, 40));
+        btnBannerVer.addActionListener(this::btnBannerVerActionPerformed);
+
+        javax.swing.GroupLayout BannerLayout = new javax.swing.GroupLayout(Banner);
+        Banner.setLayout(BannerLayout);
+        BannerLayout.setHorizontalGroup(
+            BannerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BannerLayout.createSequentialGroup()
+                .addGap(47, 47, 47)
+                .addGroup(BannerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnBannerVer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblBannerSubtitulo)
+                    .addComponent(lblBannerTitulo))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        BannerLayout.setVerticalGroup(
+            BannerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BannerLayout.createSequentialGroup()
+                .addGap(48, 48, 48)
+                .addComponent(lblBannerTitulo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblBannerSubtitulo)
+                .addGap(18, 18, 18)
+                .addComponent(btnBannerVer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(38, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -143,8 +190,9 @@ public class VistaPrincipal extends BaseFrame {
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+            .addComponent(Banner, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(50, 50, 50)
+                .addGap(18, 18, 18)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -166,9 +214,11 @@ public class VistaPrincipal extends BaseFrame {
                             .addComponent(jLabel5))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(Banner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(33, 33, 33)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(363, Short.MAX_VALUE))
+                .addContainerGap(62, Short.MAX_VALUE))
         );
 
         jPanel6.getAccessibleContext().setAccessibleDescription("");
@@ -244,8 +294,14 @@ public class VistaPrincipal extends BaseFrame {
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
+    private void btnBannerVerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBannerVerActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnBannerVerActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel Banner;
     private javax.swing.JLabel LblJoin;
+    private javax.swing.JButton btnBannerVer;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
@@ -254,6 +310,8 @@ public class VistaPrincipal extends BaseFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel6;
+    private javax.swing.JLabel lblBannerSubtitulo;
+    private javax.swing.JLabel lblBannerTitulo;
     // End of variables declaration//GEN-END:variables
 
 
@@ -281,7 +339,8 @@ public class VistaPrincipal extends BaseFrame {
 
             if (p.getRutaImagen() != null && !p.getRutaImagen().trim().isEmpty()) {
                 try {
-                    java.io.File file = new java.io.File(p.getRutaImagen());
+                    
+                    java.io.File file = new java.io.File("src" + p.getRutaImagen());
                     if (file.exists()) {
                         ImageIcon icon = new ImageIcon(file.getAbsolutePath());
                         Image img = icon.getImage().getScaledInstance(120, 90, Image.SCALE_SMOOTH);
@@ -317,6 +376,8 @@ public class VistaPrincipal extends BaseFrame {
             btnAgregar.setForeground(Color.WHITE);
             btnAgregar.setFocusPainted(false);
             btnAgregar.setAlignmentX(Component.CENTER_ALIGNMENT);
+            //al hacer click pide la cantidad y agrega el producto al carrito actual
+            btnAgregar.addActionListener(e -> agregarAlCarrito(p));
 
             // COMPONENTES PARA EL PANEL
             add(Box.createVerticalStrut(10));
@@ -347,6 +408,31 @@ public void cargarCatalogoProductos() {
     jPanel6.revalidate();
     jPanel6.repaint();
 }
+
+    //Valida cantidad y stock, agrega al carrito de la sesion y guarda
+    private void agregarAlCarrito(Producto p) {
+        if (p.getStock() <= 0) {
+            JOptionPane.showMessageDialog(this, "\"" + p.getNombre() + "\" no tiene stock disponible.", "Sin stock", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        String texto = JOptionPane.showInputDialog(this, "¿Cuántas unidades de " + p.getNombre() + "? (disponibles: " + p.getStock() + ")", "1");
+        if (texto == null) {
+            return;
+        }
+        try {
+            int cantidad = Integer.parseInt(texto.trim());
+            if (cantidad <= 0) {
+                JOptionPane.showMessageDialog(this, "La cantidad debe ser mayor a 0.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else if (st.obtenerCarritoActual().agregarProCarrito(p, cantidad)) {
+                st.guardarDatos();
+                JOptionPane.showMessageDialog(this, "Agregado al carrito: " + p.getNombre() + " x" + cantidad);
+            } else {
+                JOptionPane.showMessageDialog(this, "No hay stock suficiente (disponibles: " + p.getStock() + ").", "Sin stock", JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Ingrese un número entero válido.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
 
    

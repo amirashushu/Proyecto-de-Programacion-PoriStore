@@ -21,10 +21,9 @@ public class SistemaTienda implements Serializable{
     private static final long serialVersionUID = 1L;
 
     private final ArrayList<Producto> inventario;
-    private ArrayList<Carro> carritos;  // Múltiples carritos (Hito 2)
+    private ArrayList<Carro> carritos;  // Múltiples carritos 
     private final HashMap<String,Administrador> cuentas;
-    private final HashMap<String,Cliente> clientes;  // Clientes registrados (por correo)
-
+    private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     public SistemaTienda() {
         this.inventario = new ArrayList<>();
         this.carritos = new ArrayList<>();
@@ -188,14 +187,11 @@ public class SistemaTienda implements Serializable{
         return clientes;
     }
 
-    // ========== GESTIÓN DE CARRITOS (HITO 2) ==========
+    // ========== GESTIÓN DE CARRITOS ==========
 
-    /**
-     * Obtiene el carrito actual basado en la sesión de GestorSesion
-     * Funciona automáticamente para clientes anónimos Y registrados
-     * Maneja transición anónimo → registrado automáticamente
-     * @return El carrito activo de la sesión actual
-     */
+   
+     //Obtiene el carrito actual basado en la sesión de GestorSesion funciona automáticamente para clientes anónimos y registrados.
+
     public Carro obtenerCarritoActual() {
         Cliente clienteActual = GestorSesion.getClienteActual();
 
@@ -244,7 +240,7 @@ public class SistemaTienda implements Serializable{
         }
     }
 
-    // Obtener el carrito activo de un cliente específico (para uso interno/admin)
+    // Obtener el carrito activo de un cliente específico (para uso admin)
     public Carro obtenerCarritoCliente(Cliente cliente) {
         for (Carro c : carritos) {
             if (c.getCliente() != null &&
