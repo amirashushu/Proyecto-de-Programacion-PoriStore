@@ -3,6 +3,7 @@ package entidades;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -148,14 +149,15 @@ public class Carro implements Serializable {
     }
 
     public double getSubTotal() {
-        return calcularSubTotal();
+        
+        return (int) calcularSubTotal();
     }
 
     public double getTotal() {
-        return calcularTotal();
+        return (int) calcularTotal();
     }
 
     public double getIVA() {
-        return calcularSubTotal() * 0.19;
+        return (int) calcularSubTotal() * 0.19;
     }
 }
