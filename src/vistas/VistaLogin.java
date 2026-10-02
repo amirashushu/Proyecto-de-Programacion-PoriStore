@@ -255,10 +255,12 @@ public class VistaLogin extends BaseFrame {
             javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido Administrador");
 
             // Redirigir a Dashboard (modo ADMIN)
+            
             Dashboard dashboard = new Dashboard(st);
             this.dispose();
             dashboard.setVisible(true);
             dashboard.setLocationRelativeTo(null);
+            
         }
         // Verificar si es cliente
         else if (st.iniciarSesionCliente(correo, contraseña)) {

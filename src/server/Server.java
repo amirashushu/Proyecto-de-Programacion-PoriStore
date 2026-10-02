@@ -1,108 +1,101 @@
 package server;
+
+import entidades.Inventario;
+import entidades.Producto;
 import java.io.*;
 import java.net.*;
 import java.util.regex.*;
 
 public class Server {
-    
+
     private static final String HOST = "172.16.52.155";
     private static final int PORT = 65432;
-    
-    public void initServer(){
-    try (ServerSocket serverSocket = new ServerSocket()) {
+
+    public boolean initServer(Inventario invent) {
+        try (ServerSocket serverSocket = new ServerSocket()) {
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(HOST, PORT));
-            System.out.println("Servidor Java escuchando en " + HOST + ":" + PORT + " ...");  
-            System.out.println("Esperando conexión de un cliente...");
+            System.out.println("Servidor Java escuchando en " + HOST + ":" + PORT + " ...");
+            System.out.println("Esperando conexiones de clientes...");
 
-            Socket clientSocket = serverSocket.accept();
-            handleClient(clientSocket);
-
+            // Un hilo por cliente: el accept() se repite para siempre
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                Thread clientThread = new Thread(() -> handleClient(clientSocket, invent));
+                clientThread.start();
+            }
         } catch (IOException e) {
             System.err.println("Error en el servidor: " + e.getMessage());
+            return false;
         }
     }
-    private static void handleClient(Socket clientSocket) {
-       
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); 
+
+    private static void handleClient(Socket clientSocket, Inventario invent) {
+        System.out.println("[+] Conectado por " + clientSocket.getInetAddress());
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
              PrintWriter out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
 
-            // Hilo para recibir mensajes
-            Thread receiveThread = new Thread(() -> {
-                try {
-                    String line;
-                    while ((line = in.readLine()) != null) {
-                        if (line.trim().isEmpty()) continue;
+            String line;
+            while ((line = in.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
 
-                        String type = extractJsonField(line, "type");
-                        
-                        if ("data_exchange".equals(type)) {
-                            String numero = extractJsonField(line, "numero");
-                            String texto = extractJsonField(line, "texto");
+                String type = extractJsonField(line, "type");
 
-                        } else if ("message".equals(type)) {
-                            String content = extractJsonField(line, "content");
-                            System.out.println("\n[Cliente]: " + content);
-                            System.out.print("Tu mensaje: ");
-                        }
+                if ("data_exchange".equals(type)) {
+                    String cantidadStr = extractJsonField(line, "numero");
+                    String idStr = extractJsonField(line, "texto");
+
+                    if (cantidadStr == null || idStr == null) {
+                        out.println(createJsonMessage("Solicitud incompleta: faltan campos."));
+                        continue;
                     }
-                } catch (IOException e) {
-                    System.out.println("\n[-] El cliente se ha desconectado.");
-                } finally {
+
                     try {
-                        clientSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    System.exit(0);
-                }
-            });
-            receiveThread.setDaemon(true);
-            receiveThread.start();
+                        int cantidad = Integer.parseInt(cantidadStr.trim());
+                        int id = Integer.parseInt(idStr.trim());
 
-            // Bucle principal para enviar mensajes
-            BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
-            String msg;
-            
-            while ((msg = consoleReader.readLine()) != null) {
-                if (msg.equalsIgnoreCase("salir") || msg.equalsIgnoreCase("exit") || msg.equalsIgnoreCase("quit")) {
-                    System.out.println("Cerrando conexión...");
-                    break;
-                }
-
-                if (msg.toLowerCase().startsWith("datos:")) {
-                    try {
-                        String contenido = msg.substring(6).trim();
-                        int commaIndex = contenido.indexOf(',');
-                        
-                        if (commaIndex > 0) {
-                            String numeroStr = contenido.substring(0, commaIndex).trim();
-                            String texto = contenido.substring(commaIndex + 1).trim();
-                            int numero = Integer.parseInt(numeroStr);
-
-                            String json = createJsonData(numero, texto);
-                            System.out.println("[Servidor envía] Número: " + numero + ", Texto: '" + texto + "'");
-                            out.println(json);
-                        } else {
-                            System.out.println("[!] Formato incorrecto. Usa: datos:numero,texto");
+                        if (cantidad <= 0) {
+                            out.println(createJsonMessage("La cantidad debe ser mayor a 0."));
+                            continue;
                         }
+
+                        int stockActual;
+
+                        // Buscar, validar, actualizar y leer el stock como una sola operación atómica
+                        synchronized (invent) {
+                            Producto p = invent.buscarPorId(id);
+
+                            if (p == null) {
+                                out.println(createJsonMessage("Producto no encontrado: " + id));
+                                continue;
+                            }
+                            if (cantidad > p.getStock()) {
+                                out.println(createJsonMessage("Stock insuficiente para el producto " + id));
+                                continue;
+                            }
+
+                            invent.actualizarInventario(p, -cantidad);
+                            stockActual = p.getStock();
+                        }
+
+                        out.println(createJsonData(stockActual, String.valueOf(id)));
+
                     } catch (NumberFormatException e) {
-                        System.out.println("[!] Error: El número debe ser un entero válido.");
+                        out.println(createJsonMessage("La cantidad y el id deben ser enteros válidos."));
                     }
-                } else {
-                    String json = createJsonMessage(msg);
-                    out.println(json);
                 }
             }
 
         } catch (IOException e) {
-            System.err.println("Error manejando cliente: " + e.getMessage());
+            System.out.println("[-] Conexión con el cliente interrumpida: " + e.getMessage());
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            System.out.println("[-] El cliente se ha desconectado.");
         }
     }
 
@@ -153,4 +146,3 @@ public class Server {
                    .replace("\\t", "\t");
     }
 }
-

@@ -4,6 +4,7 @@ import entidades.Administrador;
 import entidades.Carro;
 import entidades.Categorias;
 import entidades.Cliente;
+import entidades.Inventario;
 import entidades.Producto;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,20 +17,21 @@ import java.io.Serializable;
 import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.Locale;
+import server.Server;
 
 public class SistemaTienda implements Serializable{
     private static final long serialVersionUID = 1L;
 
-    private final ArrayList<Producto> inventario;
+    
     private ArrayList<Carro> carritos;  // Múltiples carritos 
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
+    private Inventario inventario;
     public SistemaTienda() {
-        this.inventario = new ArrayList<>();
         this.carritos = new ArrayList<>();
         this.cuentas = new HashMap<>();
         this.clientes = new HashMap<>();
-
+        this.inventario = new Inventario();
         // Crear admin por defecto si no existe
         crearAdminPorDefecto();
     }
@@ -43,94 +45,7 @@ public class SistemaTienda implements Serializable{
         }
     }
 
-    // ========== GESTIÓN DE PRODUCTOS ==========
 
-    // Genera un ID único autogenerado para productos nuevos
-    public int generarSiguienteId() {
-        int maxId = 0;
-        for (Producto p : inventario) {
-            if (p.getId() > maxId) {
-                maxId = p.getId();
-            }
-        }
-        return maxId + 1;
-    }
-
-    // Agrega un producto al inventario
-    public void agregarProducto(Producto p){
-        inventario.add(p);
-    }
-
-    // Busca un producto específico por su ID en el inventario
-    public Producto buscarPorId(int id) {
-        for (Producto p : inventario) {
-            if (p.getId() == id) {
-                return p;
-            }
-        }
-        return null;
-    }
-
-    // Actualiza todos los atributos de un producto existente
-    public boolean actualizarProducto(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id) {
-        Producto p = buscarPorId(id);
-        if (p != null) {
-            p.setNombre(nombre);
-            p.setDescripcion(descripcion);
-            p.setPrecio(precio);
-            p.setStock(stock);
-            p.setCategoria(categoria);
-            return true;
-        }
-        return false;
-    }
-
-    // Actualiza todos los atributos de un producto existente con imagen
-    public boolean actualizarProducto(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id, String rutaImagen) {
-        Producto p = buscarPorId(id);
-        if (p != null) {
-            p.setNombre(nombre);
-            p.setDescripcion(descripcion);
-            p.setPrecio(precio);
-            p.setStock(stock);
-            p.setCategoria(categoria);
-            p.setRutaImagen(rutaImagen);
-            return true;
-        }
-        return false;
-    }
-
-    // Elimina un producto del inventario por su ID
-    public boolean eliminarProducto(int id) {
-        return inventario.removeIf(p -> p.getId() == id);
-    }
-
-    public List<Producto> getProductos() {
-        return inventario;
-    }
-
-    // Busca productos cuyo nombre contenga el patrón especificado
-    public List<Producto> buscarPorNombre(String patron) {
-        List<Producto> resultado = new ArrayList<>();
-        for (Producto p : inventario) {
-            if (p.getNombre().toLowerCase().contains(patron.toLowerCase())) {
-                resultado.add(p);
-            }
-        }
-        return resultado;
-    }
-
-    // Crea un producto nuevo con ID autogenerado (usa imagen por defecto)
-    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
-        crearProducto(nombre, descrip, precio, stock, cat, "/fotos/producto.png");
-    }
-
-    // Crea un producto nuevo con ID autogenerado e imagen personalizada
-    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
-        int nuevoId = this.generarSiguienteId();
-        Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat, rutaImagen);
-        this.agregarProducto(nuevo);
-    }
 
     // ========== GESTIÓN DE ADMINISTRADORES ==========
 
@@ -148,7 +63,13 @@ public class SistemaTienda implements Serializable{
     // Valida las credenciales de un administrador
     public boolean iniciarSesion(String correo, String contraseña){
         if (cuentas.containsKey(correo)){
-            return cuentas.get(correo).validarContraseña(contraseña);
+            if(cuentas.get(correo).validarContraseña(contraseña)){
+                new Thread(() -> {
+                Server servidor = new Server();
+                servidor.initServer(inventario);
+                }).start();
+                return true;
+            }
         }
         return false;
     }
@@ -186,7 +107,37 @@ public class SistemaTienda implements Serializable{
     public HashMap<String,Cliente> getClientes() {
         return clientes;
     }
-
+    // ========== METODOS PUENTES DE PRODUCTO ==========
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
+        inventario.crearProducto(nombre, descrip, precio, stock, cat, rutaImagen);
+    }
+    public List<Producto> getProductos(){
+        return inventario.getProductos();
+    }
+    public boolean actualizarProducto(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id, String rutaImagen){
+        return inventario.actualizarProducto(nombre, descripcion, precio, stock, categoria, id, rutaImagen);
+    }
+    public List<Producto> buscarPorNombre(String patron){
+        return inventario.buscarPorNombre(patron);
+    }
+    public boolean eliminarProducto(int id){
+        return inventario.eliminarProducto(id);
+    }
+    public List<Producto> filtrarPorCategoria(String categoria){
+        return inventario.filtrarPorCategoria(categoria);
+    }
+    public List<Producto> filtrarPorPrecio(double precioMin, double precioMax){
+        return inventario.filtrarPorPrecio(precioMin, precioMax);
+    }
+    public double calcularValorTotalInventario() {
+        return inventario.calcularValorTotalInventario();
+    }
+    public int calcularTotalProductos(){
+        return inventario.calcularTotalProductos();
+    }
+    public Producto buscarPorId(int id){
+        return inventario.buscarPorId(id);
+    }
     // ========== GESTIÓN DE CARRITOS ==========
 
    
@@ -289,14 +240,14 @@ public class SistemaTienda implements Serializable{
 
     // Calcula el valor total del inventario formateado
     public String obtenerValorTotalFormateado() {
-        double total = calcularValorTotalInventario();
+        double total = inventario.calcularValorTotalInventario();
         NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL"));
         return formatoMoneda.format(total);
     }
 
     // Calcula el precio promedio de productos de una categoría
     public double calcularPrecioPromedio(String categoria) {
-        List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
+        List<Producto> productosDeCategoria = inventario.filtrarPorCategoria(categoria);
         if (productosDeCategoria.isEmpty()) {
             return 0.0;
         }
@@ -310,7 +261,7 @@ public class SistemaTienda implements Serializable{
 
     // Obtiene el producto con menor stock de una categoría
     public Producto obtenerProductoMenorStock(String categoria) {
-        List<Producto> productosDeCategoria = filtrarPorCategoria(categoria);
+        List<Producto> productosDeCategoria = inventario.filtrarPorCategoria(categoria);
         if (productosDeCategoria.isEmpty()) {
             return null;
         }
@@ -323,74 +274,6 @@ public class SistemaTienda implements Serializable{
         }
         return productoMenorStock;
     }
-
-    // Calcula el valor monetario total del inventario
-    public double calcularValorTotalInventario() {
-        double total = 0;
-        for (Producto producto : inventario) {
-            double valorProducto = producto.getPrecio() * producto.getStock();
-            total += valorProducto;
-        }
-        return total;
-    }
-
-    // Cuenta el número total de productos en el inventario
-    public int calcularTotalProductos(){
-        int cant = 0;
-        if(inventario.isEmpty()){
-            return cant;
-        } else {
-            cant = inventario.size();
-            return cant;
-        }
-    }
-    
-
-    // ========== FILTROS Y BÚSQUEDA ==========
-
-    // Filtra productos por categoría
-    public List<Producto> filtrarPorCategoria(String categoria) {
-        if (categoria.equals("Todas")) {
-            return new ArrayList<>(inventario);
-        }
-        List<Producto> productosFiltrados = new ArrayList<>();
-        Categorias categoriaEnum = Categorias.valueOf(categoria);
-
-        for (Producto producto : inventario) {
-            if (producto.getCategoria() == categoriaEnum) {
-                productosFiltrados.add(producto);
-            }
-        }
-
-        return productosFiltrados;
-    }
-
-    // Filtra productos por rango de precios
-    public List<Producto> filtrarPorPrecio(double precioMin, double precioMax) {
-        List<Producto> productosFiltrados = new ArrayList<>();
-
-        for (Producto producto : inventario) {
-            double precio = producto.getPrecio();
-
-            boolean dentroDeLimites = true;
-
-            if (precioMin > 0 && precio < precioMin) {
-                dentroDeLimites = false;
-            }
-
-            if (precioMax > 0 && precio > precioMax) {
-                dentroDeLimites = false;
-            }
-
-            if (dentroDeLimites) {
-                productosFiltrados.add(producto);
-            }
-        }
-
-        return productosFiltrados;
-    }
-    
-    
 
     // ========== PERSISTENCIA  ==========
 

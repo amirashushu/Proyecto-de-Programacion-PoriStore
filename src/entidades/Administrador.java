@@ -32,6 +32,9 @@ public class Administrador implements Serializable{
 
     
     public boolean validarContraseña(String contraseña){
-        return contraseña.equals(this.contraseña);
+        if (contraseña.equals(this.contraseña)){
+            
+        }
+        return false;
     }
 }
