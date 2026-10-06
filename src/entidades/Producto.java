@@ -84,5 +84,8 @@ public class Producto implements Serializable{
     
     public String getImagen() {
     return this.rutaImagen;
-}
+    }
+    public String getCategoriaStr(){
+        return categoria.toString().trim();
+    }
 }

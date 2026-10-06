@@ -3,6 +3,7 @@ package entidades;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import server.Server;
 
 public class Inventario implements Serializable{
     private final ArrayList<Producto> inventario;
@@ -62,14 +63,31 @@ public class Inventario implements Serializable{
             p.setStock(stock);
             p.setCategoria(categoria);
             p.setRutaImagen(rutaImagen);
+            Server.notificarCreacion(p);
             return true;
         }
         return false;
     }
-
+    public boolean actualizarProductoCliente(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id, String rutaImagen) {
+        Producto p = buscarPorId(id);
+        if (p != null) {
+            p.setNombre(nombre);
+            p.setDescripcion(descripcion);
+            p.setPrecio(precio);
+            p.setStock(stock);
+            p.setCategoria(categoria);
+            p.setRutaImagen(rutaImagen);
+            return true;
+        }
+        return false;
+    }
     // Elimina un producto del inventario por su ID
     public boolean eliminarProducto(int id) {
-        return inventario.removeIf(p -> p.getId() == id);
+        if (inventario.removeIf(p -> p.getId() == id)){
+            Server.notificarEliminacion(id);
+            return true;
+        }
+        return false;
     }
 
     public List<Producto> getProductos() {
@@ -97,8 +115,13 @@ public class Inventario implements Serializable{
         int nuevoId = this.generarSiguienteId();
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat, rutaImagen);
         this.agregarProducto(nuevo);
+        Server.notificarCreacion(nuevo);
     }
-    
+    //aquí se crea el producto ya creado en el server, y se envia y se crea denuevo en cliente, con la informacion dada por el server
+    public void reCrearProducto(int id, String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
+        Producto nuevo = new Producto(id, nombre, descrip, precio, stock, cat, rutaImagen);
+        this.agregarProducto(nuevo);
+    }
     // ========== CÁLCULOS MATEMÁTICOS INVENTARIO==========
     
      // Calcula el valor monetario total del inventario
