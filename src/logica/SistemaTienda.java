@@ -166,9 +166,7 @@ public class SistemaTienda implements Serializable{
     }
 
 
-    // Obtener carritos activos (pendientes de pago).
-    // Viven en el carrito anónimo y en el carrito actual de cada cliente (no en la lista "carritos",
-    // ahí solo quedan las compras ya pagadas).
+    // Obtener carritos activos (pendientes de pago)
     public ArrayList<Carro> getCarritosActivos() {
         ArrayList<Carro> activos = new ArrayList<>();
         if (carritoAnonimo != null && carritoAnonimo.getEstado().equals("Por pagar")) {
