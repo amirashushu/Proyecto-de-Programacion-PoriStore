@@ -6,6 +6,7 @@ import entidades.Categorias;
 import entidades.Cliente;
 import entidades.Inventario;
 import entidades.Producto;
+import entidades.Ventas;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,12 +29,14 @@ public class SistemaTienda implements Serializable{
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     private final Inventario inventario;
+    private ArrayList<Ventas> ventas;
     public SistemaTienda() {
         this.carritos = new ArrayList<>();
         this.cuentas = new HashMap<>();
         this.clientes = new HashMap<>();
         this.inventario = new Inventario();
         this.carritoAnonimo = new Carro();
+        this.ventas = new ArrayList<>();
         // Crear admin por defecto si no existe
         crearAdminPorDefecto();
     }
@@ -218,8 +221,8 @@ public class SistemaTienda implements Serializable{
     // Confirmar compra de un carrito
     public void confirmarCompra(Carro c){
         c.setEstado("Pagado");
-        carritos.add(c); //se guarda en la lista de ventas
-        //le asignamos un carrito nuevo y vacío al usuario
+        Ventas venta = new Ventas(c);//se guarda en la lista de ventas
+        ventas.add(venta);
         Cliente cliente = c.getCliente();
         if (cliente != null) {
             Carro nuevoCarro = new Carro();
@@ -312,6 +315,23 @@ public class SistemaTienda implements Serializable{
     public Inventario getInventario() {
         return inventario;
     }
+
+    public Carro getCarritoAnonimo() {
+        return carritoAnonimo;
+    }
+
+    public void setCarritoAnonimo(Carro carritoAnonimo) {
+        this.carritoAnonimo = carritoAnonimo;
+    }
+
+    public ArrayList<Ventas> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(ArrayList<Ventas> ventas) {
+        this.ventas = ventas;
+    }
+    
     
     
 }

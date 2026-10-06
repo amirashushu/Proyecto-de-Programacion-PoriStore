@@ -10,7 +10,7 @@ import java.util.regex.*;
 
 public class Server {
 
-    private static final String HOST = "172.16.52.155";
+    private static final String HOST = "172.26.64.110";
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
 

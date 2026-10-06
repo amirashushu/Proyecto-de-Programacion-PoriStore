@@ -1,11 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package vistas;
 
 import entidades.Carro;
 import entidades.Producto;
+import entidades.Ventas;
 import logica.SistemaTienda;
 
 import javax.swing.table.DefaultTableModel;
@@ -540,12 +537,11 @@ public class Carrito extends BaseFrame {
             JOptionPane.showMessageDialog(this, "El carrito está vacío, porfavor agregue productos", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        st.obtenerCarritoActual().setFechaCompra(LocalDate.now());  //no formateada
         st.confirmarCompra(carrito);
         st.guardarDatos();
         javax.swing.JOptionPane.showMessageDialog(this, "¡Compra realizada con éxito!","Compra exitosa", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        cargarDatosCarrito();
+        cargarDatosCarrito(); 
+        
     }//GEN-LAST:event_btnPagarMouseClicked
 
     // Estilo de la tabla
