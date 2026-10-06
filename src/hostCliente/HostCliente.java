@@ -69,7 +69,7 @@ public class HostCliente {
                                 }
                             }
                             if (existia){
-                                invent.actualizarProducto(nombre, descripcion, precio, stock, Categorias.valueOf(categoria), id);
+                                invent.actualizarProductoCliente(nombre, descripcion, precio, stock, Categorias.valueOf(categoria), id, rutaImagen);
                             }else{
                                 invent.reCrearProducto(id, nombre, descripcion, precio, stock, Categorias.valueOf(categoria), rutaImagen);
                             }    
@@ -81,8 +81,6 @@ public class HostCliente {
                     }
                 } catch (IOException e) {
                     System.out.println("\n[-] Desconectado del servidor.");
-                } finally {
-                    System.exit(0);
                 }
             });
             receiveThread.setDaemon(true);
