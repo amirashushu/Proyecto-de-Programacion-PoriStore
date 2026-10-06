@@ -3,6 +3,7 @@ package entidades;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import server.Server;
 
 public class Inventario implements Serializable{
     private final ArrayList<Producto> inventario;
@@ -62,6 +63,7 @@ public class Inventario implements Serializable{
             p.setStock(stock);
             p.setCategoria(categoria);
             p.setRutaImagen(rutaImagen);
+            Server.notificarCreacion(p);
             return true;
         }
         return false;
@@ -69,7 +71,11 @@ public class Inventario implements Serializable{
 
     // Elimina un producto del inventario por su ID
     public boolean eliminarProducto(int id) {
-        return inventario.removeIf(p -> p.getId() == id);
+        boolean eliminado = inventario.removeIf(p -> p.getId() == id);
+        if (eliminado) {
+            Server.notificarEliminacion(id);
+        }
+        return eliminado;
     }
 
     public List<Producto> getProductos() {
@@ -110,6 +116,7 @@ public class Inventario implements Serializable{
         int nuevoId = this.generarSiguienteId();
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat, rutaImagen);
         this.agregarProducto(nuevo);
+        Server.notificarCreacion(nuevo);
     }
 
     // Recrea un producto con ID ya existente (usado por el cliente al recibir datos del servidor, sin notificar)

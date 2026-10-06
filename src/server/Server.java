@@ -40,6 +40,14 @@ public class Server {
             PrintWriter temp = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
             out = temp;
             clientesConectados.add(out);
+
+            // Sincronizar al cliente enviándole los productos existentes en el servidor
+            synchronized (invent) {
+                for (Producto p : invent.getProductos()) {
+                    out.println(createJsonProducto(p));
+                }
+            }
+
             String line;
             
             while ((line = in.readLine()) != null) {
