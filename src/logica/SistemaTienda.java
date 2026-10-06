@@ -23,7 +23,8 @@ public class SistemaTienda implements Serializable{
     private static final long serialVersionUID = 1L;
 
     
-    private ArrayList<Carro> carritos;  // Múltiples carritos 
+    private ArrayList<Carro> carritos;  // Múltiples carritos (compras)
+    private Carro carritoAnonimo;
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     private Inventario inventario;
@@ -32,6 +33,7 @@ public class SistemaTienda implements Serializable{
         this.cuentas = new HashMap<>();
         this.clientes = new HashMap<>();
         this.inventario = new Inventario();
+        this.carritoAnonimo = new Carro();
         // Crear admin por defecto si no existe
         crearAdminPorDefecto();
     }
@@ -140,71 +142,36 @@ public class SistemaTienda implements Serializable{
     }
     // ========== GESTIÓN DE CARRITOS ==========
 
-   
-     //Obtiene el carrito actual basado en la sesión de GestorSesion funciona automáticamente para clientes anónimos y registrados.
-
-    public Carro obtenerCarritoActual() {
+    public Carro obtenerCarritoActual() { //obtiene el carrito actual
         Cliente clienteActual = GestorSesion.getClienteActual();
 
         if (clienteActual != null) {
-            // CLIENTE REGISTRADO
-
-            // 1. Buscar carrito registrado a su nombre
-            for (Carro c : carritos) {
-                if (c.getEstado().equals("Por pagar") &&
-                    c.getCliente() != null &&
-                    c.getCliente().getCorreo().equals(clienteActual.getCorreo())) {
-                    return c;
-                }
-            }
-
-            // 2. No tiene carrito registrado, buscar carrito anónimo activo
-            //    (caso: usuario agregó productos como anónimo y luego hizo login)
-            for (Carro c : carritos) {
-                if (c.getEstado().equals("Por pagar") && c.getCliente() == null) {
-                    // Vincular carrito anónimo al cliente automáticamente
-                    c.setCliente(clienteActual);
-                    return c;
-                }
-            }
-
-            // 3. No hay ningún carrito, crear uno nuevo
-            Carro nuevo = new Carro();
-            nuevo.setCliente(clienteActual);
-            carritos.add(nuevo);
-            return nuevo;
-
+            //para cliente registrado
+            
+            // Si el cliente acaba de iniciar sesión y había metido cosas al carrito anónimo, le traspasamos ese carrito anónimo a su cuenta.
+            if (!carritoAnonimo.getCarritoProductos().isEmpty()) {
+                carritoAnonimo.setCliente(clienteActual);
+                clienteActual.setCarritoActual(carritoAnonimo);
+                carritoAnonimo = new Carro();      //se genera un nuevo carrito anónimo vacío para el sistema
+            }  
+            
+            return clienteActual.getCarritoActual();
         } else {
-            // CLIENTE ANÓNIMO
-
-            // Buscar carrito anónimo activo
-            for (Carro c : carritos) {
-                if (c.getEstado().equals("Por pagar") && c.getCliente() == null) {
-                    return c;
-                }
-            }
-
-            // No existe, crear uno nuevo
-            Carro nuevo = new Carro();
-            carritos.add(nuevo);
-            return nuevo;
+            return carritoAnonimo;
         }
     }
 
-    // Obtener el carrito activo de un cliente específico (para uso admin)
-    public Carro obtenerCarritoCliente(Cliente cliente) {
+    // Obtener el carritos de un cliente específico en el historial de ventas (para uso admin)
+    public ArrayList<Carro> obtenerCarritoCliente(Cliente cliente) {
+        ArrayList<Carro> carritostemp = new ArrayList<>();
         for (Carro c : carritos) {
             if (c.getCliente() != null &&
                 c.getCliente().getCorreo().equals(cliente.getCorreo()) &&
-                c.getEstado().equals("Por pagar")) {
-                return c;
+                c.getEstado().equals("Pagado")) {
+                carritostemp.add(c);
             }
         }
-        // Si no existe, crear uno nuevo
-        Carro nuevo = new Carro();
-        nuevo.setCliente(cliente);
-        carritos.add(nuevo);
-        return nuevo;
+        return carritostemp;
     }
 
     // Obtener todos los carritos
@@ -212,20 +179,20 @@ public class SistemaTienda implements Serializable{
         return carritos;
     }
 
-    // Obtener carritos activos (pendientes de pago)
-    public ArrayList<Carro> getCarritosActivos() {
-        ArrayList<Carro> activos = new ArrayList<>();
-        for (Carro c : carritos) {
-            if (c.getEstado().equals("Por pagar")) {
-                activos.add(c);
-            }
-        }
-        return activos;
-    }
-
     // Confirmar compra de un carrito
     public void confirmarCompra(Carro c){
         c.setEstado("Pagado");
+        carritos.add(c); //se guarda en la lista de ventas
+        //le asignamos un carrito nuevo y vacío al usuario
+        Cliente cliente = c.getCliente();
+        if (cliente != null) {
+            Carro nuevoCarro = new Carro();
+            nuevoCarro.setCliente(cliente);
+            cliente.setCarritoActual(nuevoCarro);
+        } else {
+            //reiniciamos el carrito anónimo
+            this.carritoAnonimo = new Carro();
+        }
     }
 
     // Cancelar compra y vaciar carrito
@@ -306,6 +273,7 @@ public class SistemaTienda implements Serializable{
         return new SistemaTienda();
     }
     }
+    
     
 }
 
