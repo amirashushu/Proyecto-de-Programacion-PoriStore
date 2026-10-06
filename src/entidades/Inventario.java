@@ -87,18 +87,6 @@ public class Inventario implements Serializable{
         return resultado;
     }
 
-    // Crea un producto nuevo con ID autogenerado (usa imagen por defecto)
-    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
-        crearProducto(nombre, descrip, precio, stock, cat, "/fotos/producto.png");
-    }
-
-    // Crea un producto nuevo con ID autogenerado e imagen personalizada
-    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
-        int nuevoId = this.generarSiguienteId();
-        Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat, rutaImagen);
-        this.agregarProducto(nuevo);
-    }
-    
     // Revisa si ya hay otro producto con ese nombre (sin importar mayúsculas ni espacios extra).
     // idExcluido es el producto que se está editando, para que no choque consigo mismo (-1 si es nuevo)
     public boolean existeNombre(String nombre, int idExcluido) {
@@ -112,6 +100,17 @@ public class Inventario implements Serializable{
         return false;
     }
 
+    // Crea un producto nuevo con ID autogenerado (usa imagen por defecto)
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
+        crearProducto(nombre, descrip, precio, stock, cat, "/fotos/producto.png");
+    }
+
+    // Crea un producto nuevo con ID autogenerado e imagen personalizada
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
+        int nuevoId = this.generarSiguienteId();
+        Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat, rutaImagen);
+        this.agregarProducto(nuevo);
+    }
     
     // ========== CÁLCULOS MATEMÁTICOS INVENTARIO==========
     

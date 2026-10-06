@@ -1,6 +1,7 @@
 
 package entidades;
 
+import hostCliente.HostCliente;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -35,7 +36,7 @@ public class Carro implements Serializable {
                 Integer cAntiguo = carritoProductos.get(p);
                 carritoProductos.put(p, cAntiguo+cant);
             }
-            p.setStock(s-cant);
+            HostCliente.notificarPeticion(p.getId(), -cant);
             return true;
         }
         return false;
@@ -52,8 +53,8 @@ public class Carro implements Serializable {
         }
         if (productoAEliminar != null) {
             int cantidad = carritoProductos.get(productoAEliminar);
-            productoAEliminar.setStock(productoAEliminar.getStock() + cantidad);  //  Restaura stock
-            carritoProductos.remove(productoAEliminar);  // Elimina del carritoProductos
+            HostCliente.notificarPeticion(id, cantidad); //  Restaura stock
+            carritoProductos.remove(productoAEliminar);  // Elimina del carritoProductos            
             return true;
         }
         return false;
@@ -63,7 +64,7 @@ public class Carro implements Serializable {
         for (Map.Entry<Producto, Integer> entrada : carritoProductos.entrySet()) {
             Producto p= entrada.getKey();
             int c = entrada.getValue();
-            p.setStock(p.getStock()+c);
+            HostCliente.notificarPeticion(p.getId(), c);
         }
         carritoProductos.clear();
     }
