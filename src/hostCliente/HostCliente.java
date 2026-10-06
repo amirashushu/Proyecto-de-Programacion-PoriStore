@@ -1,24 +1,20 @@
 package hostCliente;
+import entidades.Categorias;
+import entidades.Inventario;
+import entidades.Producto;
 import java.io.*;
 import java.net.*;
 import java.util.regex.*;
 
-public class hostCliente {
+public class HostCliente {
     private static final String HOST = "172.26.64.110";
     private static final int PORT = 65432;
+    private static PrintWriter serverOut;
     
-    public void initHost(){
+    public void initHost(Inventario inv){
         try (Socket socket = new Socket()) {
             socket.connect(new InetSocketAddress(HOST, PORT));
-            System.out.println("[+] Conectado al servidor " + HOST + ":" + PORT);
-            System.out.println("==================================================");
-            System.out.println("FORMATOS DE ENVÍO DISPONIBLES:");
-            System.out.println("  1. Chat simple: escribe tu mensaje");
-            System.out.println("  2. Datos (numero,texto): escribe 'datos:20,galleta'");
-            System.out.println("  3. Salir: escribe 'salir'");
-            System.out.println("==================================================");
-
-            handleConnection(socket);
+            handleConnection(socket, inv);
 
         } catch (ConnectException e) {
             System.err.println("[!] Error: No se pudo conectar al servidor. ¿Está encendido?");
@@ -26,10 +22,10 @@ public class hostCliente {
             System.err.println("Error en el cliente: " + e.getMessage());
         }
     }
-    private static void handleConnection(Socket socket) {
+    private static void handleConnection(Socket socket, Inventario invent) {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true)) {
-
+            PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true)) {
+            serverOut = out; 
             // Hilo para recibir mensajes
             Thread receiveThread = new Thread(() -> {
                 try {
@@ -40,65 +36,60 @@ public class hostCliente {
                         String type = extractJsonField(line, "type");
                         
                         if ("data_exchange".equals(type)) {
-                            String numero = extractJsonField(line, "numero");
-                            String texto = extractJsonField(line, "texto");
-                            System.out.println("\n[Servidor envió datos] Número: " + numero + ", Texto: '" + texto + "'");
-                            System.out.print("Tu mensaje: ");
+                            String cantidadStr = extractJsonField(line, "numero");
+                            String idStr = extractJsonField(line, "texto");
+                            
+                            int cantidad = Integer.parseInt(cantidadStr.trim());
+                            int id = Integer.parseInt(idStr.trim());
+                            Producto p = invent.buscarPorId(id);
+                            p.setStock(cantidad);
+                            
                         } else if ("message".equals(type)) {
                             String content = extractJsonField(line, "content");
                             System.out.println("\n[Servidor]: " + content);
                             System.out.print("Tu mensaje: ");
+                            
+                        }else if ("get_producto".equals(type)){
+                            String idStr = extractJsonField(line, "id");
+                            String nombre = extractJsonField(line, "nombre");
+                            String descripcion = extractJsonField(line, "descripcion");
+                            String precioStr = extractJsonField(line, "precio");
+                            String categoria = extractJsonField(line, "categoria");
+                            String stockStr = extractJsonField(line, "stock");
+                            String rutaImagen = extractJsonField(line, "rutaImagen");
+                            
+                            int id = Integer.parseInt(idStr.trim());
+                            double precio = Double.parseDouble(precioStr.trim());
+                            int stock =  Integer.parseInt(stockStr.trim());
+                            boolean existia=false;
+                            for (Producto p : invent.getProductos()){
+                                if (p.getId() == id){
+                                    existia = true;
+                                    break;
+                                }
+                            }
+                            if (existia){
+                                invent.actualizarProducto(nombre, descripcion, precio, stock, Categorias.valueOf(categoria), id);
+                            }else{
+                                invent.reCrearProducto(id, nombre, descripcion, precio, stock, Categorias.valueOf(categoria), rutaImagen);
+                            }    
+                        }else if ("eliminar".equals(type)){
+                            String idStr = extractJsonField(line, "id");
+                            int id = Integer.parseInt(idStr.trim());
+                            invent.eliminarProducto(id);
                         }
                     }
                 } catch (IOException e) {
                     System.out.println("\n[-] Desconectado del servidor.");
                 } finally {
-                    try {
-                        socket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                     System.exit(0);
                 }
             });
             receiveThread.setDaemon(true);
             receiveThread.start();
+            receiveThread.join();
 
-            // Bucle principal para enviar mensajes
-            BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
-            String msg;
-            
-            while ((msg = consoleReader.readLine()) != null) {
-                if (msg.equalsIgnoreCase("salir") || msg.equalsIgnoreCase("exit") || msg.equalsIgnoreCase("quit")) {
-                    break;
-                }
-
-                if (msg.toLowerCase().startsWith("datos:")) {
-                    try {
-                        String contenido = msg.substring(6).trim();
-                        int commaIndex = contenido.indexOf(',');
-                        
-                        if (commaIndex > 0) {
-                            String numeroStr = contenido.substring(0, commaIndex).trim();
-                            String texto = contenido.substring(commaIndex + 1).trim();
-                            int numero = Integer.parseInt(numeroStr);
-
-                            String json = createJsonData(numero, texto);
-                            System.out.println("[Cliente envía] Número: " + numero + ", Texto: '" + texto + "'");
-                            out.println(json);
-                        } else {
-                            System.out.println("[!] Formato incorrecto. Usa: datos:numero,texto");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("[!] Error: El número debe ser un entero válido.");
-                    }
-                } else {
-                    String json = createJsonMessage(msg);
-                    out.println(json);
-                }
-            }
-
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             System.err.println("Error en la conexión: " + e.getMessage());
         } finally {
             try {
@@ -106,6 +97,17 @@ public class hostCliente {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+    public static void notificarPeticion (int id, int cant){
+        broadcast(createJsonData(cant, String.valueOf(id)));
+    }
+    private static void broadcast(String mensajeJson) {        
+        if (serverOut != null) {
+            serverOut.println(mensajeJson); // Envía el mensaje al servidor
+            serverOut.flush();
+        } else {
+            System.err.println("[!] Error: No hay conexión activa con el servidor.");
         }
     }
 
