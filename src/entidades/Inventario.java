@@ -99,6 +99,20 @@ public class Inventario implements Serializable{
         this.agregarProducto(nuevo);
     }
     
+    // Revisa si ya hay otro producto con ese nombre (sin importar mayúsculas ni espacios extra).
+    // idExcluido es el producto que se está editando, para que no choque consigo mismo (-1 si es nuevo)
+    public boolean existeNombre(String nombre, int idExcluido) {
+        String buscado = nombre.trim().replaceAll("\\s+", " ").toLowerCase();
+        for (Producto p : inventario) {
+            String actual = p.getNombre().trim().replaceAll("\\s+", " ").toLowerCase();
+            if (p.getId() != idExcluido && actual.equals(buscado)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
     // ========== CÁLCULOS MATEMÁTICOS INVENTARIO==========
     
      // Calcula el valor monetario total del inventario
