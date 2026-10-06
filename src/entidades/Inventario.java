@@ -111,6 +111,27 @@ public class Inventario implements Serializable{
         Producto nuevo = new Producto(nuevoId, nombre, descrip, precio, stock, cat, rutaImagen);
         this.agregarProducto(nuevo);
     }
+
+    // Recrea un producto con ID ya existente (usado por el cliente al recibir datos del servidor, sin notificar)
+    public void reCrearProducto(int id, String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
+        Producto nuevo = new Producto(id, nombre, descrip, precio, stock, cat, rutaImagen);
+        this.agregarProducto(nuevo);
+    }
+
+    // Actualiza un producto recibido desde el servidor (sin notificar de vuelta al servidor para evitar loop)
+    public boolean actualizarProductoCliente(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id, String rutaImagen) {
+        Producto p = buscarPorId(id);
+        if (p != null) {
+            p.setNombre(nombre);
+            p.setDescripcion(descripcion);
+            p.setPrecio(precio);
+            p.setStock(stock);
+            p.setCategoria(categoria);
+            p.setRutaImagen(rutaImagen);
+            return true;
+        }
+        return false;
+    }
     
     // ========== CÁLCULOS MATEMÁTICOS INVENTARIO==========
     
