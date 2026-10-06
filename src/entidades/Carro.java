@@ -2,6 +2,7 @@
 package entidades;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ public class Carro implements Serializable {
     private final HashMap<Producto,Integer> carritoProductos;
     private Cliente cliente;  // Cliente dueño del carrito (null si es anónimo)
     private String estado;
+    private LocalDate fechaCompra; //Se actualiza cuando se realiza la compra
 
     // Carrito empieza anónimo por defecto
     public Carro(){
@@ -20,6 +22,7 @@ public class Carro implements Serializable {
         this.carritoProductos = new HashMap<>();
         this.cliente = null;  
         this.estado = "Por pagar";
+        this.fechaCompra = null;
     }
 
     //Logica carritoProductos
@@ -160,4 +163,14 @@ public class Carro implements Serializable {
     public double getIVA() {
         return (int) calcularSubTotal() * 0.19;
     }
+
+    public LocalDate getFechaCompra() {
+        return fechaCompra;
+    }
+
+    public void setFechaCompra(LocalDate fechaCompra) {
+        this.fechaCompra = fechaCompra;
+    }
+    
+    
 }

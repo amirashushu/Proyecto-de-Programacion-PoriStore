@@ -4,12 +4,15 @@
  */
 package vistas;
 
+import entidades.Carro;
 import entidades.Producto;
 import logica.SistemaTienda;
 
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
 import java.awt.Font;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
@@ -531,7 +534,18 @@ public class Carrito extends BaseFrame {
     }//GEN-LAST:event_btnVaciarMouseClicked
 
     private void btnPagarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnPagarMouseClicked
-
+         
+        Carro carrito = st.obtenerCarritoActual();
+        if(carrito.getCarritoProductos().isEmpty()){
+            JOptionPane.showMessageDialog(this, "El carrito está vacío, porfavor agregue productos", "Error!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        st.obtenerCarritoActual().setFechaCompra(LocalDate.now());  //no formateada
+        st.confirmarCompra(carrito);
+        st.guardarDatos();
+        javax.swing.JOptionPane.showMessageDialog(this, "¡Compra realizada con éxito!","Compra exitosa", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        cargarDatosCarrito();
     }//GEN-LAST:event_btnPagarMouseClicked
 
     // Estilo de la tabla
