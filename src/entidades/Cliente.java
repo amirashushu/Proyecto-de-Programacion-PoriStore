@@ -13,12 +13,15 @@ public class Cliente implements Serializable {
     private String nombre;
     private String correo;
     private String contraseña;
+    private Carro carritoActual;
 
     public Cliente(String rut, String nombre, String correo, String contraseña) {
         this.rut = rut;
         this.nombre = nombre;
         this.correo = correo;
         this.contraseña = contraseña;
+        this.carritoActual = new Carro();
+        this.carritoActual.setCliente(this);
     }
 
     public String getRut() {
@@ -65,4 +68,14 @@ public class Cliente implements Serializable {
                 ", correo='" + correo + '\'' +
                 '}';
     }
+
+    public Carro getCarritoActual() {
+        return carritoActual;
+    }
+
+    public void setCarritoActual(Carro carritoActual) {
+        this.carritoActual = carritoActual;
+    }
+    
+    
 }

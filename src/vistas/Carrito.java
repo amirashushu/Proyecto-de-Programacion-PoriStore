@@ -4,11 +4,18 @@
  */
 package vistas;
 
+import entidades.Carro;
+import entidades.Producto;
 import logica.SistemaTienda;
 
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
 import java.awt.Font;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -26,6 +33,7 @@ public class Carrito extends BaseFrame {
         initComponents();
         setLocationRelativeTo(null);
         configurarTabla();
+        cargarDatosCarrito();
     }
 
 
@@ -154,6 +162,11 @@ public class Carrito extends BaseFrame {
         btnEliminar.setText("Eliminar producto");
         btnEliminar.setBorderPainted(false);
         btnEliminar.setFocusPainted(false);
+        btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnEliminarMouseClicked(evt);
+            }
+        });
 
         btnCambiarCantidad.setBackground(new java.awt.Color(180, 0, 0));
         btnCambiarCantidad.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
@@ -161,6 +174,11 @@ public class Carrito extends BaseFrame {
         btnCambiarCantidad.setText("Cambiar cantidad");
         btnCambiarCantidad.setBorderPainted(false);
         btnCambiarCantidad.setFocusPainted(false);
+        btnCambiarCantidad.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnCambiarCantidadMouseClicked(evt);
+            }
+        });
         btnCambiarCantidad.addActionListener(this::btnCambiarCantidadActionPerformed);
 
         btnVaciar.setBackground(new java.awt.Color(0, 0, 0));
@@ -169,6 +187,11 @@ public class Carrito extends BaseFrame {
         btnVaciar.setText("Vaciar Carrito");
         btnVaciar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(180, 0, 0)));
         btnVaciar.setFocusPainted(false);
+        btnVaciar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnVaciarMouseClicked(evt);
+            }
+        });
 
         panelResumen.setBackground(new java.awt.Color(30, 30, 30));
         panelResumen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(60, 60, 60)));
@@ -182,12 +205,12 @@ public class Carrito extends BaseFrame {
         lblSubtotal.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblSubtotal.setForeground(new java.awt.Color(204, 204, 204));
         lblSubtotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblSubtotal.setText("$0");
+        lblSubtotal.setText(String.valueOf(st.obtenerCarritoActual().getTotal()));
 
         lblTotal.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         lblTotal.setForeground(new java.awt.Color(255, 255, 255));
         lblTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblTotal.setText("$0");
+        lblTotal.setText(String.valueOf(st.obtenerCarritoActual().getTotal()) );
 
         lblIvaTexto.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblIvaTexto.setForeground(new java.awt.Color(204, 204, 204));
@@ -199,6 +222,11 @@ public class Carrito extends BaseFrame {
         btnPagar.setText("Pagar");
         btnPagar.setBorderPainted(false);
         btnPagar.setFocusPainted(false);
+        btnPagar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnPagarMouseClicked(evt);
+            }
+        });
         btnPagar.addActionListener(this::btnPagarActionPerformed);
 
         lblSubtotalTexto.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -208,7 +236,7 @@ public class Carrito extends BaseFrame {
         lblIva1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblIva1.setForeground(new java.awt.Color(204, 204, 204));
         lblIva1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
-        lblIva1.setText("$0");
+        lblIva1.setText(String.valueOf(st.obtenerCarritoActual().getIVA()) );
 
         jSeparator2.setForeground(new java.awt.Color(60, 60, 60));
 
@@ -315,7 +343,7 @@ public class Carrito extends BaseFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnVaciar))
                             .addComponent(tblCarrito, javax.swing.GroupLayout.PREFERRED_SIZE, 800, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
                         .addComponent(panelResumen, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(20, 20, 20))))
         );
@@ -412,6 +440,114 @@ public class Carrito extends BaseFrame {
         //confirmar la compra y mostrar el comprobante
     }//GEN-LAST:event_btnPagarActionPerformed
 
+    private void btnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseClicked
+        int fila = jTable1.getSelectedRow();
+        if(fila != -1){
+            int id = Integer.parseInt(jTable1.getValueAt(fila, 0).toString());
+            String nombreProducto = jTable1.getValueAt(fila, 1).toString();
+            int opcion = JOptionPane.showConfirmDialog(null,"¿Desea eliminar " + nombreProducto + " de su carrito?","Eliminar producto",JOptionPane.YES_NO_OPTION);
+            if (opcion == 0){
+                st.obtenerCarritoActual().eliminarProductoCarrito(id);
+                JOptionPane.showMessageDialog(null, "Producto eliminado con éxito!.");
+            }
+            
+            cargarDatosCarrito();
+        }
+    }//GEN-LAST:event_btnEliminarMouseClicked
+
+    private void btnCambiarCantidadMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCambiarCantidadMouseClicked
+
+        int fila = jTable1.getSelectedRow();
+        if (fila != -1) {
+            int idProductoSeleccionado = Integer.parseInt(jTable1.getValueAt(fila, 0).toString());
+            HashMap<Producto, Integer> p = st.obtenerCarritoActual().getCarritoProductos();
+            Map.Entry<Producto, Integer> entrada = p.entrySet().stream()
+                .filter(e -> e.getKey().getId() == idProductoSeleccionado)
+                .findFirst()
+                .orElse(null);
+            
+            if (entrada == null) {
+                JOptionPane.showMessageDialog(this, "No se encontró el producto en el carrito.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            Producto pro = entrada.getKey();
+            int cantidadActual = entrada.getValue(); 
+            int stockEnTienda = pro.getStock();     
+            int stockMaximoElegible = stockEnTienda + cantidadActual; 
+
+            if (stockMaximoElegible <= 0) {
+                JOptionPane.showMessageDialog(this, "Error con el stock de este producto.", "Error", JOptionPane.ERROR_MESSAGE);
+            } else {
+                String[] opcionesCantidad = new String[stockMaximoElegible];
+                for (int i = 0; i < stockMaximoElegible; i++) {
+                    opcionesCantidad[i] = String.valueOf(i + 1);
+                }
+                Object seleccion = JOptionPane.showInputDialog(
+                    this,
+                    "Modificar cantidad para: " + pro.getNombre() + "\n(Máximo disponible: " + stockMaximoElegible + ")",
+                    "Cambiar Cantidad",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    opcionesCantidad,
+                    String.valueOf(cantidadActual) 
+                );
+                if (seleccion != null) {
+                    int nuevaCantidad = Integer.parseInt((String) seleccion);
+                    if (nuevaCantidad != cantidadActual) {
+                        int diferencia = nuevaCantidad - cantidadActual;
+                        int nuevoStockTienda = stockEnTienda - diferencia;
+                        pro.setStock(nuevoStockTienda);
+                        p.put(pro, nuevaCantidad);
+                        JOptionPane.showMessageDialog(this, "Cantidad actualizada a " + nuevaCantidad + " unidades.");
+                    }
+            }
+        }
+        cargarDatosCarrito();
+    }
+    }//GEN-LAST:event_btnCambiarCantidadMouseClicked
+
+    private void btnVaciarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnVaciarMouseClicked
+    HashMap<Producto, Integer> carritoProductos = st.obtenerCarritoActual().getCarritoProductos();
+    if (carritoProductos == null || carritoProductos.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "El carrito ya está vacío.", "Información", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+    int confirmacion = JOptionPane.showConfirmDialog(
+        this, 
+        "¿Estás seguro de que deseas vaciar todo el carrito?", 
+        "Confirmar Vaciar Carrito", 
+        JOptionPane.YES_NO_OPTION, 
+        JOptionPane.WARNING_MESSAGE
+    );
+    if (confirmacion == JOptionPane.YES_OPTION) {
+        for (Map.Entry<Producto, Integer> entrada : carritoProductos.entrySet()) {
+            Producto pro = entrada.getKey();
+            int cantidadEnCarrito = entrada.getValue();
+            int nuevoStock = pro.getStock() + cantidadEnCarrito;
+            pro.setStock(nuevoStock);
+        }
+        carritoProductos.clear(); 
+        JOptionPane.showMessageDialog(this, "Se ha vaciado el carrito correctamente.");
+        cargarDatosCarrito();
+        }
+    }//GEN-LAST:event_btnVaciarMouseClicked
+
+    private void btnPagarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnPagarMouseClicked
+         
+        Carro carrito = st.obtenerCarritoActual();
+        if(carrito.getCarritoProductos().isEmpty()){
+            JOptionPane.showMessageDialog(this, "El carrito está vacío, porfavor agregue productos", "Error!", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
+        st.obtenerCarritoActual().setFechaCompra(LocalDate.now());  //no formateada
+        st.confirmarCompra(carrito);
+        st.guardarDatos();
+        javax.swing.JOptionPane.showMessageDialog(this, "¡Compra realizada con éxito!","Compra exitosa", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        cargarDatosCarrito();
+    }//GEN-LAST:event_btnPagarMouseClicked
+
     // Estilo de la tabla
     private void configurarTabla() {
         ((DefaultTableModel) jTable1.getModel()).setRowCount(0);
@@ -460,4 +596,24 @@ public class Carrito extends BaseFrame {
     private javax.swing.JPanel panelResumen;
     private javax.swing.JScrollPane tblCarrito;
     // End of variables declaration//GEN-END:variables
+    private void cargarDatosCarrito() {
+        DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
+        modelo.setRowCount(0);
+        entidades.Carro carro = st.obtenerCarritoActual();
+        int cantidadTotalProductos = 0;
+        for (java.util.Map.Entry<entidades.Producto, Integer> entry : carro.getCarritoProductos().entrySet()) {
+            entidades.Producto p = entry.getKey();
+            int cantidad = entry.getValue();
+            double subtotalItem = p.getPrecio() * cantidad;
+
+            modelo.addRow(new Object[]{p.getId(), p.getNombre(), String.format("$%.0f", p.getPrecio()), cantidad, String.format("$%.0f", subtotalItem)});
+            cantidadTotalProductos += cantidad;
+        }
+        //Actualiza textos
+        lblCantidadProductos.setText(cantidadTotalProductos + " productos");
+        lblSubtotal.setText(String.format("$%.0f", carro.getSubTotal()));
+        lblIva1.setText(String.format("$%.0f", carro.getIVA()));
+        lblTotal.setText(String.format("$%.0f", carro.getTotal()));
+    }
+
 }
