@@ -81,8 +81,6 @@ public class HostCliente {
                     }
                 } catch (IOException e) {
                     System.out.println("\n[-] Desconectado del servidor.");
-                } finally {
-                    System.exit(0);
                 }
             });
             receiveThread.setDaemon(true);

@@ -8,8 +8,12 @@ public class ProyectoPoriStore {
 
     public static void main(String[] args) {
         SistemaTienda sistema = SistemaTienda.cargarDatos();
-        HostCliente hc = new HostCliente();
-        hc.initHost(sistema.getInventario());
+        Thread hiloCliente = new Thread(() -> {
+            HostCliente hc = new HostCliente();
+            hc.initHost(sistema.getInventario());
+        });
+        hiloCliente.setDaemon(true);
+        hiloCliente.start();
         java.awt.EventQueue.invokeLater(() -> {
             VistaPrincipal vista = new VistaPrincipal(sistema);
             vista.setLocationRelativeTo(null); 
