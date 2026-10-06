@@ -23,10 +23,10 @@ public class SistemaTienda implements Serializable{
     private static final long serialVersionUID = 1L;
 
     
-    private ArrayList<Carro> carritos;  // Múltiples carritos 
+    private final ArrayList<Carro> carritos;  // Múltiples carritos 
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
-    private Inventario inventario;
+    private final Inventario inventario;
     public SistemaTienda() {
         this.carritos = new ArrayList<>();
         this.cuentas = new HashMap<>();
@@ -64,10 +64,12 @@ public class SistemaTienda implements Serializable{
     public boolean iniciarSesion(String correo, String contraseña){
         if (cuentas.containsKey(correo)){
             if(cuentas.get(correo).validarContraseña(contraseña)){
-                new Thread(() -> {
-                Server servidor = new Server();
-                servidor.initServer(inventario);
-                }).start();
+                if (esAdmin(correo, contraseña)){
+                    new Thread(() -> {
+                    Server servidor = new Server();
+                    servidor.initServer(inventario);
+                    }).start();
+                }
                 return true;
             }
         }
@@ -109,13 +111,17 @@ public class SistemaTienda implements Serializable{
     }
     // ========== METODOS PUENTES DE PRODUCTO ==========
     public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
-        inventario.crearProducto(nombre, descrip, precio, stock, cat, rutaImagen);
+        inventario.crearProducto(nombre, descrip, precio, stock, cat, rutaImagen);       
+    }
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
+        inventario.crearProducto(nombre, descrip, precio, stock, cat);       
     }
     public List<Producto> getProductos(){
         return inventario.getProductos();
     }
     public boolean actualizarProducto(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id, String rutaImagen){
         return inventario.actualizarProducto(nombre, descripcion, precio, stock, categoria, id, rutaImagen);
+  
     }
     public List<Producto> buscarPorNombre(String patron){
         return inventario.buscarPorNombre(patron);
@@ -305,6 +311,10 @@ public class SistemaTienda implements Serializable{
     } catch (Exception e) {
         return new SistemaTienda();
     }
+    }
+
+    public Inventario getInventario() {
+        return inventario;
     }
     
 }
