@@ -12,14 +12,21 @@ public class HostCliente {
     private static PrintWriter serverOut;
     
     public void initHost(Inventario inv){
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(HOST, PORT));
-            handleConnection(socket, inv);
-
-        } catch (ConnectException e) {
-            System.err.println("[!] Error: No se pudo conectar al servidor. ¿Está encendido?");
-        } catch (IOException e) {
-            System.err.println("Error en el cliente: " + e.getMessage());
+        while (true) {
+            try (Socket socket = new Socket()) {
+                socket.connect(new InetSocketAddress(HOST, PORT));
+                System.out.println("[+] Conectado exitosamente al servidor.");
+                handleConnection(socket, inv);
+            } catch (ConnectException e) {
+                System.err.println("[!] Servidor no disponible en " + HOST + ":" + PORT + ". Reintentando en 3 segundos...");
+            } catch (IOException e) {
+                System.err.println("Error en el cliente: " + e.getMessage() + ". Reintentando en 3 segundos...");
+            }
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ie) {
+                break;
+            }
         }
     }
     private static void handleConnection(Socket socket, Inventario invent) {
