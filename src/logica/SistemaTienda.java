@@ -146,6 +146,10 @@ public class SistemaTienda implements Serializable{
     public Producto buscarPorId(int id){
         return inventario.buscarPorId(id);
     }
+    // Revisa si el nombre ya lo usa otro producto (idExcluido = producto que se edita, -1 si es nuevo)
+    public boolean existeNombre(String nombre, int idExcluido){
+        return inventario.existeNombre(nombre, idExcluido);
+    }
     // ========== GESTIÓN DE CARRITOS ==========
 
     public Carro obtenerCarritoActual() { //obtiene el carrito actual
@@ -167,17 +171,28 @@ public class SistemaTienda implements Serializable{
         }
     }
 
-    // Obtener el carritos de un cliente específico en el historial de ventas (para uso admin)
-    public ArrayList<Carro> obtenerCarritoCliente(Cliente cliente) {
-        ArrayList<Carro> carritostemp = new ArrayList<>();
+
+    // Obtener carritos activos (pendientes de pago) // Agregar el de pagado(?)
+    public ArrayList<Carro> getCarritosActivos() {
+        ArrayList<Carro> activos = new ArrayList<>();
         for (Carro c : carritos) {
-            if (c.getCliente() != null &&
-                c.getCliente().getCorreo().equals(cliente.getCorreo()) &&
-                c.getEstado().equals("Pagado")) {
-                carritostemp.add(c);
+            if (c.getEstado().equals("Por pagar")) {
+                activos.add(c);
             }
         }
-        return carritostemp;
+        return activos;
+    }
+
+    // Unidades de un producto apartadas en carritos que aún no se pagan
+    public int calcularReservado(Producto p) {
+        int reservado = 0;
+        for (Carro c : getCarritosActivos()) {
+            Integer cantidad = c.getCarritoProductos().get(p);
+            if (cantidad != null) {
+                reservado += cantidad;
+            }
+        }
+        return reservado;
     }
 
     // Obtener todos los carritos
@@ -206,7 +221,6 @@ public class SistemaTienda implements Serializable{
         c.vaciarCarrito();
         carritos.remove(c);
     }
-    
     
 
     // ========== CÁLCULOS MATEMÁTICOS ==========
