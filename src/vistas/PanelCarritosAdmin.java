@@ -268,11 +268,11 @@ public final class PanelCarritosAdmin extends BaseFrame {
                     .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblMenuProductos)
-                            .addComponent(lblMenuCarritos))))
+                            .addComponent(lblMenuCarritos))
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(15, 15, 15))
         );
 
@@ -286,11 +286,11 @@ public final class PanelCarritosAdmin extends BaseFrame {
 
             },
             new String [] {
-                "N°", "Cliente", "Productos", "Unidades", "Total"
+                "N°", "Cliente", "Productos", "Unidades", "Total", "Estado"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -490,14 +490,26 @@ public final class PanelCarritosAdmin extends BaseFrame {
         darEstilo(tblCarritos, jScrollPane1);
         darEstilo(tblInventario, jScrollPanel2);
 
-        // Carritos: N° | Cliente | Productos | Unidades | Total
-        int[] anchos = {50, 130, 420, 90, 120};
+        // Carritos: N° | Cliente | Productos | Unidades | Total | Estado
+        int[] anchos = {50, 130, 340, 90, 120, 90};
         for (int i = 0; i < anchos.length; i++) {
             tblCarritos.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
         }
         tblCarritos.getColumnModel().getColumn(0).setCellRenderer(alineado(SwingConstants.CENTER));
         tblCarritos.getColumnModel().getColumn(3).setCellRenderer(alineado(SwingConstants.CENTER));
         tblCarritos.getColumnModel().getColumn(4).setCellRenderer(alineado(SwingConstants.RIGHT));
+        tblCarritos.getColumnModel().getColumn(5).setCellRenderer(new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable tabla, Object valor, boolean seleccionada, boolean foco, int fila, int columna) {
+                super.getTableCellRendererComponent(tabla, valor, seleccionada, foco, fila, columna);
+                setHorizontalAlignment(SwingConstants.CENTER);
+                // Pagado en verde, por pagar en amarillo
+                if (!seleccionada) {
+                    setForeground("Pagado".equals(valor) ? new Color(80, 200, 120) : new Color(240, 200, 80));
+                }
+                return this;
+            }
+        });
 
         // Inventario: Producto | Stock | Reservado
         tblInventario.getColumnModel().getColumn(1).setCellRenderer(alineado(SwingConstants.CENTER));
@@ -546,11 +558,15 @@ public final class PanelCarritosAdmin extends BaseFrame {
         int unidadesTotales = 0;
         double montoTotal = 0;
 
-        //Una fila por cada carrito que aun no se paga
-        for (Carro c : st.getCarritosActivos()) {
+        // Primero los carritos que aun no se pagan, despues las compras ya pagadas
+        java.util.List<Carro> todos = new java.util.ArrayList<>(st.getCarritosActivos());
+        todos.addAll(st.getCarritosPagados());
+        int fila = 0;
+        for (Carro c : todos) {
             if (c.getCarritoProductos().isEmpty()) {
                 continue; // un carrito vacío no se muestra
             }
+            boolean pagado = c.getEstado().equals("Pagado");
             // Arma el texto de productos ("mariajuana, cocacola x2") y suma las unidades del carrito
             StringBuilder productos = new StringBuilder();
             int unidades = 0;
@@ -561,12 +577,15 @@ public final class PanelCarritosAdmin extends BaseFrame {
                 productos.append(entrada.getKey().getNombre()).append(" x").append(entrada.getValue());
                 unidades += entrada.getValue();
             }
-            // Agrega la fila: N° | Cliente | Productos | Unidades | Total
-            numero++;
-            modeloCarritos.addRow(new Object[]{numero, c.getNombre(), productos.toString(), unidades, formatoCLP.format(c.getTotal())});
-            // Acumula para las tarjetas
-            unidadesTotales += unidades;
-            montoTotal += c.getTotal();
+            // Agrega la fila: N° | Cliente | Productos | Unidades | Total | Estado
+            fila++;
+            modeloCarritos.addRow(new Object[]{fila, c.getNombre(), productos.toString(), unidades, formatoCLP.format(c.getTotal()), pagado ? "Pagado" : "Por pagar"});
+            // Las tarjetas de arriba solo cuentan lo que sigue reservado (carritos sin pagar)
+            if (!pagado) {
+                numero++;
+                unidadesTotales += unidades;
+                montoTotal += c.getTotal();
+            }
         }
 
         // Inventario: stock que queda en la tienda y cuanto está apartado en carritos
