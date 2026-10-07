@@ -10,10 +10,16 @@ import java.util.regex.*;
 
 public class Server {
 
-    private static final String HOST = "172.26.64.110";
+    private static final String HOST = "192.168.1.8";
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
-
+    private static vistas.Dashboard dashboardTabla;
+   
+    
+    public static void setDashboard(vistas.Dashboard d) {
+        dashboardTabla = d;
+    }   
+    
     public boolean initServer(Inventario invent) {
         try (ServerSocket serverSocket = new ServerSocket()) {
             serverSocket.setReuseAddress(true);
@@ -68,7 +74,7 @@ public class Server {
                         int cantidad = Integer.parseInt(cantidadStr.trim());
                         int id = Integer.parseInt(idStr.trim());
 
-                        if (cantidad <= 0) {
+                        if (cantidad == 0) {
                             out.println(createJsonMessage("La cantidad debe ser mayor a 0."));
                             continue;
                         }
@@ -83,17 +89,21 @@ public class Server {
                                 out.println(createJsonMessage("Producto no encontrado: " + id));
                                 continue;
                             }
-                            if (cantidad > p.getStock()) {
+                            if (cantidad < 0 && (p.getStock() + cantidad) < 0) {
                                 out.println(createJsonMessage("Stock insuficiente para el producto " + id));
                                 continue;
                             }
 
-                            invent.actualizarInventario(p, -cantidad);
+                            invent.actualizarInventario(p, cantidad);
                             stockActual = p.getStock();
                         }
-
+                        if (dashboardTabla != null) {
+                            java.awt.EventQueue.invokeLater(() -> {
+                                dashboardTabla.actualizarTabla(invent.getProductos());
+                            });
+                        }
                         broadcast(createJsonData(stockActual, String.valueOf(id)));
-
+                        
                     } catch (NumberFormatException e) {
                         out.println(createJsonMessage("La cantidad y el id deben ser enteros válidos."));
                     }
@@ -122,14 +132,16 @@ public class Server {
         broadcast(json);   
     }
     private static void broadcast(String mensajeJson) {
-    for (PrintWriter clienteOut : clientesConectados) {
-        try {
-            clienteOut.println(mensajeJson); // Envía el cambio actualizado al cliente
-        } catch (Exception e) {
-            // Si falla, el cliente probablemente se desconectó mal, lo removemos
-            clientesConectados.remove(clienteOut);
+        System.out.println("[Server] Difundiendo a " + clientesConectados.size() + " cliente(s): " + mensajeJson);
+        for (PrintWriter clienteOut : clientesConectados) {
+            try {
+                clienteOut.println(mensajeJson); // Envía el cambio actualizado al cliente
+                clienteOut.flush();
+            } catch (Exception e) {
+                // Si falla, el cliente probablemente se desconectó mal, lo removemos
+                clientesConectados.remove(clienteOut);
+            }
         }
-    }
     }
     
     // Método para crear JSON de mensaje simple

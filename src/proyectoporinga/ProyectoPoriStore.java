@@ -16,6 +16,7 @@ public class ProyectoPoriStore {
         hiloCliente.start();
         java.awt.EventQueue.invokeLater(() -> {
             VistaPrincipal vista = new VistaPrincipal(sistema);
+            HostCliente.setVistaPrincipal(vista);
             vista.setLocationRelativeTo(null); 
             vista.setVisible(true);
             

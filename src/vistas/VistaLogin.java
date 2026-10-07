@@ -5,6 +5,7 @@
 package vistas;
 
 import logica.SistemaTienda;
+import server.Server;
 
 /**
  *
@@ -252,11 +253,12 @@ public class VistaLogin extends BaseFrame {
 
         // Verificar si es admin
         if (st.esAdmin(correo, contraseña)) {
+            st.iniciarSesion(correo, contraseña);
             javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido Administrador");
 
             // Redirigir a Dashboard (modo ADMIN)
-            
             Dashboard dashboard = new Dashboard(st);
+            Server.setDashboard(dashboard);
             this.dispose();
             dashboard.setVisible(true);
             dashboard.setLocationRelativeTo(null);
