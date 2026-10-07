@@ -4,12 +4,15 @@ import entidades.Inventario;
 import entidades.Producto;
 import java.io.*;
 import java.net.*;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.*;
 
 public class Server {
 
-    private static final String HOST = "172.16.52.155";
+    private static final String HOST = "172.26.64.110";
     private static final int PORT = 65432;
+    private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
 
     public boolean initServer(Inventario invent) {
         try (ServerSocket serverSocket = new ServerSocket()) {
@@ -32,11 +35,21 @@ public class Server {
 
     private static void handleClient(Socket clientSocket, Inventario invent) {
         System.out.println("[+] Conectado por " + clientSocket.getInetAddress());
-
+        PrintWriter out = null;
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
-             PrintWriter out = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
+            PrintWriter temp = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
+            out = temp;
+            clientesConectados.add(out);
+
+            // Sincronizar al cliente enviándole los productos existentes en el servidor
+            synchronized (invent) {
+                for (Producto p : invent.getProductos()) {
+                    out.println(createJsonProducto(p));
+                }
+            }
 
             String line;
+            
             while ((line = in.readLine()) != null) {
                 if (line.trim().isEmpty()) continue;
 
@@ -62,7 +75,7 @@ public class Server {
 
                         int stockActual;
 
-                        // Buscar, validar, actualizar y leer el stock como una sola operación atómica
+                        // Buscar, validar, actualizar y leer el stock como una sola operación 
                         synchronized (invent) {
                             Producto p = invent.buscarPorId(id);
 
@@ -79,7 +92,7 @@ public class Server {
                             stockActual = p.getStock();
                         }
 
-                        out.println(createJsonData(stockActual, String.valueOf(id)));
+                        broadcast(createJsonData(stockActual, String.valueOf(id)));
 
                     } catch (NumberFormatException e) {
                         out.println(createJsonMessage("La cantidad y el id deben ser enteros válidos."));
@@ -90,15 +103,35 @@ public class Server {
         } catch (IOException e) {
             System.out.println("[-] Conexión con el cliente interrumpida: " + e.getMessage());
         } finally {
+            clientesConectados.remove(out);
             try {
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("[-] El cliente se ha desconectado.");
+            System.out.println("[-] El cliente se ha desconectado.");   
+        }
+        
+    }
+    
+    public static void notificarCreacion (Producto p){
+        broadcast(createJsonProducto(p));    
+    }
+    public static void notificarEliminacion (int id){
+        String json = "{\"type\": \"eliminar\", \"id\": " + id + "}";
+        broadcast(json);   
+    }
+    private static void broadcast(String mensajeJson) {
+    for (PrintWriter clienteOut : clientesConectados) {
+        try {
+            clienteOut.println(mensajeJson); // Envía el cambio actualizado al cliente
+        } catch (Exception e) {
+            // Si falla, el cliente probablemente se desconectó mal, lo removemos
+            clientesConectados.remove(clienteOut);
         }
     }
-
+    }
+    
     // Método para crear JSON de mensaje simple
     private static String createJsonMessage(String content) {
         return "{\"type\": \"message\", \"content\": \"" + escapeJson(content) + "\"}";
@@ -108,7 +141,22 @@ public class Server {
     private static String createJsonData(int numero, String texto) {
         return "{\"type\": \"data_exchange\", \"numero\": " + numero + ", \"texto\": \"" + escapeJson(texto) + "\"}";
     }
-
+    
+    // Método para crear el JSON de un solo producto con todos sus datos
+    private static String createJsonProducto(Producto p) {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"type\": \"").append("get_producto").append("\", ");
+        json.append("\"id\": ").append(p.getId()).append(", ");
+        json.append("\"nombre\": \"").append(escapeJson(p.getNombre())).append("\", ");
+        json.append("\"descripcion\": \"").append(escapeJson(p.getDescripcion())).append("\", ");
+        json.append("\"precio\": ").append(p.getPrecio()).append(", ");
+        json.append("\"categoria\": \"").append(escapeJson(p.getCategoriaStr())).append("\", ");
+        json.append("\"stock\": ").append(p.getStock()).append(", ");
+        json.append("\"rutaImagen\": \"").append(escapeJson(p.getRutaImagen())).append("\"");
+        json.append("}");
+        return json.toString();
+    }
     // Método para escapar caracteres especiales en JSON
     private static String escapeJson(String text) {
         return text.replace("\\", "\\\\")

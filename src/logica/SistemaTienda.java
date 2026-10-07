@@ -6,6 +6,7 @@ import entidades.Categorias;
 import entidades.Cliente;
 import entidades.Inventario;
 import entidades.Producto;
+import entidades.Ventas;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -27,13 +28,15 @@ public class SistemaTienda implements Serializable{
     private Carro carritoAnonimo;
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
-    private Inventario inventario;
+    private final Inventario inventario;
+    private ArrayList<Ventas> ventas;
     public SistemaTienda() {
         this.carritos = new ArrayList<>();
         this.cuentas = new HashMap<>();
         this.clientes = new HashMap<>();
         this.inventario = new Inventario();
         this.carritoAnonimo = new Carro();
+        this.ventas = new ArrayList<>();
         // Crear admin por defecto si no existe
         crearAdminPorDefecto();
     }
@@ -66,10 +69,12 @@ public class SistemaTienda implements Serializable{
     public boolean iniciarSesion(String correo, String contraseña){
         if (cuentas.containsKey(correo)){
             if(cuentas.get(correo).validarContraseña(contraseña)){
-                new Thread(() -> {
-                Server servidor = new Server();
-                servidor.initServer(inventario);
-                }).start();
+                if (esAdmin(correo, contraseña)){
+                    new Thread(() -> {
+                    Server servidor = new Server();
+                    servidor.initServer(inventario);
+                    }).start();
+                }
                 return true;
             }
         }
@@ -111,13 +116,17 @@ public class SistemaTienda implements Serializable{
     }
     // ========== METODOS PUENTES DE PRODUCTO ==========
     public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat, String rutaImagen){
-        inventario.crearProducto(nombre, descrip, precio, stock, cat, rutaImagen);
+        inventario.crearProducto(nombre, descrip, precio, stock, cat, rutaImagen);       
+    }
+    public void crearProducto(String nombre, String descrip, double precio, int stock, Categorias cat){
+        inventario.crearProducto(nombre, descrip, precio, stock, cat);       
     }
     public List<Producto> getProductos(){
         return inventario.getProductos();
     }
     public boolean actualizarProducto(String nombre, String descripcion, double precio, int stock, Categorias categoria, int id, String rutaImagen){
         return inventario.actualizarProducto(nombre, descripcion, precio, stock, categoria, id, rutaImagen);
+  
     }
     public List<Producto> buscarPorNombre(String patron){
         return inventario.buscarPorNombre(patron);
@@ -166,15 +175,30 @@ public class SistemaTienda implements Serializable{
     }
 
 
-    // Obtener carritos activos (pendientes de pago) // Agregar el de pagado(?)
+    // Obtener carritos activos (pendientes de pago)
     public ArrayList<Carro> getCarritosActivos() {
         ArrayList<Carro> activos = new ArrayList<>();
-        for (Carro c : carritos) {
-            if (c.getEstado().equals("Por pagar")) {
+        if (carritoAnonimo != null && carritoAnonimo.getEstado().equals("Por pagar")) {
+            activos.add(carritoAnonimo);
+        }
+        for (Cliente cl : clientes.values()) {
+            Carro c = cl.getCarritoActual();
+            if (c != null && c.getEstado().equals("Por pagar") && !activos.contains(c)) {
                 activos.add(c);
             }
         }
         return activos;
+    }
+
+    // Obtener carritos ya pagados (ventas realizadas)
+    public ArrayList<Carro> getCarritosPagados() {
+        ArrayList<Carro> pagados = new ArrayList<>();
+        for (Carro c : carritos) {
+            if (c.getEstado().equals("Pagado")) {
+                pagados.add(c);
+            }
+        }
+        return pagados;
     }
 
     // Unidades de un producto apartadas en carritos que aún no se pagan
@@ -197,8 +221,8 @@ public class SistemaTienda implements Serializable{
     // Confirmar compra de un carrito
     public void confirmarCompra(Carro c){
         c.setEstado("Pagado");
-        carritos.add(c); //se guarda en la lista de ventas
-        //le asignamos un carrito nuevo y vacío al usuario
+        Ventas venta = new Ventas(c);//se guarda en la lista de ventas
+        ventas.add(venta);
         Cliente cliente = c.getCliente();
         if (cliente != null) {
             Carro nuevoCarro = new Carro();
@@ -287,6 +311,27 @@ public class SistemaTienda implements Serializable{
         return new SistemaTienda();
     }
     }
+
+    public Inventario getInventario() {
+        return inventario;
+    }
+
+    public Carro getCarritoAnonimo() {
+        return carritoAnonimo;
+    }
+
+    public void setCarritoAnonimo(Carro carritoAnonimo) {
+        this.carritoAnonimo = carritoAnonimo;
+    }
+
+    public ArrayList<Ventas> getVentas() {
+        return ventas;
+    }
+
+    public void setVentas(ArrayList<Ventas> ventas) {
+        this.ventas = ventas;
+    }
+    
     
     
 }
