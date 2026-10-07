@@ -7,9 +7,14 @@ import java.net.*;
 import java.util.regex.*;
 
 public class HostCliente {
-    private static final String HOST = "172.26.64.110";
+    private static final String HOST = "192.168.1.8";
     private static final int PORT = 65432;
     private static PrintWriter serverOut;
+    private static vistas.VistaPrincipal vistaPrincipalActiva;
+    
+    public static void setVistaPrincipal(vistas.VistaPrincipal vista) {
+        vistaPrincipalActiva = vista;
+    }
     
     public void initHost(Inventario inv){
         while (true) {
@@ -49,7 +54,10 @@ public class HostCliente {
                             int cantidad = Integer.parseInt(cantidadStr.trim());
                             int id = Integer.parseInt(idStr.trim());
                             Producto p = invent.buscarPorId(id);
-                            p.setStock(cantidad);
+                            if (p != null) {
+                                p.setStock(cantidad);
+                                System.out.println("[Cliente] Stock actualizado para producto ID " + id + ": " + cantidad);
+                            }
                             
                         } else if ("message".equals(type)) {
                             String content = extractJsonField(line, "content");
@@ -77,13 +85,23 @@ public class HostCliente {
                             }
                             if (existia){
                                 invent.actualizarProductoCliente(nombre, descripcion, precio, stock, Categorias.valueOf(categoria), id, rutaImagen);
+                                System.out.println("[Cliente] Producto actualizado: " + nombre + " (ID " + id + ")");
                             }else{
                                 invent.reCrearProducto(id, nombre, descripcion, precio, stock, Categorias.valueOf(categoria), rutaImagen);
+                                System.out.println("[Cliente] Producto agregado al inventario: " + nombre + " (ID " + id + ")");
                             }    
                         }else if ("eliminar".equals(type)){
                             String idStr = extractJsonField(line, "id");
                             int id = Integer.parseInt(idStr.trim());
                             invent.eliminarProducto(id);
+                            System.out.println("[Cliente] Producto eliminado (ID " + id + ")");
+                        }
+
+                        // Refrescar automáticamente la pantalla del catálogo si la vista está abierta
+                        if (vistaPrincipalActiva != null) {
+                            java.awt.EventQueue.invokeLater(() -> {
+                                vistaPrincipalActiva.cargarCatalogoProductos();
+                            });
                         }
                     }
                 } catch (IOException e) {
@@ -115,11 +133,8 @@ public class HostCliente {
             System.err.println("[!] Error: No hay conexión activa con el servidor.");
         }
     }
-
     // Método para crear JSON de mensaje simple
-    private static String createJsonMessage(String content) {
-        return "{\"type\": \"message\", \"content\": \"" + escapeJson(content) + "\"}";
-    }
+
 
     // Método para crear JSON de intercambio de datos
     private static String createJsonData(int numero, String texto) {

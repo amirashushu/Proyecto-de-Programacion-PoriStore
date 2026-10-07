@@ -339,12 +339,25 @@ public class VistaPrincipal extends BaseFrame {
 
             if (p.getRutaImagen() != null && !p.getRutaImagen().trim().isEmpty()) {
                 try {
-                    
-                    java.io.File file = new java.io.File("src" + p.getRutaImagen());
-                    if (file.exists()) {
-                        ImageIcon icon = new ImageIcon(file.getAbsolutePath());
-                        Image img = icon.getImage().getScaledInstance(120, 90, Image.SCALE_SMOOTH);
-                        lblImagen.setIcon(new ImageIcon(img));
+                    String ruta = p.getRutaImagen().trim();
+                    Image img = null;
+
+                    // 1. Intentar cargar como recurso empaquetado del proyecto (funciona en cualquier PC)
+                    String rutaRecurso = ruta.startsWith("/") ? ruta : "/" + ruta;
+                    java.net.URL url = getClass().getResource(rutaRecurso);
+                    if (url != null) {
+                        img = new ImageIcon(url).getImage();
+                    } else {
+                        // 2. Intentar como archivo físico en src/
+                        java.io.File file = new java.io.File("src" + rutaRecurso);
+                        if (file.exists()) {
+                            img = new ImageIcon(file.getAbsolutePath()).getImage();
+                        }
+                    }
+
+                    if (img != null) {
+                        Image escalada = img.getScaledInstance(120, 90, Image.SCALE_SMOOTH);
+                        lblImagen.setIcon(new ImageIcon(escalada));
                         imagenCargada = true;
                     }
                 } catch (Exception e) {
@@ -391,23 +404,23 @@ public class VistaPrincipal extends BaseFrame {
             add(Box.createVerticalStrut(10));
         }
     }
+    
+    public void cargarCatalogoProductos() {
+        jPanel6.removeAll(); //LIMPIA EL CATALOGO
+        jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 15, 15)); // ORGANIZA LAS TARJETAS
+        jPanel6.setBackground(new java.awt.Color(20, 20, 20)); // FONDO OSCURO
+        java.util.List<entidades.Producto> productos = st.getProductos();
 
-public void cargarCatalogoProductos() {
-    jPanel6.removeAll(); //LIMPIA EL CATALOGO
-    jPanel6.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 15, 15)); // ORGANIZA LAS TARJETAS
-    jPanel6.setBackground(new java.awt.Color(20, 20, 20)); // FONDO OSCURO
-    java.util.List<entidades.Producto> productos = st.getProductos();
-
-    if (st != null && st.getProductos() != null) {
-        for (Producto p : st.getProductos()) {
-            PanelProducto card = new PanelProducto(p);
-            jPanel6.add(card);
+        if (st != null && st.getProductos() != null) {
+            for (Producto p : st.getProductos()) {
+                PanelProducto card = new PanelProducto(p);
+                jPanel6.add(card);
+            }
         }
-    }
 
-    jPanel6.revalidate();
-    jPanel6.repaint();
-}
+        jPanel6.revalidate();
+        jPanel6.repaint();
+    }
 
     //Valida cantidad y stock, agrega al carrito de la sesion y guarda
     private void agregarAlCarrito(Producto p) {
