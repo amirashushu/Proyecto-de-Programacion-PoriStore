@@ -1226,29 +1226,22 @@ public final class Dashboard extends BaseFrame {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleccionar imagen del producto");
         fileChooser.setFileFilter(new FileNameExtensionFilter("Imágenes (PNG, JPG, GIF)", "png", "jpg", "jpeg", "gif"));
-
         // Abrir directamente en la carpeta fotos del proyecto si existe
         File carpetaFotos = new File("src/fotos");
         if (carpetaFotos.exists()) {
+
             fileChooser.setCurrentDirectory(carpetaFotos);
+
         }
-
         int resultado = fileChooser.showOpenDialog(this);
-
         if (resultado == JFileChooser.APPROVE_OPTION) {
             File archivoSeleccionado = fileChooser.getSelectedFile();
-            String rutaGuardada = copiarImagenAProyecto(archivoSeleccionado);
-        
-            // Verificamos que la copia haya sido exitosa
-            if (rutaGuardada != null) {
+            // Usar la ruta relativa estándar del proyecto
+            String rutaRelativa = "/fotos/" + archivoSeleccionado.getName();
             // Guardar ruta relativa
-                rutaImagenActual = rutaGuardada;
-
+            rutaImagenActual = rutaRelativa;
             // Actualizar vista previa con ruta relativa
-                actualizarVistaPrevia(rutaGuardada);
-            } else {
-                javax.swing.JOptionPane.showMessageDialog(this, "Hubo un error al copiar la imagen a la carpeta del proyecto.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-            }
+            actualizarVistaPrevia(rutaRelativa);
         }
     }//GEN-LAST:event_btnSeleccionarImgActionPerformed
 
