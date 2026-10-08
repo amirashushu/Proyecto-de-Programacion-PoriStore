@@ -165,4 +165,12 @@ public class Carro implements Serializable {
         return (int) calcularSubTotal() * 0.19;
     }
     
+    public int getTotalProductos() {
+        int totalProductos = 0;
+        for (Integer cantidad : carritoProductos.values()) {
+            totalProductos += cantidad;
+        }
+        return totalProductos;
+    }
+    
 }

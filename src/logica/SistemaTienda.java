@@ -220,8 +220,9 @@ public class SistemaTienda implements Serializable{
 
     // Confirmar compra de un carrito
     public void confirmarCompra(Carro c){
+        int nuevoId = ventas.size() + 1;
         c.setEstado("Pagado");
-        Ventas venta = new Ventas(c);//se guarda en la lista de ventas
+        Ventas venta = new Ventas(c, nuevoId);//se guarda en la lista de ventas
         ventas.add(venta);
         Cliente cliente = c.getCliente();
         if (cliente != null) {
