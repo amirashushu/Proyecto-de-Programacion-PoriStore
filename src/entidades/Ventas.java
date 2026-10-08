@@ -7,11 +7,11 @@ import java.util.ArrayList;
 
 public class Ventas implements Serializable{
     private Carro carroVenta;
-    private static int idVenta = 1;
+    private int idVenta;
     private LocalDate fecha;
-    public Ventas(Carro c){
-        this.carroVenta = carroVenta;
-        this.idVenta++;
+    public Ventas(Carro c,int idGenerado){
+        this.carroVenta = c;
+        this.idVenta = idGenerado;
         this.fecha = LocalDate.now();
     }
 
@@ -23,12 +23,14 @@ public class Ventas implements Serializable{
         this.carroVenta = carroVenta;
     }
 
-    public static int getIdVenta() {
+    
+
+    public int getIdVenta() {
         return idVenta;
     }
 
-    public static void setIdVenta(int idVenta) {
-        Ventas.idVenta = idVenta;
+    public void setIdVenta(int idVenta) {
+        this.idVenta = idVenta;
     }
 
     public LocalDate getFecha() {

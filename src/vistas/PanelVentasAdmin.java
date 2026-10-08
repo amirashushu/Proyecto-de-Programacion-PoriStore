@@ -1,8 +1,8 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
+
 package vistas;
+import java.text.NumberFormat;
+import java.util.Locale;
+import javax.swing.table.DefaultTableModel;
 import logica.SistemaTienda;
 
 /**
@@ -47,6 +47,9 @@ public PanelVentasAdmin(SistemaTienda st) {
     
     
     tblVentas.setFillsViewportHeight(true);
+    
+    tblVentas.setFillsViewportHeight(true);
+    actualizarTablaVentas();
 }
 public PanelVentasAdmin() {
     initComponents();
@@ -92,7 +95,7 @@ public PanelVentasAdmin() {
         jPanel7.setPreferredSize(new java.awt.Dimension(250, 80));
 
         jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jLabel24.setForeground(new java.awt.Color(255, 0, 51));
+        jLabel24.setForeground(new java.awt.Color(255, 204, 0));
         jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel24.setText(Double.toString(st.calcularValorTotalInventario()));
 
@@ -128,7 +131,7 @@ public PanelVentasAdmin() {
         jPanel8.setPreferredSize(new java.awt.Dimension(250, 80));
 
         jLabel27.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
-        jLabel27.setForeground(new java.awt.Color(255, 200, 0));
+        jLabel27.setForeground(new java.awt.Color(255, 51, 51));
         jLabel27.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel27.setText("Por hacer");
 
@@ -184,7 +187,7 @@ public PanelVentasAdmin() {
                 .addComponent(lblMenuCarritos)
                 .addGap(18, 18, 18)
                 .addComponent(lblMenuVentas)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 340, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -220,7 +223,7 @@ public PanelVentasAdmin() {
                 {null, null, null, null, null, null}
             },
             new String [] {
-                "ID Carrito", "Cliente", "R.U.T", "Fecha", "Productos", "Total"
+                "ID Venta", "Cliente", "R.U.T", "Fecha", "Productos", "Monto Total"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -243,7 +246,9 @@ public PanelVentasAdmin() {
         jPanelVentas.setLayout(jPanelVentasLayout);
         jPanelVentasLayout.setHorizontalGroup(
             jPanelVentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1)
+            .addGroup(jPanelVentasLayout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1524, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 16, Short.MAX_VALUE))
         );
         jPanelVentasLayout.setVerticalGroup(
             jPanelVentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -254,11 +259,11 @@ public PanelVentasAdmin() {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1651, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1592, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanelVentas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanelVentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -289,6 +294,40 @@ public PanelVentasAdmin() {
     private javax.swing.JTable tblVentas;
     // End of variables declaration//GEN-END:variables
 
+    
+    public void actualizarTablaVentas() {
+        DefaultTableModel modelo = (DefaultTableModel) tblVentas.getModel();
+        modelo.setRowCount(0); //limpiar filas anteriores
+        for (entidades.Ventas v : st.getVentas()) {  //recorremos todas las ventas guardadas en el sistema
+            entidades.Carro c = v.getCarroVenta();
+            String rutCliente = (c.getRun() != null) ? c.getRun() : "Sin RUT";             
+            // Si el RUT es nulo (cliente anónimo), mostramos "Sin RUT"
+            
+            modelo.addRow(new Object[]{
+                v.getIdVenta(),                  // ID Venta
+                c.getNombre(),                   // Cliente
+                rutCliente,                      // R.U.T
+                v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
+                c.getTotalProductos(),           // El método que le agregamos a Carro!
+                c.getTotal()  // Monto Total
+            });
+        }
+        
+        actualizarKPIsVentas();
+    }
+
+    // 
+    private void actualizarKPIsVentas() {  
+        double gananciasTotales = 0;
+        int cantidadVentas = st.getVentas().size(); //total de ventas realizadas
+        for(entidades.Ventas v : st.getVentas()){
+            gananciasTotales += v.getCarroVenta().getTotal();
+        }
+        int gananciasTotalesINT = (int) gananciasTotales;
+
+        jLabel24.setText(String.valueOf(cantidadVentas)); //ventas
+        jLabel27.setText("$" + Integer.toString(gananciasTotalesINT));      //monto
+    }
 public javax.swing.JLabel getMenuProductos() {
     return lblMenuProductos;
 }
@@ -311,6 +350,9 @@ public javax.swing.JLabel getLogo() {
 
 public javax.swing.JLabel getTitulo() {
     return jLabel10; 
+}
+public javax.swing.JPanel getPanelPrincipal() {
+    return this; 
 }
 
 }
