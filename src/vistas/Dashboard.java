@@ -34,6 +34,11 @@ public final class Dashboard extends BaseFrame {
     public Dashboard(SistemaTienda st) {
         super(st);
         initComponents();
+        jPanelVistaPrevia.setLayout(new java.awt.BorderLayout()); 
+        lblVistaPrevia.setPreferredSize(new java.awt.Dimension(130, 130));
+        lblVistaPrevia.setHorizontalAlignment(javax.swing.SwingConstants.CENTER); //centro horizontal
+        lblVistaPrevia.setVerticalAlignment(javax.swing.SwingConstants.CENTER);   //centro vertical
+        jPanelVistaPrevia.add(lblVistaPrevia, java.awt.BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
         this.modeloTabla = (DefaultTableModel) tblProductos.getModel();
         txtId.setText("Auto");
@@ -1299,7 +1304,7 @@ public final class Dashboard extends BaseFrame {
 
                 // Escalar imagen para que quepa en lblVistaPrevia 
                 Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(
-                    150, 150, Image.SCALE_SMOOTH
+                    130, 130, Image.SCALE_SMOOTH
                 );
 
                 // Mostrar en vista previa
