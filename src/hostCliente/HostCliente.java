@@ -125,6 +125,25 @@ public class HostCliente {
     public static void notificarPeticion (int id, int cant){
         broadcast(createJsonData(cant, String.valueOf(id)));
     }
+
+    // Envía al servidor el carrito completo para que el admin lo vea en "Carritos activos" y calcule lo reservado
+    // Productos van como "idProducto x cantidad" separados por coma, por ejemplo "1x2,3x1"
+    public static void notificarCarrito(entidades.Carro carro) {
+        StringBuilder productos = new StringBuilder();
+        for (java.util.Map.Entry<Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
+            if (productos.length() > 0) {
+                productos.append(",");
+            }
+            productos.append(entrada.getKey().getId()).append("x").append(entrada.getValue());
+        }
+        String run = carro.getRun() != null ? carro.getRun() : "-";
+        String json = "{\"type\": \"carrito\", \"id\": \"" + escapeJson(carro.getIdSesion()) + "\", "
+                + "\"cliente\": \"" + escapeJson(carro.getNombre()) + "\", "
+                + "\"run\": \"" + escapeJson(run) + "\", "
+                + "\"estado\": \"" + escapeJson(carro.getEstado()) + "\", "
+                + "\"productos\": \"" + productos + "\"}";
+        broadcast(json);
+    }
     private static void broadcast(String mensajeJson) {        
         if (serverOut != null) {
             serverOut.println(mensajeJson); // Envía el mensaje al servidor

@@ -70,6 +70,7 @@ public class SistemaTienda implements Serializable{
         if (cuentas.containsKey(correo)){
             if(cuentas.get(correo).validarContraseña(contraseña)){
                 if (esAdmin(correo, contraseña)){
+                    Server.setSistema(this);
                     new Thread(() -> {
                     Server servidor = new Server();
                     servidor.initServer(inventario);
@@ -187,7 +188,52 @@ public class SistemaTienda implements Serializable{
                 activos.add(c);
             }
         }
+    // Carritos de los clientes conectados por socket (solo los tiene el admin)
+        activos.addAll(getCarritosRemotos().values());
         return activos;
+    }
+
+    // ========== CARRITOS DE CLIENTES CONECTADOS (los recibe el servidor del admin) ==========
+
+    private transient java.util.concurrent.ConcurrentHashMap<String, Carro> carritosRemotos;
+
+    private java.util.concurrent.ConcurrentHashMap<String, Carro> getCarritosRemotos() {
+        if (carritosRemotos == null) {
+            carritosRemotos = new java.util.concurrent.ConcurrentHashMap<>();
+        }
+        return carritosRemotos;
+    }
+
+    // Se arma un Carro nuevo cada vez (no se modifica el anterior) para que la vista del admin no choque al leerlo
+    public void actualizarCarritoRemoto(String id, String nombreCliente, String run, String estado, String productos) {
+        if (id == null) {
+            return;
+        }
+        Carro carro = new Carro();
+        if (nombreCliente != null && !nombreCliente.equals("Anónimo")) {
+            carro.setCliente(new Cliente(run == null ? "-" : run, nombreCliente, "-", ""));
+        }
+        if (productos != null && !productos.isEmpty()) {
+            for (String par : productos.split(",")) {
+                String[] partes = par.split("x");
+                Producto p = inventario.buscarPorId(Integer.parseInt(partes[0].trim()));
+                if (p != null) {
+                    carro.getCarritoProductos().put(p, Integer.parseInt(partes[1].trim()));
+                }
+            }
+        }
+
+        if ("Pagado".equals(estado)) {
+            // Compra confirmada, deja de estar activo y queda registrada como venta en el admin
+            getCarritosRemotos().remove(id);
+            carro.setEstado("Pagado");
+            carritos.add(carro);
+            ventas.add(new Ventas(carro));
+        } else if (carro.getCarritoProductos().isEmpty()) {
+            getCarritosRemotos().remove(id); // carrito vacio, ya no es activo
+        } else {
+            getCarritosRemotos().put(id, carro);
+        }
     }
 
     // Obtener carritos ya pagados (ventas realizadas)
@@ -221,6 +267,7 @@ public class SistemaTienda implements Serializable{
     // Confirmar compra de un carrito
     public void confirmarCompra(Carro c){
         c.setEstado("Pagado");
+        hostCliente.HostCliente.notificarCarrito(c); // el admin la registra como venta y la saca de carritos activos
         Ventas venta = new Ventas(c);//se guarda en la lista de ventas
         ventas.add(venta);
         Cliente cliente = c.getCliente();

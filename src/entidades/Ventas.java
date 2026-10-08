@@ -1,4 +1,3 @@
-
 package entidades;
 
 import java.io.Serializable;
@@ -10,7 +9,7 @@ public class Ventas implements Serializable{
     private static int idVenta = 1;
     private LocalDate fecha;
     public Ventas(Carro c){
-        this.carroVenta = carroVenta;
+        this.carroVenta = c; 
         this.idVenta++;
         this.fecha = LocalDate.now();
     }

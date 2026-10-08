@@ -18,7 +18,14 @@ public class Server {
     
     public static void setDashboard(vistas.Dashboard d) {
         dashboardTabla = d;
-    }   
+    }
+
+    //Sistema del admin, donde se guardan los carritos que mandan los clientes
+    private static logica.SistemaTienda sistemaAdmin;
+
+    public static void setSistema(logica.SistemaTienda st) {
+        sistemaAdmin = st;
+    }
     
     public boolean initServer(Inventario invent) {
         try (ServerSocket serverSocket = new ServerSocket()) {
@@ -60,6 +67,19 @@ public class Server {
                 if (line.trim().isEmpty()) continue;
 
                 String type = extractJsonField(line, "type");
+
+                //Un cliente avisa como quedo su carrito, el admin lo muestra en "Carritos activos" y en "Reservado"
+                if ("carrito".equals(type)) {
+                    if (sistemaAdmin != null) {
+                        sistemaAdmin.actualizarCarritoRemoto(
+                                extractJsonField(line, "id"),
+                                extractJsonField(line, "cliente"),
+                                extractJsonField(line, "run"),
+                                extractJsonField(line, "estado"),
+                                extractJsonField(line, "productos"));
+                    }
+                    continue;
+                }
 
                 if ("data_exchange".equals(type)) {
                     String cantidadStr = extractJsonField(line, "numero");

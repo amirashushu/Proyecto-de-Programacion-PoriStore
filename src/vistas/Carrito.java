@@ -430,11 +430,9 @@ public class Carrito extends BaseFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnCambiarCantidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCambiarCantidadActionPerformed
-        //cambiar la cantidad del producto seleccionado
     }//GEN-LAST:event_btnCambiarCantidadActionPerformed
 
     private void btnPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarActionPerformed
-        //confirmar la compra y mostrar el comprobante
     }//GEN-LAST:event_btnPagarActionPerformed
 
     private void btnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseClicked
@@ -492,10 +490,7 @@ public class Carrito extends BaseFrame {
                 if (seleccion != null) {
                     int nuevaCantidad = Integer.parseInt((String) seleccion);
                     if (nuevaCantidad != cantidadActual) {
-                        int diferencia = nuevaCantidad - cantidadActual;
-                        int nuevoStockTienda = stockEnTienda - diferencia;
-                        pro.setStock(nuevoStockTienda);
-                        p.put(pro, nuevaCantidad);
+                        st.obtenerCarritoActual().actualizarCantidad(pro.getId(), nuevaCantidad);
                         JOptionPane.showMessageDialog(this, "Cantidad actualizada a " + nuevaCantidad + " unidades.");
                     }
             }
@@ -518,13 +513,7 @@ public class Carrito extends BaseFrame {
         JOptionPane.WARNING_MESSAGE
     );
     if (confirmacion == JOptionPane.YES_OPTION) {
-        for (Map.Entry<Producto, Integer> entrada : carritoProductos.entrySet()) {
-            Producto pro = entrada.getKey();
-            int cantidadEnCarrito = entrada.getValue();
-            int nuevoStock = pro.getStock() + cantidadEnCarrito;
-            pro.setStock(nuevoStock);
-        }
-        carritoProductos.clear(); 
+        st.obtenerCarritoActual().vaciarCarrito();
         JOptionPane.showMessageDialog(this, "Se ha vaciado el carrito correctamente.");
         cargarDatosCarrito();
         }
