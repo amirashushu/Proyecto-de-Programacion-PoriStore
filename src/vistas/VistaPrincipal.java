@@ -20,6 +20,7 @@ public class VistaPrincipal extends BaseFrame {
     public VistaPrincipal(SistemaTienda st) {
         super(st);
         initComponents();
+        hostCliente.HostCliente.setVistaPrincipal(this);
         setLocationRelativeTo(null);
         cargarCatalogoProductos();
     }

@@ -308,7 +308,7 @@ public PanelVentasAdmin() {
                 c.getNombre(),                   // Cliente
                 rutCliente,                      // R.U.T
                 v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
-                c.getTotalProductos(),           // El método que le agregamos a Carro!
+                c.getTotalProductos(),          
                 c.getTotal()  // Monto Total
             });
         }
@@ -321,7 +321,7 @@ public PanelVentasAdmin() {
         double gananciasTotales = 0;
         int cantidadVentas = st.getVentas().size(); //total de ventas realizadas
         for(entidades.Ventas v : st.getVentas()){
-            gananciasTotales += v.getCarroVenta().getTotal();
+            gananciasTotales += v.getCarroVenta().getSubTotal() ;
         }
         int gananciasTotalesINT = (int) gananciasTotales;
 
