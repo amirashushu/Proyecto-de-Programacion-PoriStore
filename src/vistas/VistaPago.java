@@ -1,0 +1,449 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package vistas;
+
+/**
+ *
+ * @author amira
+ */
+public class VistaPago extends javax.swing.JFrame {
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaPago.class.getName());
+
+    /**
+     * Creates new form VistaPago
+     */
+    public VistaPago() {
+        initComponents();
+    }
+
+    private entidades.Carro carro;
+    private Runnable confirmarCompra; // registra la venta (lo entrega el Carrito)
+    private final java.text.NumberFormat formatoCLP = java.text.NumberFormat.getCurrencyInstance(java.util.Locale.forLanguageTag("es-CL"));
+
+    // Pago simulado, confirmarCompra registra la venta y alCerrar recarga el carrito cuando se cierra la ventana
+    public VistaPago(entidades.Carro carro, Runnable confirmarCompra, Runnable alCerrar) {
+        initComponents();
+        this.carro = carro;
+        this.confirmarCompra = confirmarCompra;
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE); // cerrar solo esta ventana
+        setResizable(false);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                alCerrar.run();
+            }
+        });
+
+        // Las dos pantallas una sobre otra, se muestra una a la vez
+        getContentPane().removeAll();
+        getContentPane().setLayout(new java.awt.CardLayout());
+        getContentPane().add(panelPago, "pago");
+        getContentPane().add(panelComprobante, "comprobante");
+        setPreferredSize(null); 
+        pack();
+
+        // Tabla del comprobante
+        ((javax.swing.table.DefaultTableModel) tblComprobante.getModel()).setRowCount(0);
+        tblComprobante.setDefaultEditor(Object.class, null);
+        tblComprobante.getTableHeader().setBackground(new java.awt.Color(180, 0, 0));
+        tblComprobante.getTableHeader().setForeground(java.awt.Color.WHITE);
+        tblComprobante.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+        jScrollPane1.getViewport().setBackground(new java.awt.Color(30, 30, 30));
+
+        lblTotalPagar.setText("Total a pagar: " + plata(carro.getTotal()));
+        lblEstado.setText(" ");
+        btnPagarAhora.addActionListener(e -> pagar());
+        btnCancelar.addActionListener(e -> dispose());
+        btnCerrar.addActionListener(e -> dispose());
+    }
+
+    // Simula que el banco procesa el pago y luego muestra el comprobante
+    private void pagar() {
+        lblEstado.setText("Procesando pago...");
+        btnPagarAhora.setEnabled(false);
+        btnCancelar.setEnabled(false); 
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        javax.swing.Timer espera = new javax.swing.Timer(1500, e -> {
+            confirmarCompra.run();
+            llenarComprobante();
+            ((java.awt.CardLayout) getContentPane().getLayout()).show(getContentPane(), "comprobante");
+            setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        });
+        espera.setRepeats(false);
+        espera.start();
+    }
+
+    private void llenarComprobante() {
+        String numero = txtNumeroTarjeta.getText().replaceAll("[^0-9]", "");
+        String ultimos = numero.length() >= 4 ? numero.substring(numero.length() - 4) : numero;
+        lblFecha.setText("Fecha: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
+        lblCliente.setText("Cliente: " + carro.getNombre() + (carro.getRun() != null ? " (" + carro.getRun() + ")" : ""));
+        lblTarjeta.setText("Tarjeta: **** **** **** " + ultimos);
+
+        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tblComprobante.getModel();
+        for (java.util.Map.Entry<entidades.Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
+            entidades.Producto p = entrada.getKey();
+            modelo.addRow(new Object[]{p.getNombre(), entrada.getValue(), plata(p.getPrecio() * entrada.getValue())});
+        }
+        lblSubtotal.setText("Subtotal: " + plata(carro.getSubTotal()));
+        lblIva.setText("IVA (19%): " + plata(carro.getIVA()));
+        lblTotal.setText("Total: " + plata(carro.getTotal()));
+    }
+
+    // Formato chileno
+    private String plata(double monto) {
+        boolean conCentavos = Math.round(monto * 100) % 100 != 0;
+        formatoCLP.setMinimumFractionDigits(conCentavos ? 2 : 0);
+        formatoCLP.setMaximumFractionDigits(conCentavos ? 2 : 0);
+        return formatoCLP.format(monto);
+    }
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        panelPago = new javax.swing.JPanel();
+        lblTituloPago = new javax.swing.JLabel();
+        lblTotalPagar = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        txtNumeroTarjeta = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        txtTitular = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        txtVencimiento = new javax.swing.JTextField();
+        txtCVV = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        lblEstado = new javax.swing.JLabel();
+        btnCancelar = new javax.swing.JButton();
+        btnPagarAhora = new javax.swing.JButton();
+        panelComprobante = new javax.swing.JPanel();
+        lblTituloComprobante = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        lblFecha = new javax.swing.JLabel();
+        lblCliente = new javax.swing.JLabel();
+        lblTarjeta = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tblComprobante = new javax.swing.JTable();
+        lblSubtotal = new javax.swing.JLabel();
+        lblIva = new javax.swing.JLabel();
+        lblTotal = new javax.swing.JLabel();
+        btnCerrar = new javax.swing.JButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        panelPago.setBackground(new java.awt.Color(20, 20, 20));
+        panelPago.setForeground(new java.awt.Color(20, 20, 20));
+
+        lblTituloPago.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        lblTituloPago.setForeground(new java.awt.Color(255, 255, 255));
+        lblTituloPago.setText("Pago con tarjeta");
+        lblTituloPago.setAlignmentY(0.0F);
+
+        lblTotalPagar.setBackground(new java.awt.Color(255, 255, 255));
+        lblTotalPagar.setFont(new java.awt.Font("Segoe UI", 1, 16)); // NOI18N
+        lblTotalPagar.setForeground(new java.awt.Color(255, 255, 255));
+        lblTotalPagar.setText("Total a pagar: $0");
+
+        jLabel1.setForeground(new java.awt.Color(170, 170, 170));
+        jLabel1.setText("Número de tarjeta");
+
+        txtNumeroTarjeta.addActionListener(this::txtNumeroTarjetaActionPerformed);
+
+        jLabel2.setForeground(new java.awt.Color(170, 170, 170));
+        jLabel2.setText("Nombre del titular");
+
+        txtTitular.addActionListener(this::txtTitularActionPerformed);
+
+        jLabel3.setForeground(new java.awt.Color(170, 170, 170));
+        jLabel3.setText("\tVencimiento (MM/AA)");
+
+        txtVencimiento.addActionListener(this::txtVencimientoActionPerformed);
+
+        txtCVV.addActionListener(this::txtCVVActionPerformed);
+
+        jLabel4.setForeground(new java.awt.Color(170, 170, 170));
+        jLabel4.setText("\tCVV");
+
+        lblEstado.setForeground(new java.awt.Color(170, 170, 170));
+
+        btnCancelar.setBackground(new java.awt.Color(30, 30, 30));
+        btnCancelar.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnCancelar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCancelar.setText("Cancelar");
+
+        btnPagarAhora.setBackground(new java.awt.Color(180, 0, 0));
+        btnPagarAhora.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnPagarAhora.setForeground(new java.awt.Color(255, 255, 255));
+        btnPagarAhora.setText("Pagar");
+
+        javax.swing.GroupLayout panelPagoLayout = new javax.swing.GroupLayout(panelPago);
+        panelPago.setLayout(panelPagoLayout);
+        panelPagoLayout.setHorizontalGroup(
+            panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPagoLayout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblEstado)
+                    .addComponent(jLabel2)
+                    .addComponent(txtTitular, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(lblTotalPagar)
+                    .addComponent(lblTituloPago)
+                    .addComponent(txtNumeroTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 370, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(panelPagoLayout.createSequentialGroup()
+                        .addGroup(panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(btnCancelar, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtVencimiento))
+                        .addGap(18, 18, 18)
+                        .addGroup(panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4)
+                            .addComponent(txtCVV, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnPagarAhora, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(29, Short.MAX_VALUE))
+        );
+        panelPagoLayout.setVerticalGroup(
+            panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPagoLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(lblTituloPago)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblTotalPagar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtNumeroTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel2)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtTitular, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtVencimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtCVV, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(lblEstado)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnPagarAhora, javax.swing.GroupLayout.DEFAULT_SIZE, 38, Short.MAX_VALUE)
+                    .addComponent(btnCancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(181, Short.MAX_VALUE))
+        );
+
+        panelComprobante.setBackground(new java.awt.Color(20, 20, 20));
+
+        lblTituloComprobante.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        lblTituloComprobante.setForeground(new java.awt.Color(255, 255, 255));
+        lblTituloComprobante.setText("Compra realizada");
+
+        jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(170, 170, 170));
+        jLabel5.setText("Comprobante de pago");
+
+        lblFecha.setForeground(new java.awt.Color(255, 255, 255));
+        lblFecha.setText("Fecha:");
+
+        lblCliente.setForeground(new java.awt.Color(255, 255, 255));
+        lblCliente.setText("Cliente:");
+
+        lblTarjeta.setForeground(new java.awt.Color(255, 255, 255));
+        lblTarjeta.setText("Tarjeta:");
+
+        tblComprobante.setBackground(new java.awt.Color(30, 30, 30));
+        tblComprobante.setForeground(new java.awt.Color(255, 255, 255));
+        tblComprobante.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Producto", "Cantidad", "Subtotal"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, true, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblComprobante.setRowHeight(22);
+        jScrollPane1.setViewportView(tblComprobante);
+
+        lblSubtotal.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        lblSubtotal.setForeground(new java.awt.Color(170, 170, 170));
+        lblSubtotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblSubtotal.setText("\tSubtotal: $0");
+
+        lblIva.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        lblIva.setForeground(new java.awt.Color(170, 170, 170));
+        lblIva.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblIva.setText("\tIVA (19%): $0");
+
+        lblTotal.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTotal.setForeground(new java.awt.Color(255, 255, 255));
+        lblTotal.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblTotal.setText("Total: $0");
+
+        btnCerrar.setBackground(new java.awt.Color(180, 0, 0));
+        btnCerrar.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
+        btnCerrar.setForeground(new java.awt.Color(255, 255, 255));
+        btnCerrar.setText("Cerrar");
+
+        javax.swing.GroupLayout panelComprobanteLayout = new javax.swing.GroupLayout(panelComprobante);
+        panelComprobante.setLayout(panelComprobanteLayout);
+        panelComprobanteLayout.setHorizontalGroup(
+            panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelComprobanteLayout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel5)
+                    .addComponent(lblTituloComprobante)
+                    .addGroup(panelComprobanteLayout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+                            .addComponent(btnCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblSubtotal, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblIva, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblTotal, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addComponent(lblFecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblTarjeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+        panelComprobanteLayout.setVerticalGroup(
+            panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelComprobanteLayout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(lblTituloComprobante)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblFecha)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblCliente)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblTarjeta)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lblSubtotal)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblIva)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblTotal)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(85, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panelPago, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(panelComprobante, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(panelPago, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(panelComprobante, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addContainerGap()))
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void txtNumeroTarjetaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNumeroTarjetaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtNumeroTarjetaActionPerformed
+
+    private void txtTitularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTitularActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtTitularActionPerformed
+
+    private void txtVencimientoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtVencimientoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtVencimientoActionPerformed
+
+    private void txtCVVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCVVActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCVVActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new VistaPago().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnCerrar;
+    private javax.swing.JButton btnPagarAhora;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel lblCliente;
+    private javax.swing.JLabel lblEstado;
+    private javax.swing.JLabel lblFecha;
+    private javax.swing.JLabel lblIva;
+    private javax.swing.JLabel lblSubtotal;
+    private javax.swing.JLabel lblTarjeta;
+    private javax.swing.JLabel lblTituloComprobante;
+    private javax.swing.JLabel lblTituloPago;
+    private javax.swing.JLabel lblTotal;
+    private javax.swing.JLabel lblTotalPagar;
+    private javax.swing.JPanel panelComprobante;
+    private javax.swing.JPanel panelPago;
+    private javax.swing.JTable tblComprobante;
+    private javax.swing.JTextField txtCVV;
+    private javax.swing.JTextField txtNumeroTarjeta;
+    private javax.swing.JTextField txtTitular;
+    private javax.swing.JTextField txtVencimiento;
+    // End of variables declaration//GEN-END:variables
+}
