@@ -53,7 +53,7 @@ public class Carro implements Serializable {
         if (productoAEliminar != null) {
             int cantidad = carritoProductos.get(productoAEliminar);
             HostCliente.notificarPeticion(id, cantidad); //  Restaura stock
-            carritoProductos.remove(productoAEliminar);  // Elimina del carritoProductos
+            carritoProductos.remove(productoAEliminar);  // Elimina del carritoProductos            
             HostCliente.notificarCarrito(this); // el admin ve el carrito actualizado
             return true;
         }
@@ -67,7 +67,7 @@ public class Carro implements Serializable {
             HostCliente.notificarPeticion(p.getId(), c);
         }
         carritoProductos.clear();
-        HostCliente.notificarCarrito(this); //el admin ve que el carrito quedo vacio
+        HostCliente.notificarCarrito(this); // el admin ve que el carrito quedo vacio
     }
 
     // Cambia la cantidad de un producto ajustando el stock por la diferencia (0 = eliminar)
@@ -81,7 +81,7 @@ public class Carro implements Serializable {
                 if (diferencia > p.getStock()) {
                     return false;
                 }
-                //le pide al servidor que descuente (o devuelva) la diferencia, el servidor avisa el nuevo stock a todos
+                // le pide al servidor que descuente la diferencia, el servidor avisa el nuevo stock a todos
                 HostCliente.notificarPeticion(id, -diferencia);
                 carritoProductos.put(p, nuevaCantidad);
                 HostCliente.notificarCarrito(this); // el admin ve la nueva cantidad
@@ -168,6 +168,14 @@ public class Carro implements Serializable {
 
     public double getIVA() {
         return (int) calcularSubTotal() * 0.19;
+    }
+    
+    public int getTotalProductos() {
+        int totalProductos = 0;
+        for (Integer cantidad : carritoProductos.values()) {
+            totalProductos += cantidad;
+        }
+        return totalProductos;
     }
     
 }

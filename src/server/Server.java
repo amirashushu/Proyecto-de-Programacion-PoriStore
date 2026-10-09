@@ -18,9 +18,9 @@ public class Server {
     
     public static void setDashboard(vistas.Dashboard d) {
         dashboardTabla = d;
-    }
+    }   
 
-    //Sistema del admin, donde se guardan los carritos que mandan los clientes
+    // Sistema del admin, donde se guardan los carritos que mandan los clientes
     private static logica.SistemaTienda sistemaAdmin;
 
     public static void setSistema(logica.SistemaTienda st) {

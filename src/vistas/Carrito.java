@@ -430,9 +430,11 @@ public class Carrito extends BaseFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnCambiarCantidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCambiarCantidadActionPerformed
+        //cambiar la cantidad del producto seleccionado
     }//GEN-LAST:event_btnCambiarCantidadActionPerformed
 
     private void btnPagarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarActionPerformed
+        //confirmar la compra y mostrar el comprobante
     }//GEN-LAST:event_btnPagarActionPerformed
 
     private void btnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseClicked

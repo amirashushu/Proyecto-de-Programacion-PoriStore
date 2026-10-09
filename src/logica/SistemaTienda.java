@@ -70,7 +70,7 @@ public class SistemaTienda implements Serializable{
         if (cuentas.containsKey(correo)){
             if(cuentas.get(correo).validarContraseña(contraseña)){
                 if (esAdmin(correo, contraseña)){
-                    Server.setSistema(this);
+                    Server.setSistema(this); // el servidor guarda aqui los carritos de los clientes
                     new Thread(() -> {
                     Server servidor = new Server();
                     servidor.initServer(inventario);
@@ -188,7 +188,7 @@ public class SistemaTienda implements Serializable{
                 activos.add(c);
             }
         }
-    // Carritos de los clientes conectados por socket (solo los tiene el admin)
+        //Carritos de los clientes conectados por socket (solo los tiene el admin)
         activos.addAll(getCarritosRemotos().values());
         return activos;
     }
@@ -228,9 +228,9 @@ public class SistemaTienda implements Serializable{
             getCarritosRemotos().remove(id);
             carro.setEstado("Pagado");
             carritos.add(carro);
-            ventas.add(new Ventas(carro));
+            ventas.add(new Ventas(carro, ventas.size() + 1));
         } else if (carro.getCarritoProductos().isEmpty()) {
-            getCarritosRemotos().remove(id); // carrito vacio, ya no es activo
+            getCarritosRemotos().remove(id); // carrito vacio
         } else {
             getCarritosRemotos().put(id, carro);
         }
@@ -266,9 +266,10 @@ public class SistemaTienda implements Serializable{
 
     // Confirmar compra de un carrito
     public void confirmarCompra(Carro c){
+        int nuevoId = ventas.size() + 1;
         c.setEstado("Pagado");
         hostCliente.HostCliente.notificarCarrito(c); // el admin la registra como venta y la saca de carritos activos
-        Ventas venta = new Ventas(c);//se guarda en la lista de ventas
+        Ventas venta = new Ventas(c, nuevoId);//se guarda en la lista de ventas
         ventas.add(venta);
         Cliente cliente = c.getCliente();
         if (cliente != null) {

@@ -34,6 +34,11 @@ public final class Dashboard extends BaseFrame {
     public Dashboard(SistemaTienda st) {
         super(st);
         initComponents();
+        jPanelVistaPrevia.setLayout(new java.awt.BorderLayout()); 
+        lblVistaPrevia.setPreferredSize(new java.awt.Dimension(130, 130));
+        lblVistaPrevia.setHorizontalAlignment(javax.swing.SwingConstants.CENTER); //centro horizontal
+        lblVistaPrevia.setVerticalAlignment(javax.swing.SwingConstants.CENTER);   //centro vertical
+        jPanelVistaPrevia.add(lblVistaPrevia, java.awt.BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
         this.modeloTabla = (DefaultTableModel) tblProductos.getModel();
         txtId.setText("Auto");
@@ -57,18 +62,21 @@ public final class Dashboard extends BaseFrame {
 
     // Vista de carritos activos e inventario reservado
     private PanelCarritosAdmin vistaCarritos;
+    private PanelVentasAdmin vistaVentas;
     // Muestra una vista a la vez: "productos" (este Dashboard) o "carritos"
     private java.awt.CardLayout vistas;
     private javax.swing.JPanel contenedorVistas;
     // Opciones del menú 
     private final List<JLabel> menuProductos = new java.util.ArrayList<>();
     private final List<JLabel> menuCarritos = new java.util.ArrayList<>();
+    private final List<JLabel> menuVentas = new java.util.ArrayList<>();
     private static final Color GRIS_MENU = new Color(150, 150, 150);
     private static final Color ROJO_MENU = new Color(255, 0, 51);
 
     // Junta las dos vistas en la misma ventana y muestra una a la vez
     private void configurarMenu() {
         vistaCarritos = new PanelCarritosAdmin(st);
+        vistaVentas = new PanelVentasAdmin(st);
 
         java.awt.Dimension tamañoVista = jPanel3.getSize();
         vistas = new java.awt.CardLayout();
@@ -77,6 +85,7 @@ public final class Dashboard extends BaseFrame {
         getContentPane().removeAll();
         getContentPane().setLayout(new java.awt.BorderLayout());
         getContentPane().add(contenedorVistas, java.awt.BorderLayout.CENTER);
+        contenedorVistas.add(vistaVentas.getPanelPrincipal(), "ventas");
         contenedorVistas.add(jPanel3, "productos");
         contenedorVistas.add(vistaCarritos.getPanelPrincipal(), "carritos");
         pack();
@@ -84,13 +93,18 @@ public final class Dashboard extends BaseFrame {
 
         conectarOpcionMenu(lblMenuProductos, "productos");
         conectarOpcionMenu(lblMenuCarritos, "carritos");
+        conectarOpcionMenu(lblMenuVentas, "ventas");
         conectarOpcionMenu(vistaCarritos.getMenuProductos(), "productos");
         conectarOpcionMenu(vistaCarritos.getMenuCarritos(), "carritos");
+        conectarOpcionMenu(vistaCarritos.getMenuVentas(), "ventas");
+        conectarOpcionMenu(vistaVentas.getMenuProductos(), "productos");
+        conectarOpcionMenu(vistaVentas.getMenuCarritos(), "carritos");
+        conectarOpcionMenu(vistaVentas.getMenuVentas(), "ventas");
 
         // Menu centrado con el logo y con la misma separacion en los dos headers
-        alinearHeader(jPanel5, jLabel11, jLabel10, lblMenuProductos, lblMenuCarritos);
-        alinearHeader(vistaCarritos.getHeader(), vistaCarritos.getLogo(), vistaCarritos.getTitulo(),
-                vistaCarritos.getMenuProductos(), vistaCarritos.getMenuCarritos());
+        alinearHeader(jPanel5, jLabel11, jLabel10, lblMenuProductos, lblMenuCarritos, lblMenuVentas);
+        alinearHeader(vistaCarritos.getHeader(), vistaCarritos.getLogo(), vistaCarritos.getTitulo(), vistaCarritos.getMenuProductos(), vistaCarritos.getMenuCarritos(), vistaCarritos.getMenuVentas());
+        alinearHeader(vistaVentas.getHeader(), vistaVentas.getLogo(), vistaVentas.getTitulo(), vistaVentas.getMenuProductos(), vistaVentas.getMenuCarritos(), vistaVentas.getMenuVentas());
         mostrarVista("productos");
 
         // Al cerrar el Dashboard se detiene la actualización automatica de los carritos
@@ -104,7 +118,7 @@ public final class Dashboard extends BaseFrame {
     }
 
     // Acomoda un header 
-    private void alinearHeader(javax.swing.JPanel header, JLabel logo, JLabel titulo, JLabel opcion1, JLabel opcion2) {
+    private void alinearHeader(javax.swing.JPanel header, JLabel logo, JLabel titulo, JLabel opcion1, JLabel opcion2, JLabel opcion3) {
         java.awt.Dimension tamañoHeader = header.getSize();
 
         // Las tarjetas son los paneles del header
@@ -128,6 +142,11 @@ public final class Dashboard extends BaseFrame {
         izquierda.add(opcion1);
         izquierda.add(javax.swing.Box.createHorizontalStrut(30));
         izquierda.add(opcion2);
+        
+        if (opcion3 != null) {
+            izquierda.add(javax.swing.Box.createHorizontalStrut(30));
+            izquierda.add(opcion3);
+        }
 
         // Si el header del diseño es más ancho que la ventana, esa parte no se ve
         int parteOculta = Math.max(0, tamañoHeader.width - header.getParent().getWidth());
@@ -150,8 +169,10 @@ public final class Dashboard extends BaseFrame {
     private void conectarOpcionMenu(JLabel opcion, String vista) {
         if (vista.equals("productos")) {
             menuProductos.add(opcion);
-        } else {
+        } else if (vista.equals("carritos")){
             menuCarritos.add(opcion);
+        } else if (vista.equals("ventas")) {
+            menuVentas.add(opcion);
         }
         opcion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         opcion.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -166,14 +187,22 @@ public final class Dashboard extends BaseFrame {
     private void mostrarVista(String vista) {
         vistas.show(contenedorVistas, vista);
         boolean productos = vista.equals("productos");
+        boolean carritos = vista.equals("carritos");
+        boolean ventas = vista.equals("ventas");
         for (JLabel opcion : menuProductos) {
             marcarOpcion(opcion, productos);
         }
         for (JLabel opcion : menuCarritos) {
-            marcarOpcion(opcion, !productos);
+            marcarOpcion(opcion, carritos);
+        }
+        for (JLabel opcion : menuVentas) {      
+            marcarOpcion(opcion, ventas);
         }
         if (productos) {
             actualizarTabla(st.getProductos()); // el stock pudo cambiar mientras se veian los carritos
+        }
+        if (ventas) {
+            vistaVentas.actualizarTablaVentas(); // muestra las ventas que llegaron de los clientes
         }
     }
 
@@ -206,6 +235,7 @@ public final class Dashboard extends BaseFrame {
         jLabel28 = new javax.swing.JLabel();
         lblMenuProductos = new javax.swing.JLabel();
         lblMenuCarritos = new javax.swing.JLabel();
+        lblMenuVentas = new javax.swing.JLabel();
         Formulario = new javax.swing.JPanel();
         txtId = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -423,6 +453,10 @@ public final class Dashboard extends BaseFrame {
         lblMenuCarritos.setForeground(new java.awt.Color(255, 255, 255));
         lblMenuCarritos.setText("Carritos Activos");
 
+        lblMenuVentas.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMenuVentas.setForeground(new java.awt.Color(255, 255, 255));
+        lblMenuVentas.setText("Ventas");
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -437,6 +471,8 @@ public final class Dashboard extends BaseFrame {
                 .addGap(68, 68, 68)
                 .addComponent(lblMenuCarritos)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(lblMenuVentas)
+                .addGap(53, 53, 53)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(29, 29, 29)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -456,7 +492,8 @@ public final class Dashboard extends BaseFrame {
                     .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblMenuProductos)
-                            .addComponent(lblMenuCarritos))
+                            .addComponent(lblMenuCarritos)
+                            .addComponent(lblMenuVentas))
                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(15, 15, 15))
         );
@@ -1197,24 +1234,20 @@ public final class Dashboard extends BaseFrame {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Seleccionar imagen del producto");
         fileChooser.setFileFilter(new FileNameExtensionFilter("Imágenes (PNG, JPG, GIF)", "png", "jpg", "jpeg", "gif"));
-
         // Abrir directamente en la carpeta fotos del proyecto si existe
         File carpetaFotos = new File("src/fotos");
         if (carpetaFotos.exists()) {
+
             fileChooser.setCurrentDirectory(carpetaFotos);
+
         }
-
         int resultado = fileChooser.showOpenDialog(this);
-
         if (resultado == JFileChooser.APPROVE_OPTION) {
             File archivoSeleccionado = fileChooser.getSelectedFile();
-            
             // Usar la ruta relativa estándar del proyecto
             String rutaRelativa = "/fotos/" + archivoSeleccionado.getName();
-
             // Guardar ruta relativa
             rutaImagenActual = rutaRelativa;
-
             // Actualizar vista previa con ruta relativa
             actualizarVistaPrevia(rutaRelativa);
         }
@@ -1274,7 +1307,7 @@ public final class Dashboard extends BaseFrame {
 
                 // Escalar imagen para que quepa en lblVistaPrevia 
                 Image imagenEscalada = iconoOriginal.getImage().getScaledInstance(
-                    150, 150, Image.SCALE_SMOOTH
+                    130, 130, Image.SCALE_SMOOTH
                 );
 
                 // Mostrar en vista previa
@@ -1400,6 +1433,7 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lblMenuCarritos;
     private javax.swing.JLabel lblMenuProductos;
+    private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JLabel lblVistaPrevia;
     private javax.swing.JTable tblProductos;
     private javax.swing.JTextField txtBuscar;
