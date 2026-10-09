@@ -492,10 +492,7 @@ public class Carrito extends BaseFrame {
                 if (seleccion != null) {
                     int nuevaCantidad = Integer.parseInt((String) seleccion);
                     if (nuevaCantidad != cantidadActual) {
-                        int diferencia = nuevaCantidad - cantidadActual;
-                        int nuevoStockTienda = stockEnTienda - diferencia;
-                        pro.setStock(nuevoStockTienda);
-                        p.put(pro, nuevaCantidad);
+                        st.obtenerCarritoActual().actualizarCantidad(pro.getId(), nuevaCantidad);
                         JOptionPane.showMessageDialog(this, "Cantidad actualizada a " + nuevaCantidad + " unidades.");
                     }
             }
@@ -518,13 +515,7 @@ public class Carrito extends BaseFrame {
         JOptionPane.WARNING_MESSAGE
     );
     if (confirmacion == JOptionPane.YES_OPTION) {
-        for (Map.Entry<Producto, Integer> entrada : carritoProductos.entrySet()) {
-            Producto pro = entrada.getKey();
-            int cantidadEnCarrito = entrada.getValue();
-            int nuevoStock = pro.getStock() + cantidadEnCarrito;
-            pro.setStock(nuevoStock);
-        }
-        carritoProductos.clear(); 
+        st.obtenerCarritoActual().vaciarCarrito();
         JOptionPane.showMessageDialog(this, "Se ha vaciado el carrito correctamente.");
         cargarDatosCarrito();
         }

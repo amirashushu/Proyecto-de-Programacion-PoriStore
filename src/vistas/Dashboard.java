@@ -201,6 +201,9 @@ public final class Dashboard extends BaseFrame {
         if (productos) {
             actualizarTabla(st.getProductos()); // el stock pudo cambiar mientras se veian los carritos
         }
+        if (ventas) {
+            vistaVentas.actualizarTablaVentas(); // muestra las ventas que llegaron de los clientes
+        }
     }
 
     private void marcarOpcion(JLabel opcion, boolean activa) {

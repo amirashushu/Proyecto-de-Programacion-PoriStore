@@ -1,4 +1,7 @@
-
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
 package vistas;
 import logica.SistemaTienda;
 import javax.swing.*;
@@ -20,7 +23,6 @@ public class VistaPrincipal extends BaseFrame {
     public VistaPrincipal(SistemaTienda st) {
         super(st);
         initComponents();
-        hostCliente.HostCliente.setVistaPrincipal(this);
         setLocationRelativeTo(null);
         cargarCatalogoProductos();
     }
