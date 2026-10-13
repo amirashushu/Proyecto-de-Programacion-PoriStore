@@ -230,7 +230,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID Venta", "Cliente", "R.U.T", "Fecha", "Productos", "Monto Total"
+                "ID Carrito", "Cliente", "R.U.T", "Fecha", "Productos", "Total"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -254,9 +254,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         jPanelVentas.setLayout(jPanelVentasLayout);
         jPanelVentasLayout.setHorizontalGroup(
             jPanelVentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanelVentasLayout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 1524, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 16, Short.MAX_VALUE))
+            .addComponent(jScrollPane1)
         );
         jPanelVentasLayout.setVerticalGroup(
             jPanelVentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -272,7 +270,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1592, Short.MAX_VALUE)
+            .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1651, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
@@ -330,6 +328,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 c.getNombre(),                   // Cliente
                 rutCliente,                      // R.U.T
                 v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
+                v.getHoraFormateada(),
                 c.getTotalProductos(),          
                 c.getTotal()  // Monto Total
             });
@@ -347,8 +346,11 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         }
         int gananciasTotalesINT = (int) gananciasTotales;
 
+        Locale localeCl = Locale.of("es", "CL");  //formato chileno
+        NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(localeCl);
+        String montoFormateado = formatoMoneda.format(gananciasTotalesINT);
         jLabel24.setText(String.valueOf(cantidadVentas)); //ventas
-        jLabel27.setText("$" + Integer.toString(gananciasTotalesINT));      //monto
+        jLabel27.setText(montoFormateado);      //monto
     }
     private void ordenarColumna() {
         // Habilitar ordenamiento por columnas
