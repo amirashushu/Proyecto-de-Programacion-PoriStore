@@ -13,48 +13,48 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     private SistemaTienda st;
 
 
-public PanelVentasAdmin(SistemaTienda st) {
-    this.st = st;
-           
-    initComponents();
+    public PanelVentasAdmin(SistemaTienda st) {
+        this.st = st;
 
-    
-    jPanelVentas.setBorder(javax.swing.BorderFactory.createCompoundBorder(
-        null, 
-        javax.swing.BorderFactory.createCompoundBorder(
-            javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15), 
-            javax.swing.BorderFactory.createTitledBorder(
-                javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)), 
-                "Ventas", 
-                javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
-                javax.swing.border.TitledBorder.DEFAULT_POSITION, 
-                new java.awt.Font("Segoe UI", 1, 18), 
-                new java.awt.Color(255, 0, 51)
+        initComponents();
+
+
+        jPanelVentas.setBorder(javax.swing.BorderFactory.createCompoundBorder(
+            null, 
+            javax.swing.BorderFactory.createCompoundBorder(
+                javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15), 
+                javax.swing.BorderFactory.createTitledBorder(
+                    javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)), 
+                    "Ventas", 
+                    javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, 
+                    javax.swing.border.TitledBorder.DEFAULT_POSITION, 
+                    new java.awt.Font("Segoe UI", 1, 18), 
+                    new java.awt.Color(255, 0, 51)
+                )
             )
-        )
-    ));
+        ));
 
-    
-    jScrollPane1.setBackground(new java.awt.Color(20, 20, 20));
-    jScrollPane1.getViewport().setBackground(new java.awt.Color(20, 20, 20));
-    jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(60, 60, 60)));
 
-    
-    tblVentas.getTableHeader().setBackground(new java.awt.Color(180, 0, 0));
-    tblVentas.getTableHeader().setForeground(java.awt.Color.WHITE);
-    tblVentas.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
-    tblVentas.getTableHeader().setReorderingAllowed(false);
-    
-    
-    tblVentas.setFillsViewportHeight(true);
-    
-    tblVentas.setFillsViewportHeight(true);
-    actualizarTablaVentas();
-}
-public PanelVentasAdmin() {
-    initComponents();
-}
-    
+        jScrollPane1.setBackground(new java.awt.Color(20, 20, 20));
+        jScrollPane1.getViewport().setBackground(new java.awt.Color(20, 20, 20));
+        jScrollPane1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(60, 60, 60)));
+
+
+        tblVentas.getTableHeader().setBackground(new java.awt.Color(180, 0, 0));
+        tblVentas.getTableHeader().setForeground(java.awt.Color.WHITE);
+        tblVentas.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
+        tblVentas.getTableHeader().setReorderingAllowed(false);
+
+        ordenarColumna();
+        tblVentas.setFillsViewportHeight(true);
+
+        tblVentas.setFillsViewportHeight(true);
+        actualizarTablaVentas();
+    }
+    public PanelVentasAdmin() {
+        initComponents();
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -71,9 +71,11 @@ public PanelVentasAdmin() {
         lblMenuProductos = new javax.swing.JLabel();
         lblMenuCarritos = new javax.swing.JLabel();
         lblMenuVentas = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
         jPanelVentas = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblVentas = new javax.swing.JTable();
+        jLabel1 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(0, 0, 0));
 
@@ -97,7 +99,7 @@ public PanelVentasAdmin() {
         jLabel24.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         jLabel24.setForeground(new java.awt.Color(255, 0, 51));
         jLabel24.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel24.setText(Double.toString(st.calcularValorTotalInventario()));
+        jLabel24.setText("0");
 
         jLabel25.setForeground(new java.awt.Color(200, 200, 200));
         jLabel25.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -123,7 +125,7 @@ public PanelVentasAdmin() {
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel24)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel8.setBackground(new java.awt.Color(30, 30, 30));
@@ -133,7 +135,7 @@ public PanelVentasAdmin() {
         jLabel27.setFont(new java.awt.Font("Segoe UI", 1, 28)); // NOI18N
         jLabel27.setForeground(new java.awt.Color(255, 200, 0));
         jLabel27.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel27.setText("Por hacer");
+        jLabel27.setText("$0");
 
         jLabel28.setForeground(new java.awt.Color(200, 200, 200));
         jLabel28.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -157,7 +159,7 @@ public PanelVentasAdmin() {
                 .addComponent(jLabel28)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel27)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         lblMenuProductos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -171,6 +173,8 @@ public PanelVentasAdmin() {
         lblMenuVentas.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblMenuVentas.setForeground(new java.awt.Color(255, 255, 255));
         lblMenuVentas.setText("Ventas");
+
+        jTextField1.setText("jTextField1");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -187,7 +191,9 @@ public PanelVentasAdmin() {
                 .addComponent(lblMenuCarritos)
                 .addGap(18, 18, 18)
                 .addComponent(lblMenuVentas)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 340, Short.MAX_VALUE)
+                .addGap(62, 62, 62)
+                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(36, 36, 36)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -196,7 +202,7 @@ public PanelVentasAdmin() {
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap(10, Short.MAX_VALUE)
+                .addGap(6, 10, Short.MAX_VALUE)
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -205,13 +211,14 @@ public PanelVentasAdmin() {
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblMenuProductos)
                             .addComponent(lblMenuCarritos)
-                            .addComponent(lblMenuVentas))
+                            .addComponent(lblMenuVentas)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(15, 15, 15))
         );
 
         jPanelVentas.setBackground(new java.awt.Color(0, 0, 0));
-        jPanelVentas.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15), javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)), "Carritos Activos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 18), new java.awt.Color(255, 0, 51))))); // NOI18N
+        jPanelVentas.setBorder(javax.swing.BorderFactory.createCompoundBorder(null, javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEmptyBorder(15, 15, 15, 15), javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 0, 51)), "Ventas", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Segoe UI", 1, 18), new java.awt.Color(255, 0, 51))))); // NOI18N
 
         jScrollPane1.setToolTipText("");
 
@@ -220,7 +227,7 @@ public PanelVentasAdmin() {
         tblVentas.setForeground(new java.awt.Color(255, 255, 255));
         tblVentas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null}
+
             },
             new String [] {
                 "ID Carrito", "Cliente", "R.U.T", "Fecha", "Productos", "Total"
@@ -239,6 +246,7 @@ public PanelVentasAdmin() {
         tblVentas.setRowHeight(30);
         tblVentas.setSelectionBackground(new java.awt.Color(255, 0, 51));
         tblVentas.setSelectionForeground(new java.awt.Color(255, 255, 255));
+        tblVentas.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(tblVentas);
         tblVentas.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
@@ -250,8 +258,13 @@ public PanelVentasAdmin() {
         );
         jPanelVentasLayout.setVerticalGroup(
             jPanelVentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 657, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanelVentasLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 543, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
+
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("Ordenar por RUT");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -259,22 +272,30 @@ public PanelVentasAdmin() {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1651, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanelVentas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jPanelVentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(28, 28, 28)
+                        .addComponent(jLabel1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanelVentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanelVentas, javax.swing.GroupLayout.PREFERRED_SIZE, 589, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel24;
@@ -286,6 +307,7 @@ public PanelVentasAdmin() {
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanelVentas;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblMenuCarritos;
     private javax.swing.JLabel lblMenuProductos;
     private javax.swing.JLabel lblMenuVentas;
@@ -330,32 +352,36 @@ public PanelVentasAdmin() {
         jLabel24.setText(String.valueOf(cantidadVentas)); //ventas
         jLabel27.setText(montoFormateado);      //monto
     }
-public javax.swing.JLabel getMenuProductos() {
-    return lblMenuProductos;
-}
+    private void ordenarColumna() {
+        // Habilitar ordenamiento por columnas
+        tblVentas.setAutoCreateRowSorter(true);
+    }
+    public javax.swing.JLabel getMenuProductos() {
+        return lblMenuProductos;
+    }
 
-public javax.swing.JLabel getMenuCarritos() {
-    return lblMenuCarritos;
-}
+    public javax.swing.JLabel getMenuCarritos() {
+        return lblMenuCarritos;
+    }
 
-public javax.swing.JLabel getMenuVentas() {
-    return lblMenuVentas;
-}
+    public javax.swing.JLabel getMenuVentas() {
+        return lblMenuVentas;
+    }
 
-public javax.swing.JPanel getHeader() {
-    return jPanel5; 
-}
+    public javax.swing.JPanel getHeader() {
+        return jPanel5; 
+    }
 
-public javax.swing.JLabel getLogo() {
-    return jLabel11; 
-}
+    public javax.swing.JLabel getLogo() {
+        return jLabel11; 
+    }
 
-public javax.swing.JLabel getTitulo() {
-    return jLabel10; 
-}
-public javax.swing.JPanel getPanelPrincipal() {
-    return this; 
-}
+    public javax.swing.JLabel getTitulo() {
+        return jLabel10; 
+    }
+    public javax.swing.JPanel getPanelPrincipal() {
+        return this; 
+    }
 
 }
 
