@@ -31,6 +31,28 @@ public class Carrito extends BaseFrame {
         setLocationRelativeTo(null);
         configurarTabla();
         cargarDatosCarrito();
+
+        // iCONO DE PERFIL 
+        jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                abrirCuenta();
+            }
+        });
+    }
+
+    // Con sesión abre "Mi Perfil", sin sesión abre el login 
+    private void abrirCuenta() {
+        if (logica.GestorSesion.haySesionActiva()) {
+            VistaPerfil perfil = new VistaPerfil(st, this);
+            perfil.setVisible(true);
+        } else {
+            VistaLogin login = new VistaLogin(st);
+            this.dispose();
+            login.setVisible(true);
+            login.setLocationRelativeTo(null);
+        }
     }
 
 
