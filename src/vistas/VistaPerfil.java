@@ -13,10 +13,30 @@ public class VistaPerfil extends javax.swing.JFrame {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaPerfil.class.getName());
 
     /**
-     * Creates new form VistaPago
+     * Creates new form VistaPerfil
      */
     public VistaPerfil() {
         initComponents();
+    }
+
+    private logica.SistemaTienda st;
+    private javax.swing.JFrame ventanaOrigen; 
+
+    //Muestra los datos del cliente 
+    public VistaPerfil(logica.SistemaTienda st, javax.swing.JFrame ventanaOrigen) {
+        initComponents();
+        this.st = st;
+        this.ventanaOrigen = ventanaOrigen;
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE); // cerrar solo el perfil
+        setResizable(false);
+        setLocationRelativeTo(ventanaOrigen);
+
+        entidades.Cliente cliente = logica.GestorSesion.getClienteActual();
+        if (cliente != null) {
+            lblNombre.setText("Nombre: " + cliente.getNombre());
+            lblCorreo.setText("Correo: " + cliente.getCorreo());
+            lblRut.setText("Rut: " + cliente.getRut());
+        }
     }
 
 
@@ -29,7 +49,7 @@ public class VistaPerfil extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        panelComprobante = new javax.swing.JPanel();
+        panelPerfil = new javax.swing.JPanel();
         lblTituloPerfil = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         lblNombre = new javax.swing.JLabel();
@@ -40,9 +60,9 @@ public class VistaPerfil extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        panelComprobante.setBackground(new java.awt.Color(20, 20, 20));
+        panelPerfil.setBackground(new java.awt.Color(20, 20, 20));
 
-        lblTituloPerfil.setFont(new java.awt.Font("Segoe UI", 1, 20)); // NOI18N
+        lblTituloPerfil.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
         lblTituloPerfil.setForeground(new java.awt.Color(255, 255, 255));
         lblTituloPerfil.setText("Mi Perfil");
 
@@ -50,12 +70,15 @@ public class VistaPerfil extends javax.swing.JFrame {
         jLabel5.setForeground(new java.awt.Color(170, 170, 170));
         jLabel5.setText("Información de la Cuenta");
 
+        lblNombre.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblNombre.setForeground(new java.awt.Color(255, 255, 255));
         lblNombre.setText("Nombre:");
 
+        lblCorreo.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblCorreo.setForeground(new java.awt.Color(255, 255, 255));
         lblCorreo.setText("Correo:");
 
+        lblRut.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         lblRut.setForeground(new java.awt.Color(255, 255, 255));
         lblRut.setText("Rut:");
 
@@ -63,47 +86,49 @@ public class VistaPerfil extends javax.swing.JFrame {
         btnVolver.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnVolver.setForeground(new java.awt.Color(255, 255, 255));
         btnVolver.setText("Volver");
+        btnVolver.setFocusPainted(false);
         btnVolver.addActionListener(this::btnVolverActionPerformed);
 
         btnCerrar.setBackground(new java.awt.Color(180, 0, 0));
         btnCerrar.setFont(new java.awt.Font("Segoe UI", 1, 13)); // NOI18N
         btnCerrar.setForeground(new java.awt.Color(255, 255, 255));
         btnCerrar.setText("Cerrar Sesión");
+        btnCerrar.setFocusPainted(false);
         btnCerrar.addActionListener(this::btnCerrarActionPerformed);
 
-        javax.swing.GroupLayout panelComprobanteLayout = new javax.swing.GroupLayout(panelComprobante);
-        panelComprobante.setLayout(panelComprobanteLayout);
-        panelComprobanteLayout.setHorizontalGroup(
-            panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelComprobanteLayout.createSequentialGroup()
+        javax.swing.GroupLayout panelPerfilLayout = new javax.swing.GroupLayout(panelPerfil);
+        panelPerfil.setLayout(panelPerfilLayout);
+        panelPerfilLayout.setHorizontalGroup(
+            panelPerfilLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPerfilLayout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(panelPerfilLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel5)
                     .addComponent(lblTituloPerfil)
-                    .addGroup(panelComprobanteLayout.createSequentialGroup()
+                    .addGroup(panelPerfilLayout.createSequentialGroup()
                         .addGap(1, 1, 1)
-                        .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(btnVolver, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
-                            .addComponent(btnCerrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(panelPerfilLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnVolver, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnCerrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)))
                     .addComponent(lblNombre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblCorreo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblRut, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
-        panelComprobanteLayout.setVerticalGroup(
-            panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(panelComprobanteLayout.createSequentialGroup()
+        panelPerfilLayout.setVerticalGroup(
+            panelPerfilLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelPerfilLayout.createSequentialGroup()
                 .addGap(28, 28, 28)
                 .addComponent(lblTituloPerfil)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(lblNombre)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblCorreo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblRut)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 80, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 57, Short.MAX_VALUE)
                 .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnVolver, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -114,16 +139,16 @@ public class VistaPerfil extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelComprobante, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelPerfil, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(panelComprobante, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelPerfil, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -131,11 +156,22 @@ public class VistaPerfil extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-        // TODO add your handling code here:
+        dispose(); 
     }//GEN-LAST:event_btnVolverActionPerformed
 
     private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
+        // Cierra la sesión y vuelve al catalogo como invitado
         logica.GestorSesion.cerrarSesion();
+        javax.swing.JOptionPane.showMessageDialog(this, "Sesión cerrada exitosamente");
+        dispose();
+        if (ventanaOrigen != null) {
+            ventanaOrigen.dispose();
+        }
+        if (st != null) {
+            VistaPrincipal vista = new VistaPrincipal(st);
+            vista.setLocationRelativeTo(null);
+            vista.setVisible(true);
+        }
     }//GEN-LAST:event_btnCerrarActionPerformed
 
     /**
@@ -171,6 +207,6 @@ public class VistaPerfil extends javax.swing.JFrame {
     private javax.swing.JLabel lblNombre;
     private javax.swing.JLabel lblRut;
     private javax.swing.JLabel lblTituloPerfil;
-    private javax.swing.JPanel panelComprobante;
+    private javax.swing.JPanel panelPerfil;
     // End of variables declaration//GEN-END:variables
 }
