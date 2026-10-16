@@ -3,6 +3,8 @@ package vistas;
 import java.text.NumberFormat;
 import java.util.Locale;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+import javax.swing.RowFilter;
 import logica.SistemaTienda;
 
 /**
@@ -11,6 +13,7 @@ import logica.SistemaTienda;
  */
 public class PanelVentasAdmin extends javax.swing.JPanel {
     private SistemaTienda st;
+    private TableRowSorter<DefaultTableModel> filtroVentas;
 
 
     public PanelVentasAdmin(SistemaTienda st) {
@@ -46,6 +49,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         tblVentas.getTableHeader().setReorderingAllowed(false);
 
         ordenarColumna();
+        configurarBusquedaPorRut();
         tblVentas.setFillsViewportHeight(true);
 
         tblVentas.setFillsViewportHeight(true);
@@ -75,6 +79,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblVentas = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
+        txtBuscarRut = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(0, 0, 0));
 
@@ -121,7 +126,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel24)
-                .addGap(18, 18, Short.MAX_VALUE))
+                .addGap(19, 19, Short.MAX_VALUE))
         );
 
         jPanel8.setBackground(new java.awt.Color(30, 30, 30));
@@ -155,7 +160,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jLabel28)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel27)
-                .addGap(18, 18, Short.MAX_VALUE))
+                .addGap(19, 19, Short.MAX_VALUE))
         );
 
         lblMenuProductos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -185,7 +190,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(lblMenuCarritos)
                 .addGap(12, 12, 12)
                 .addComponent(lblMenuVentas)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 208, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 193, Short.MAX_VALUE)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -251,7 +256,13 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         );
 
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Ordenar por RUT");
+        jLabel1.setText("Buscar por RUT:");
+
+        txtBuscarRut.setBackground(new java.awt.Color(30, 30, 30));
+        txtBuscarRut.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        txtBuscarRut.setForeground(new java.awt.Color(255, 255, 255));
+        txtBuscarRut.setCaretColor(new java.awt.Color(255, 0, 51));
+        txtBuscarRut.setPreferredSize(new java.awt.Dimension(260, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -261,7 +272,11 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtBuscarRut, javax.swing.GroupLayout.PREFERRED_SIZE, 260, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jPanelVentas, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(16, 16, 16))
         );
@@ -270,7 +285,9 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(22, 22, 22)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(txtBuscarRut, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(8, 8, 8)
                 .addComponent(jPanelVentas, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(16, 16, 16))
@@ -295,6 +312,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     private javax.swing.JLabel lblMenuProductos;
     private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JTable tblVentas;
+    private javax.swing.JTextField txtBuscarRut;
     // End of variables declaration//GEN-END:variables
 
     
@@ -336,8 +354,46 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         jLabel27.setText(montoFormateado);      //monto
     }
     private void ordenarColumna() {
-        // Habilitar ordenamiento por columnas
-        tblVentas.setAutoCreateRowSorter(true);
+        // Permite ordenar columnas y filtrar sin modificar los datos originales
+        filtroVentas = new TableRowSorter<>((DefaultTableModel) tblVentas.getModel());
+        tblVentas.setRowSorter(filtroVentas);
+    }
+
+    private void configurarBusquedaPorRut() {
+        txtBuscarRut.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarVentasPorRut();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarVentasPorRut();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                filtrarVentasPorRut();
+            }
+        });
+    }
+
+    private void filtrarVentasPorRut() {
+        if (filtroVentas == null) return;
+        // Compara solo los números; permite escribir con o sin puntos y guion
+        String buscado = txtBuscarRut.getText().replaceAll("[^0-9kK]", "").toLowerCase();
+        if (buscado.isEmpty()) {
+            filtroVentas.setRowFilter(null);
+        } else {
+            filtroVentas.setRowFilter(new RowFilter<DefaultTableModel, Integer>() {
+                @Override
+                public boolean include(Entry<? extends DefaultTableModel, ? extends Integer> entrada) {
+                    String rut = String.valueOf(entrada.getValue(2));
+                    rut = rut.replaceAll("[^0-9kK]", "").toLowerCase();
+                    return rut.contains(buscado);
+                }
+            });
+        }
     }
     public javax.swing.JLabel getMenuProductos() {
         return lblMenuProductos;
