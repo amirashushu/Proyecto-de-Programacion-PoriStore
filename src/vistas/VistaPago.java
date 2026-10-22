@@ -21,7 +21,6 @@ public class VistaPago extends javax.swing.JFrame {
 
     private entidades.Carro carro;
     private Runnable confirmarCompra; // registra la venta (lo entrega el Carrito)
-    private final java.text.NumberFormat formatoCLP = java.text.NumberFormat.getCurrencyInstance(java.util.Locale.forLanguageTag("es-CL"));
 
     // Pago simulado, confirmarCompra registra la venta y alCerrar recarga el carrito cuando se cierra la ventana
     public VistaPago(entidades.Carro carro, Runnable confirmarCompra, Runnable alCerrar) {
@@ -95,10 +94,7 @@ public class VistaPago extends javax.swing.JFrame {
 
     // Formato chileno
     private String plata(double monto) {
-        boolean conCentavos = Math.round(monto * 100) % 100 != 0;
-        formatoCLP.setMinimumFractionDigits(conCentavos ? 2 : 0);
-        formatoCLP.setMaximumFractionDigits(conCentavos ? 2 : 0);
-        return formatoCLP.format(monto);
+        return logica.SistemaTienda.formatoPesos(monto); 
     }
 
     /**

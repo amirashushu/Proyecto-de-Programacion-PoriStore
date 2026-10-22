@@ -50,6 +50,11 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
 
         ordenarColumna();
         configurarBusquedaPorRut();
+        //Productos mas anchos para que se lea el detalle completo
+        int[] anchos = {70, 170, 130, 110, 70, 500, 150};
+        for (int i = 0; i < anchos.length; i++) {
+            tblVentas.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+        }
         tblVentas.setFillsViewportHeight(true);
 
         tblVentas.setFillsViewportHeight(true);
@@ -330,12 +335,24 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 rutCliente,                      // R.U.T
                 v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
                 v.getHoraFormateada(),
-                c.getTotalProductos(),          
-                c.getTotal()  // Monto Total
+                detalleProductos(c),             // Productos comprados (detalle de la venta)
+                logica.SistemaTienda.formatoPesos(c.getTotal())  // Monto Total
             });
         }
-        
+
         actualizarKPIsVentas();
+    }
+
+    //Productos de la venta con su cantidad
+    private String detalleProductos(entidades.Carro c) {
+        StringBuilder texto = new StringBuilder();
+        for (java.util.Map.Entry<entidades.Producto, Integer> entrada : c.getCarritoProductos().entrySet()) {
+            if (texto.length() > 0) {
+                texto.append(", ");
+            }
+            texto.append(entrada.getKey().getNombre()).append(" x").append(entrada.getValue());
+        }
+        return texto.toString();
     }
 
     // 

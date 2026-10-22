@@ -135,6 +135,17 @@ public class SistemaTienda implements Serializable{
     public boolean eliminarProducto(int id){
         return inventario.eliminarProducto(id);
     }
+    //elimina todos los productos (avisando a los clientes) 
+    public int vaciarInventario(){
+        List<Integer> ids = new ArrayList<>();
+        for (Producto p : inventario.getProductos()) {
+            ids.add(p.getId());
+        }
+        for (int id : ids) {
+            inventario.eliminarProducto(id);
+        }
+        return ids.size();
+    }
     public List<Producto> filtrarPorCategoria(String categoria){
         return inventario.filtrarPorCategoria(categoria);
     }
@@ -296,6 +307,14 @@ public class SistemaTienda implements Serializable{
         double total = inventario.calcularValorTotalInventario();
         NumberFormat formatoMoneda = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL"));
         return formatoMoneda.format(total);
+    }
+
+    //Formato chileno 
+    public static String formatoPesos(double monto) {
+        NumberFormat formato = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CL"));
+        formato.setMaximumFractionDigits(0);
+        formato.setRoundingMode(java.math.RoundingMode.HALF_UP);
+        return formato.format(monto);
     }
 
     // Calcula el precio promedio de productos de una categoría
