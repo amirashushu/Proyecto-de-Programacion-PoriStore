@@ -37,8 +37,6 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         tblVentas.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
         tblVentas.getTableHeader().setReorderingAllowed(false);
 
-        ordenarColumna();
-        configurarBusquedaPorRut();
         //Productos mas anchos para que se lea el detalle completo
         int[] anchos = {70, 170, 130, 110, 70, 500, 150};
         for (int i = 0; i < anchos.length; i++) {
@@ -52,7 +50,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         jPanel5 = new javax.swing.JPanel();
@@ -284,9 +282,9 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jPanelVentas, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(16, 16, 16))
         );
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -304,7 +302,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JTable tblVentas;
     private javax.swing.JTextField txtBuscarRut;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     
     public void actualizarTablaVentas() {
