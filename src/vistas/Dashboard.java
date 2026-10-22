@@ -263,6 +263,7 @@ public final class Dashboard extends BaseFrame {
         tblProductos = new javax.swing.JTable();
         btnEliminar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
+        btnVaciarInventario = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
@@ -758,23 +759,31 @@ public final class Dashboard extends BaseFrame {
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Buscar por nombre:");
 
+        btnVaciarInventario.setBackground(new java.awt.Color(139, 0, 0));
+        btnVaciarInventario.setForeground(new java.awt.Color(255, 255, 255));
+        btnVaciarInventario.setText("Vaciar Inventario");
+        btnVaciarInventario.setPreferredSize(new java.awt.Dimension(90, 35));
+        btnVaciarInventario.addActionListener(this::btnVaciarInventarioActionPerformed);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(btnRestablecer, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(txtBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(btnBuscar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                            .addComponent(btnRestablecer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGap(290, 290, 290)
+                            .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnVaciarInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(63, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -792,7 +801,9 @@ public final class Dashboard extends BaseFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnRestablecer, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(261, 261, 261))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnVaciarInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(220, 220, 220))
         );
 
         jPanel4.setBackground(new java.awt.Color(0, 0, 0));
@@ -1148,18 +1159,27 @@ public final class Dashboard extends BaseFrame {
     // Solicita confirmación antes de eliminar. Persiste cambios, actualiza tabla y limpia formulario
     // Si no hay producto seleccionado, muestra mensaje de advertencia
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        int fila = tblProductos.getSelectedRow();
-        if (fila == -1) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione un producto de la tabla para eliminar.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+        // Puede haber varias filas seleccionada
+        int[] filas = tblProductos.getSelectedRows();
+        if (filas.length == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione uno o más productos de la tabla para eliminar.", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        int id = (int) tblProductos.getValueAt(fila, 1); // ID ahora en índice 1
-        String nombre = tblProductos.getValueAt(fila, 2).toString();
+        //Se guardan los IDs antes de borrar, porque al eliminar cambian las filas de la tabla
+        List<Integer> ids = new java.util.ArrayList<>();
+        for (int fila : filas) {
+            ids.add((int) tblProductos.getValueAt(fila, 1)); //id en indice 1
+        }
+        String mensaje = filas.length == 1
+                ? "¿Seguro de eliminar el producto \"" + tblProductos.getValueAt(filas[0], 2) + "\"?"
+                : "¿Seguro de eliminar los " + filas.length + " productos seleccionados?";
 
-        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, "¿Seguro de eliminar el producto \"" + nombre + "\"?", "Confirmar Eliminación", javax.swing.JOptionPane.YES_NO_OPTION);
+        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this, mensaje, "Confirmar Eliminación", javax.swing.JOptionPane.YES_NO_OPTION);
         if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
-            st.eliminarProducto(id);
+            for (int id : ids) {
+                st.eliminarProducto(id); //avisa a los clientes por socket
+            }
             st.guardarDatos(); //Guardado automatico
             actualizarTabla(st.getProductos());
             limpiarCampos();
@@ -1256,6 +1276,25 @@ public final class Dashboard extends BaseFrame {
     private void btnSeleccionarImgMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSeleccionarImgMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_btnSeleccionarImgMouseClicked
+
+    private void btnVaciarInventarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVaciarInventarioActionPerformed
+        //elimina TODOS los productos despues de confirmar
+        int cantidad = st.getProductos().size();
+        if (cantidad == 0) {
+            javax.swing.JOptionPane.showMessageDialog(this, "El inventario ya está vacío.", "Vaciar Inventario", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        int confirmacion = javax.swing.JOptionPane.showConfirmDialog(this,
+                "¿Seguro que quieres eliminar TODOS los productos (" + cantidad + ")?\nEsta acción no se puede deshacer.",
+                "Vaciar Inventario", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE);
+        if (confirmacion == javax.swing.JOptionPane.YES_OPTION) {
+            int eliminados = st.vaciarInventario(); //avisa a los clientes por socket
+            st.guardarDatos(); 
+            actualizarTabla(st.getProductos());
+            limpiarCampos();
+            javax.swing.JOptionPane.showMessageDialog(this, "Se eliminaron " + eliminados + " productos.", "Vaciar Inventario", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+        }
+    }//GEN-LAST:event_btnVaciarInventarioActionPerformed
 
     // Copia imagen a carpeta /fotos/ y retorna ruta relativa
     private String copiarImagenAProyecto(File archivoOriginal) {
@@ -1387,6 +1426,7 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnRestablecer;
     private javax.swing.JButton btnSeleccionarImg;
+    private javax.swing.JButton btnVaciarInventario;
     private javax.swing.JComboBox<String> cbCategoria;
     private javax.swing.JComboBox<String> cbOrden;
     private javax.swing.JComboBox<String> cbReportCategoria;
@@ -1638,6 +1678,10 @@ public final class Dashboard extends BaseFrame {
     private void configurarTabla() {
         // Habilitar ordenamiento por columnas
         tblProductos.setAutoCreateRowSorter(true);
+        //Seleccionar filas completas y varias a la vez para eliminar varios productos
+        tblProductos.setColumnSelectionAllowed(false);
+        tblProductos.setRowSelectionAllowed(true);
+        tblProductos.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
     }
 
     // Implementa búsqueda dinámica: filtra productos instantáneamente mientras el usuario escribe

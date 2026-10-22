@@ -36,6 +36,16 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         tblVentas.getTableHeader().setForeground(java.awt.Color.WHITE);
         tblVentas.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 14));
         tblVentas.getTableHeader().setReorderingAllowed(false);
+
+        ordenarColumna();
+        configurarBusquedaPorRut();
+        //Productos mas anchos para que se lea el detalle completo
+        int[] anchos = {70, 170, 130, 110, 70, 500, 150};
+        for (int i = 0; i < anchos.length; i++) {
+            tblVentas.getColumnModel().getColumn(i).setPreferredWidth(anchos[i]);
+        }
+        tblVentas.setFillsViewportHeight(true);
+
         tblVentas.setFillsViewportHeight(true);
         ordenarColumna();
         configurarBusqueda();
@@ -298,7 +308,37 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
 
     
     public void actualizarTablaVentas() {
-    if (st != null) actualizarTablaVentas(st.getVentas());
+        DefaultTableModel modelo = (DefaultTableModel) tblVentas.getModel();
+        modelo.setRowCount(0); //limpiar filas anteriores
+        for (entidades.Ventas v : st.getVentas()) {  //recorremos todas las ventas guardadas en el sistema
+            entidades.Carro c = v.getCarroVenta();
+            String rutCliente = (c.getRun() != null) ? c.getRun() : "Sin RUT";             
+            // Si el RUT es nulo (cliente anónimo), mostramos "Sin RUT"
+            
+            modelo.addRow(new Object[]{
+                v.getIdVenta(),                  // ID Venta
+                c.getNombre(),                   // Cliente
+                rutCliente,                      // R.U.T
+                v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
+                v.getHoraFormateada(),
+                detalleProductos(c),             // Productos comprados (detalle de la venta)
+                logica.SistemaTienda.formatoPesos(c.getTotal())  // Monto Total
+            });
+        }
+
+        actualizarKPIsVentas();
+    }
+
+    //Productos de la venta con su cantidad
+    private String detalleProductos(entidades.Carro c) {
+        StringBuilder texto = new StringBuilder();
+        for (java.util.Map.Entry<entidades.Producto, Integer> entrada : c.getCarritoProductos().entrySet()) {
+            if (texto.length() > 0) {
+                texto.append(", ");
+            }
+            texto.append(entrada.getKey().getNombre()).append(" x").append(entrada.getValue());
+        }
+        return texto.toString();
     }
 
     // 

@@ -31,6 +31,28 @@ public class Carrito extends BaseFrame {
         setLocationRelativeTo(null);
         configurarTabla();
         cargarDatosCarrito();
+
+        // iCONO DE PERFIL 
+        jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                abrirCuenta();
+            }
+        });
+    }
+
+    // Con sesión abre "Mi Perfil", sin sesión abre el login 
+    private void abrirCuenta() {
+        if (logica.GestorSesion.haySesionActiva()) {
+            VistaPerfil perfil = new VistaPerfil(st, this);
+            perfil.setVisible(true);
+        } else {
+            VistaLogin login = new VistaLogin(st);
+            this.dispose();
+            login.setVisible(true);
+            login.setLocationRelativeTo(null);
+        }
     }
 
 
@@ -601,14 +623,14 @@ public class Carrito extends BaseFrame {
             int cantidad = entry.getValue();
             double subtotalItem = p.getPrecio() * cantidad;
 
-            modelo.addRow(new Object[]{p.getId(), p.getNombre(), String.format("$%.0f", p.getPrecio()), cantidad, String.format("$%.0f", subtotalItem)});
+            modelo.addRow(new Object[]{p.getId(), p.getNombre(), SistemaTienda.formatoPesos(p.getPrecio()), cantidad, SistemaTienda.formatoPesos(subtotalItem)});
             cantidadTotalProductos += cantidad;
         }
         //Actualiza textos
         lblCantidadProductos.setText(cantidadTotalProductos + " productos");
-        lblSubtotal.setText(String.format("$%.0f", carro.getSubTotal()));
-        lblIva1.setText(String.format("$%.0f", carro.getIVA()));
-        lblTotal.setText(String.format("$%.0f", carro.getTotal()));
+        lblSubtotal.setText(SistemaTienda.formatoPesos(carro.getSubTotal()));
+        lblIva1.setText(SistemaTienda.formatoPesos(carro.getIVA()));
+        lblTotal.setText(SistemaTienda.formatoPesos(carro.getTotal()));
     }
 
 }
