@@ -253,40 +253,10 @@ public class VistaPrincipal extends BaseFrame {
            login.setVisible(true);
            login.setLocationRelativeTo(null);
        } else {
-           // Si ya hay sesión, mostrar menú con opciones
-           Cliente clienteActual = logica.GestorSesion.getClienteActual();
-           String[] opciones = {"Ver Perfil", "Cerrar Sesión"};
-           int opcion = javax.swing.JOptionPane.showOptionDialog(
-               this,
-               "Sesión activa: " + clienteActual.getNombre(),
-               "Mi Cuenta",
-               javax.swing.JOptionPane.DEFAULT_OPTION,
-               javax.swing.JOptionPane.INFORMATION_MESSAGE,
-               null,
-               opciones,
-               opciones[0]
-           );
-
-           if (opcion == 0) {
-               // Ver Perfil
-               javax.swing.JOptionPane.showMessageDialog(this,
-                   "Nombre: " + clienteActual.getNombre() + "\n" +
-                   "RUT: " + clienteActual.getRut() + "\n" +
-                   "Correo: " + clienteActual.getCorreo(),
-                   "Mi Perfil",
-                   javax.swing.JOptionPane.INFORMATION_MESSAGE
-               );
-           } else if (opcion == 1) {
-               // Cerrar Sesión con GestorSesion
-               logica.GestorSesion.cerrarSesion();
-               javax.swing.JOptionPane.showMessageDialog(this, "Sesión cerrada exitosamente");
-               // Recargar vista sin sesión
-               vistas.VistaPrincipal vista = new vistas.VistaPrincipal(st);
-               this.dispose();
-               vista.setVisible(true);
-               vista.setLocationRelativeTo(null);
-           }
-       }  
+           // Si ya hay sesión, abre "Mi Perfil" 
+           VistaPerfil perfil = new VistaPerfil(st, this);
+           perfil.setVisible(true);
+       }
     }//GEN-LAST:event_LblJoinMouseClicked
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing

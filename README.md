@@ -1,5 +1,11 @@
 # 🛒 Proyecto PoriStore — PROYECTO DE PROGRAMACIÓN
 
+Notas
+Cristóbal Pacheco: 7.0
+Gonzalo Reyes: 6.9
+Amira Casanova: 6.8
+Hugo Muñoz: 6.7
+
 ## 🧾 Descripción General
 
 **Proyecto PoriStore**  
