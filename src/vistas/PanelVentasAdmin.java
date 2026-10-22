@@ -57,6 +57,28 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     }
     public PanelVentasAdmin() {
         initComponents();
+        
+        
+        // Evento al hacer clic en el botón Buscar
+    btnBuscar.addActionListener(e -> ejecutarBusquedaCliente());
+
+    // Búsqueda automática mientras se escribe en el cuadro de texto
+    txtBuscar.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+    @Override
+    public void insertUpdate(javax.swing.event.DocumentEvent e) {
+        ejecutarBusquedaCliente();
+    }
+    @Override
+    public void removeUpdate(javax.swing.event.DocumentEvent e) {
+        ejecutarBusquedaCliente();
+    }
+    @Override
+    public void changedUpdate(javax.swing.event.DocumentEvent e) {
+        ejecutarBusquedaCliente();
+    }
+});
+    
+
     }
 
     @SuppressWarnings("unchecked")
@@ -79,6 +101,9 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblVentas = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
+        txtBuscar = new javax.swing.JTextField();
+        btnBuscar = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         txtBuscarRut = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(0, 0, 0));
@@ -264,6 +289,17 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         txtBuscarRut.setCaretColor(new java.awt.Color(255, 0, 51));
         txtBuscarRut.setPreferredSize(new java.awt.Dimension(260, 30));
 
+        txtBuscar.addActionListener(this::txtBuscarActionPerformed);
+
+        btnBuscar.setBackground(new java.awt.Color(204, 0, 0));
+        btnBuscar.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        btnBuscar.setForeground(new java.awt.Color(255, 255, 255));
+        btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(this::btnBuscarActionPerformed);
+
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("Buscar Por Cliente");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -294,11 +330,21 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void txtBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtBuscarActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        ejecutarBusquedaCliente();
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBuscar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel24;
     private javax.swing.JLabel jLabel25;
     private javax.swing.JLabel jLabel27;
@@ -312,30 +358,13 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     private javax.swing.JLabel lblMenuProductos;
     private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JTable tblVentas;
+    private javax.swing.JTextField txtBuscar;
     private javax.swing.JTextField txtBuscarRut;
     // End of variables declaration//GEN-END:variables
 
     
     public void actualizarTablaVentas() {
-        DefaultTableModel modelo = (DefaultTableModel) tblVentas.getModel();
-        modelo.setRowCount(0); //limpiar filas anteriores
-        for (entidades.Ventas v : st.getVentas()) {  //recorremos todas las ventas guardadas en el sistema
-            entidades.Carro c = v.getCarroVenta();
-            String rutCliente = (c.getRun() != null) ? c.getRun() : "Sin RUT";             
-            // Si el RUT es nulo (cliente anónimo), mostramos "Sin RUT"
-            
-            modelo.addRow(new Object[]{
-                v.getIdVenta(),                  // ID Venta
-                c.getNombre(),                   // Cliente
-                rutCliente,                      // R.U.T
-                v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
-                v.getHoraFormateada(),
-                c.getTotalProductos(),          
-                c.getTotal()  // Monto Total
-            });
-        }
-        
-        actualizarKPIsVentas();
+    actualizarTablaVentas(st.getVentas());
     }
 
     // 
@@ -421,6 +450,50 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     public javax.swing.JPanel getPanelPrincipal() {
         return this; 
     }
+
+    
+    
+   
+public void actualizarTablaVentas(java.util.List<entidades.Ventas> listaVentas) {
+    DefaultTableModel modelo = (DefaultTableModel) tblVentas.getModel();
+    modelo.setRowCount(0);
+    java.text.NumberFormat formatoCLP = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("es", "CL"));
+
+    for (entidades.Ventas v : listaVentas) {
+        if (v.getCarroVenta() == null) continue;
+
+        // Formatear la fecha y hora usando los getters correspondientes
+        String fecha = (v.getFecha() != null) ? v.getFecha().toString() : "-";
+        if (v.getHora() != null) {
+            fecha += " " + v.getHora().toString().substring(0, 5); // Agrega HH:mm
+        }
+
+        String rut = v.getCarroVenta().getRun();
+        String cliente = v.getCarroVenta().getNombre();
+        
+        StringBuilder productosStr = new StringBuilder();
+        for (java.util.Map.Entry<entidades.Producto, Integer> entry : v.getCarroVenta().getCarritoProductos().entrySet()) {
+            if (productosStr.length() > 0) productosStr.append(", ");
+            productosStr.append(entry.getKey().getNombre()).append(" x").append(entry.getValue());
+        }
+
+        double total = v.getCarroVenta().getTotal();
+
+        modelo.addRow(new Object[]{
+            v.getIdVenta(),
+            rut,
+            cliente,
+            fecha,
+            productosStr.toString(),
+            formatoCLP.format(total)
+        });
+    }
+}
+
+private void ejecutarBusquedaCliente() {
+    String criterio = txtBuscar.getText().trim();
+    actualizarTablaVentas(st.buscarVentasPorCliente(criterio));
+}
 
 }
 
