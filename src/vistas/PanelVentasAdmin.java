@@ -50,7 +50,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     }
 
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
         jPanel5 = new javax.swing.JPanel();
@@ -282,9 +282,9 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jPanelVentas, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(16, 16, 16))
         );
-    }// </editor-fold>                        
+    }// </editor-fold>//GEN-END:initComponents
 
-    // Variables declaration - do not modify                     
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -302,7 +302,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JTable tblVentas;
     private javax.swing.JTextField txtBuscarRut;
-    // End of variables declaration                   
+    // End of variables declaration//GEN-END:variables
 
     
     public void actualizarTablaVentas() {
