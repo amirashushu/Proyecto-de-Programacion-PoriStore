@@ -550,18 +550,10 @@ public class Carrito extends BaseFrame {
             JOptionPane.showMessageDialog(this, "El carrito está vacío, porfavor agregue productos", "Error!", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Abre el pago simulado con tarjeta, si se aprueba registra la venta y muestra el comprobante
         setEnabled(false); // el carrito queda bloqueado mientras está abierta la ventana de pago
-        VistaPago pago = new VistaPago(carrito, () -> {
-            st.confirmarCompra(carrito);
-            st.guardarDatos();
-        }, () -> {
-            setEnabled(true);
-            cargarDatosCarrito();
-            toFront();
-        });
-        pago.setLocationRelativeTo(this);
-        pago.setVisible(true);
+        VistaSeleccionarEnvío vista = new VistaSeleccionarEnvío(st, this);
+        
+        
         
     }//GEN-LAST:event_btnPagarMouseClicked
 
