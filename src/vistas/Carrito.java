@@ -544,17 +544,19 @@ public class Carrito extends BaseFrame {
     }//GEN-LAST:event_btnVaciarMouseClicked
 
     private void btnPagarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnPagarMouseClicked
-         
-        Carro carrito = st.obtenerCarritoActual();
-        if(carrito.getCarritoProductos().isEmpty()){
-            JOptionPane.showMessageDialog(this, "El carrito está vacío, porfavor agregue productos", "Error!", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        setEnabled(false); // el carrito queda bloqueado mientras está abierta la ventana de pago
-        VistaSeleccionarEnvío vista = new VistaSeleccionarEnvío(st, this);
-        
-        
-        
+    Carro carrito = st.obtenerCarritoActual();
+    if(carrito.getCarritoProductos().isEmpty()){
+        JOptionPane.showMessageDialog(this, "El carrito está vacío, porfavor agregue productos", "Error!", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    setEnabled(false); // el carrito queda bloqueado
+
+            // ABRIR VISTA DE ENVÍO EN LUGAR DE VISTA PAGO
+    VistaSeleccionarEnvío envio = new VistaSeleccionarEnvío(st, this);
+    envio.setLocationRelativeTo(this);
+    envio.setVisible(true);
+
     }//GEN-LAST:event_btnPagarMouseClicked
 
     // Estilo de la tabla
@@ -605,7 +607,7 @@ public class Carrito extends BaseFrame {
     private javax.swing.JPanel panelResumen;
     private javax.swing.JScrollPane tblCarrito;
     // End of variables declaration//GEN-END:variables
-    private void cargarDatosCarrito() {
+    void cargarDatosCarrito() {
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
         modelo.setRowCount(0);
         entidades.Carro carro = st.obtenerCarritoActual();

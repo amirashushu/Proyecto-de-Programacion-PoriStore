@@ -389,16 +389,22 @@ public class VistaSeleccionarEnvío extends BaseFrame {
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
-        VistaPago pago = new VistaPago(carro, () -> {
-            st.confirmarCompra(carro);
+        // Aquí puedes agregar validaciones previas (ej. if(!jRadioButton1.isSelected() && !jRadioButton2.isSelected()) ...)
+        entidades.Carro carritoActual = st.obtenerCarritoActual();
+        VistaPago pago = new VistaPago(carritoActual, () -> {
+            // Lógica para confirmar compra
+            st.confirmarCompra(carritoActual);
             st.guardarDatos();
         }, () -> {
-            setEnabled(true);
-            cargarDatosCarrito();
-            toFront();
+            // Lógica al cerrar la ventana de pago (habilita y actualiza el Carrito)
+            carro.setEnabled(true);
+            carro.cargarDatosCarrito();
+            carro.toFront();
         });
         pago.setLocationRelativeTo(this);
         pago.setVisible(true);
+        // Cierra la vista de envío para dar paso a la de pago
+        this.dispose();
     }//GEN-LAST:event_jPanel10MouseClicked
 
 
