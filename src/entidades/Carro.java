@@ -35,7 +35,7 @@ public class Carro implements Serializable {
                 carritoProductos.put(p, cAntiguo+cant);
             }
             HostCliente.notificarPeticion(p.getId(), -cant);
-            HostCliente.notificarCarrito(this); // el admin ve el carrito actualizado
+            HostCliente.notificarCarrito(this, null); // el admin ve el carrito actualizado
             return true;
         }
         return false;
@@ -54,7 +54,7 @@ public class Carro implements Serializable {
             int cantidad = carritoProductos.get(productoAEliminar);
             HostCliente.notificarPeticion(id, cantidad); //  Restaura stock
             carritoProductos.remove(productoAEliminar);  // Elimina del carritoProductos            
-            HostCliente.notificarCarrito(this); // el admin ve el carrito actualizado
+            HostCliente.notificarCarrito(this, null); // el admin ve el carrito actualizado
             return true;
         }
         return false;
@@ -67,7 +67,7 @@ public class Carro implements Serializable {
             HostCliente.notificarPeticion(p.getId(), c);
         }
         carritoProductos.clear();
-        HostCliente.notificarCarrito(this); // el admin ve que el carrito quedo vacio
+        HostCliente.notificarCarrito(this, null); // el admin ve que el carrito quedo vacio
     }
 
     // Cambia la cantidad de un producto ajustando el stock por la diferencia (0 = eliminar)
@@ -84,7 +84,7 @@ public class Carro implements Serializable {
                 // le pide al servidor que descuente la diferencia, el servidor avisa el nuevo stock a todos
                 HostCliente.notificarPeticion(id, -diferencia);
                 carritoProductos.put(p, nuevaCantidad);
-                HostCliente.notificarCarrito(this); // el admin ve la nueva cantidad
+                HostCliente.notificarCarrito(this, null); // el admin ve la nueva cantidad
                 return true;
             }
         }

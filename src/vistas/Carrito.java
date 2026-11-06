@@ -567,7 +567,8 @@ public class Carrito extends BaseFrame {
 
     setEnabled(false); // el carrito queda bloqueado
 
-            // ABRIR VISTA DE ENVÍO EN LUGAR DE VISTA PAGO
+    //abre vista envio
+    
     VistaSeleccionarEnvío envio = new VistaSeleccionarEnvío(st, this);
     envio.setLocationRelativeTo(this);
     envio.setVisible(true);
