@@ -46,7 +46,7 @@ public class Server {
         }
     }
 
-    private static void handleClient(Socket clientSocket, Inventario invent) {
+private static void handleClient(Socket clientSocket, Inventario invent) {
         System.out.println("[+] Conectado por " + clientSocket.getInetAddress());
         PrintWriter out = null;
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
@@ -54,7 +54,7 @@ public class Server {
             out = temp;
             clientesConectados.add(out);
 
-            // Sincronizar al cliente enviándole los productos existentes en el servidor
+            //sincronizar al cliente enviándole los productos existentes en el servidor
             synchronized (invent) {
                 for (Producto p : invent.getProductos()) {
                     out.println(createJsonProducto(p));
@@ -71,12 +71,27 @@ public class Server {
                 //Un cliente avisa como quedo su carrito, el admin lo muestra en "Carritos activos" y en "Reservado"
                 if ("carrito".equals(type)) {
                     if (sistemaAdmin != null) {
+                        // Extraemos los datos de envío del JSON
+                        String metodo = extractJsonField(line, "metodo_entrega");
+                        String region = extractJsonField(line, "region");
+                        String ciudad = extractJsonField(line, "ciudad");
+                        String calle = extractJsonField(line, "calle");
+                        String numero = extractJsonField(line, "numero");
+                        String cel = extractJsonField(line, "cel");
+                        String comentarios = extractJsonField(line, "comentarios");
+                        
+                        entidades.EntregaPedido entrega = null;
+                        if (metodo != null && !metodo.isEmpty()) {
+                            entrega = new entidades.EntregaPedido(metodo, region, ciudad, calle, numero, cel, comentarios); 
+                        }
+
                         sistemaAdmin.actualizarCarritoRemoto(
                                 extractJsonField(line, "id"),
                                 extractJsonField(line, "cliente"),
                                 extractJsonField(line, "run"),
                                 extractJsonField(line, "estado"),
-                                extractJsonField(line, "productos"));
+                                extractJsonField(line, "productos"),
+                                entrega);
                     }
                     continue;
                 }
@@ -133,7 +148,9 @@ public class Server {
         } catch (IOException e) {
             System.out.println("[-] Conexión con el cliente interrumpida: " + e.getMessage());
         } finally {
-            clientesConectados.remove(out);
+            if (out != null) {
+                clientesConectados.remove(out);
+            }
             try {
                 clientSocket.close();
             } catch (IOException e) {
@@ -141,7 +158,6 @@ public class Server {
             }
             System.out.println("[-] El cliente se ha desconectado.");   
         }
-        
     }
     
     public static void notificarCreacion (Producto p){

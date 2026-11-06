@@ -12,12 +12,14 @@ public class Ventas implements Serializable{
     private int idVenta;
     private LocalDate fecha;
     private LocalTime hora;
+    private EntregaPedido metodoEntrega;
     
-    public Ventas(Carro c,int idGenerado){
+    public Ventas(Carro c,int idGenerado, EntregaPedido metodoEntrega){
         this.carroVenta = c;
         this.idVenta = idGenerado;
         this.fecha = LocalDate.now();
         this.hora = LocalTime.now();
+        this.metodoEntrega = metodoEntrega;
     }
 
     public Carro getCarroVenta() {
