@@ -125,9 +125,10 @@ public class HostCliente {
     public static void notificarPeticion (int id, int cant){
         broadcast(createJsonData(cant, String.valueOf(id)));
     }
+
     // Envia al servidor el carrito completo para que el admin lo vea en "Carritos activos" y calcule lo reservado
-    //Productos van como "idProducto x cantidad" separados por coma, por ejemplo "1x2,3x1"
-    public static void notificarCarrito(entidades.Carro carro) {
+    // Productos van como "idProducto x cantidad" separados por coma, por ejemplo "1x2,3x1"
+    public static void notificarCarrito(entidades.Carro carro, entidades.EntregaPedido entrega) {
         StringBuilder productos = new StringBuilder();
         for (java.util.Map.Entry<Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
             if (productos.length() > 0) {
@@ -136,13 +137,31 @@ public class HostCliente {
             productos.append(entrada.getKey().getId()).append("x").append(entrada.getValue());
         }
         String run = carro.getRun() != null ? carro.getRun() : "-";
+        
+        //extraer los datos de entrega verificando que no sean nulos
+        String metodo = (entrega != null && entrega.getMetodoEntrega() != null) ? entrega.getMetodoEntrega() : "";
+        String region = (entrega != null && entrega.getRegión() != null) ? entrega.getRegión() : "";
+        String ciudad = (entrega != null && entrega.getCiudad() != null) ? entrega.getCiudad() : "";
+        String calle = (entrega != null && entrega.getCalle() != null) ? entrega.getCalle() : "";
+        String numero = (entrega != null && entrega.getNumero() != null) ? entrega.getNumero() : "";
+        String cel = (entrega != null && entrega.getCel() != null) ? entrega.getCel() : "";
+        String comentarios = (entrega != null && entrega.getComentarios() != null) ? entrega.getComentarios() : "";
+
         String json = "{\"type\": \"carrito\", \"id\": \"" + escapeJson(carro.getIdSesion()) + "\", "
                 + "\"cliente\": \"" + escapeJson(carro.getNombre()) + "\", "
                 + "\"run\": \"" + escapeJson(run) + "\", "
                 + "\"estado\": \"" + escapeJson(carro.getEstado()) + "\", "
-                + "\"productos\": \"" + productos + "\"}";
+                + "\"productos\": \"" + productos + "\", "
+                + "\"metodo_entrega\": \"" + escapeJson(metodo) + "\", "
+                + "\"region\": \"" + escapeJson(region) + "\", "
+                + "\"ciudad\": \"" + escapeJson(ciudad) + "\", "
+                + "\"calle\": \"" + escapeJson(calle) + "\", "
+                + "\"numero\": \"" + escapeJson(numero) + "\", "
+                + "\"cel\": \"" + escapeJson(cel) + "\", "
+                + "\"comentarios\": \"" + escapeJson(comentarios) + "\"}";
         broadcast(json);
     }
+    
     private static void broadcast(String mensajeJson) {        
         if (serverOut != null) {
             serverOut.println(mensajeJson); // Envía el mensaje al servidor
@@ -151,7 +170,6 @@ public class HostCliente {
             System.err.println("[!] Error: No hay conexión activa con el servidor.");
         }
     }
-    // Método para crear JSON de mensaje simple
 
 
     // Método para crear JSON de intercambio de datos

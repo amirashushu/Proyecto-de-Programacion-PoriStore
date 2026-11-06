@@ -4,6 +4,7 @@ import entidades.Administrador;
 import entidades.Carro;
 import entidades.Categorias;
 import entidades.Cliente;
+import entidades.EntregaPedido;
 import entidades.Inventario;
 import entidades.Producto;
 import entidades.Ventas;
@@ -216,7 +217,7 @@ public class SistemaTienda implements Serializable{
     }
 
     // Se arma un Carro nuevo cada vez (no se modifica el anterior) para que la vista del admin no choque al leerlo
-    public void actualizarCarritoRemoto(String id, String nombreCliente, String run, String estado, String productos) {
+    public void actualizarCarritoRemoto(String id, String nombreCliente, String run, String estado, String productos, EntregaPedido e) {
         if (id == null) {
             return;
         }
@@ -239,7 +240,7 @@ public class SistemaTienda implements Serializable{
             getCarritosRemotos().remove(id);
             carro.setEstado("Pagado");
             carritos.add(carro);
-            ventas.add(new Ventas(carro, ventas.size() + 1));
+            ventas.add(new Ventas(carro, ventas.size() + 1, e));
         } else if (carro.getCarritoProductos().isEmpty()) {
             getCarritosRemotos().remove(id); // carrito vacio
         } else {
@@ -276,11 +277,11 @@ public class SistemaTienda implements Serializable{
     }
 
     // Confirmar compra de un carrito
-    public void confirmarCompra(Carro c){
+    public void confirmarCompra(Carro c, EntregaPedido metodoEntrega){
         int nuevoId = ventas.size() + 1;
         c.setEstado("Pagado");
-        hostCliente.HostCliente.notificarCarrito(c); // el admin la registra como venta y la saca de carritos activos
-        Ventas venta = new Ventas(c, nuevoId);//se guarda en la lista de ventas
+        hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
+        Ventas venta = new Ventas(c, nuevoId, metodoEntrega);//se guarda en la lista de ventas
         ventas.add(venta);
         Cliente cliente = c.getCliente();
         if (cliente != null) {
