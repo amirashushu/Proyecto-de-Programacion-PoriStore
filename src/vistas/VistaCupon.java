@@ -1,26 +1,15 @@
 package vistas;
 
-import java.util.ArrayList;
+import entidades.Cupon;
+import java.util.List;
 import logica.SistemaTienda;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
+public class VistaCupon extends BaseFrame {
 
-/**
- *
- * @author cristobal
- */
-public class VistaCupon extends javax.swing.JFrame {
-    
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaCupon.class.getName());
-    private ArrayList<String> cupones;
-    /**
-     * Creates new form PanelCupon
-     */
-    public VistaCupon(ArrayList<String> cupones) {
-        this.cupones=cupones;
+
+
+    public VistaCupon(SistemaTienda st) {
+        super(st);
         initComponents();
     }
 
@@ -115,23 +104,25 @@ public class VistaCupon extends javax.swing.JFrame {
     }//GEN-LAST:event_cuponTextoActionPerformed
 
     private void botonAplicarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAplicarActionPerformed
-        String cupon = cuponTexto.getText();
-        if (cupon.isEmpty()){
+        String codigo = cuponTexto.getText().trim();
+
+        if (codigo.isEmpty()) {
             javax.swing.JOptionPane.showMessageDialog(this, "Pruebe poniendo un cupon", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
         }
-        for (String c : cupones){
-            if (cupon.equals(c)){
-                javax.swing.JOptionPane.showMessageDialog(this, "El cupon es valido se realizara un descuento");
-            }
-            else{
-                javax.swing.JOptionPane.showMessageDialog(this, "Cupon no valido, pruebe con otro", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
-            }
+        
+        if (st.verificarCuponesValidos(codigo)){
+            javax.swing.JOptionPane.showMessageDialog(this, "El cupon es valido");
+            
+            return;
         }
+        javax.swing.JOptionPane.showMessageDialog(this, "Cupon no valido, pruebe con otro", "Aviso", javax.swing.JOptionPane.WARNING_MESSAGE);
     }//GEN-LAST:event_botonAplicarActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
 
         this.dispose();
+        
     }//GEN-LAST:event_formWindowClosing
 
     /**

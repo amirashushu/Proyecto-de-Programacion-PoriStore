@@ -576,8 +576,20 @@ public class Carrito extends BaseFrame {
 
     private void botonCuponActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCuponActionPerformed
         setEnabled(false);
-       
-        VistaCupon cupon = new VistaCupon(cupones);
+
+        VistaCupon cupon = new VistaCupon(st);
+        cupon.setDefaultCloseOperation(
+        javax.swing.WindowConstants.DISPOSE_ON_CLOSE
+        );
+
+        cupon.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosed(java.awt.event.WindowEvent e) {
+            Carrito.this.setEnabled(true);
+            Carrito.this.toFront();
+        }
+        });
+
         cupon.setLocationRelativeTo(this);
         cupon.setVisible(true);
     }//GEN-LAST:event_botonCuponActionPerformed
