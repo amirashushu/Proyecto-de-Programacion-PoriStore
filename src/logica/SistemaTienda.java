@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Locale;
 import server.Server;
@@ -32,6 +33,8 @@ public class SistemaTienda implements Serializable{
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     private final Inventario inventario;
     private ArrayList<Ventas> ventas;
+    private ArrayList<Cupon> cupones = new ArrayList<>();
+    
     public SistemaTienda() {
         this.carritos = new ArrayList<>();
         this.cuentas = new HashMap<>();
@@ -402,27 +405,47 @@ public class SistemaTienda implements Serializable{
     }
     
     // --- GESTOR DE CUPONES ---
-    private java.util.List<entidades.Cupon> cupones = new java.util.ArrayList<>();
+    
     
 
 
     // --- AGREGAR CUPON ---
-    public boolean agregarCupon(entidades.Cupon cupon) {
-        for (entidades.Cupon c : cupones) {
+    public boolean agregarCupon(Cupon cupon) {
+        for (Cupon c : cupones) {
         if (c.getCodigo().equalsIgnoreCase(cupon.getCodigo())) {
             return false; // Manejo de excepciones
         }
     }
-    cupones.add(cupon);
-    guardarDatos();
-    return true;
+        cupones.add(cupon);
+        guardarDatos();
+        return true;
     }
 
    
-    public java.util.List<entidades.Cupon> getCupones() {
-    return cupones;
-}
-    
+    public List<Cupon> getCupones() {
+        return cupones;
+    }
+    private boolean verificarVencimientoCupon(Cupon c){
+        LocalDate vencimiento=c.getCreacion().plusDays(c.getDias());
+        if (vencimiento.isAfter(LocalDate.now()) || c.getUsos() == 0){
+            cupones.remove(c);
+            return false;
+        }
+        return true;
+    }
+    public boolean verificarCuponesValidos (String codigo){
+        if(cupones.isEmpty()){
+            return false;
+        }
+        for (Cupon c : cupones) {
+            if (verificarVencimientoCupon(c)){
+                if(c.validarCupon(codigo)){
+                    return true;
+                }
+            }           
+        }
+        return false;
+    }
    
 }
 
