@@ -8,6 +8,7 @@ import entidades.EntregaPedido;
 import entidades.Inventario;
 import entidades.Producto;
 import entidades.Ventas;
+import entidades.Cupon;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -400,7 +401,28 @@ public class SistemaTienda implements Serializable{
         this.ventas = ventas;
     }
     
+    // --- GESTOR DE CUPONES ---
+    private java.util.List<entidades.Cupon> cupones = new java.util.ArrayList<>();
     
+
+
+    // --- AGREGAR CUPON ---
+    public boolean agregarCupon(entidades.Cupon cupon) {
+        for (entidades.Cupon c : cupones) {
+        if (c.getCodigo().equalsIgnoreCase(cupon.getCodigo())) {
+            return false; // Manejo de excepciones
+        }
+    }
+    cupones.add(cupon);
+    guardarDatos();
+    return true;
+    }
+
+   
+    public java.util.List<entidades.Cupon> getCupones() {
+    return cupones;
+}
     
+   
 }
 
