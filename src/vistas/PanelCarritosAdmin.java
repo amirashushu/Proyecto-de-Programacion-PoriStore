@@ -63,6 +63,7 @@ public final class PanelCarritosAdmin extends BaseFrame {
         lblMenuCarritos = new javax.swing.JLabel();
         lblMenuProductos = new javax.swing.JLabel();
         lblMenuVentas = new javax.swing.JLabel();
+        lblMenuPedidos = new javax.swing.JLabel();
         jPanelCarritos = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblCarritos = new javax.swing.JTable();
@@ -243,6 +244,10 @@ public final class PanelCarritosAdmin extends BaseFrame {
         lblMenuVentas.setForeground(new java.awt.Color(255, 255, 255));
         lblMenuVentas.setText("Ventas");
 
+        lblMenuPedidos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMenuPedidos.setForeground(new java.awt.Color(255, 255, 255));
+        lblMenuPedidos.setText("Pedidos");
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -254,11 +259,13 @@ public final class PanelCarritosAdmin extends BaseFrame {
                 .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblMenuProductos)
-                .addGap(68, 68, 68)
+                .addGap(40, 40, 40)
                 .addComponent(lblMenuCarritos)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(40, 40, 40)
                 .addComponent(lblMenuVentas)
-                .addGap(71, 71, 71)
+                .addGap(40, 40, 40)
+                .addComponent(lblMenuPedidos)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(29, 29, 29)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -279,7 +286,8 @@ public final class PanelCarritosAdmin extends BaseFrame {
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblMenuProductos)
                             .addComponent(lblMenuCarritos)
-                            .addComponent(lblMenuVentas))
+                            .addComponent(lblMenuVentas)
+                            .addComponent(lblMenuPedidos))
                         .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(15, 15, 15))
         );
@@ -449,6 +457,7 @@ public final class PanelCarritosAdmin extends BaseFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPanel2;
     private javax.swing.JLabel lblMenuCarritos;
+    private javax.swing.JLabel lblMenuPedidos;
     private javax.swing.JLabel lblMenuProductos;
     private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JTable tblCarritos;
@@ -611,5 +620,9 @@ public final class PanelCarritosAdmin extends BaseFrame {
     
     public javax.swing.JLabel getMenuVentas() {
         return lblMenuVentas;
+    }
+
+    public javax.swing.JLabel getMenuPedidos() {
+        return lblMenuPedidos;
     }
 }
