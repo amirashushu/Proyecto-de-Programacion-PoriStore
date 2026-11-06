@@ -24,14 +24,14 @@ import javax.swing.table.JTableHeader;
 public class Carrito extends BaseFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Carrito.class.getName());
-
+    private ArrayList<String> cupones;// esto despues se cambiara por la clase cupones, que se creara prontamente 
     public Carrito(SistemaTienda st) {
         super(st);
         initComponents();
         setLocationRelativeTo(null);
         configurarTabla();
         cargarDatosCarrito();
-
+        
         // iCONO DE PERFIL 
         jLabel3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jLabel3.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -83,6 +83,7 @@ public class Carrito extends BaseFrame {
         lblIva1 = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         lblTotalText = new javax.swing.JLabel();
+        botonCupon = new javax.swing.JButton();
         lblTitulo = new javax.swing.JLabel();
         lblCantidadProductos = new javax.swing.JLabel();
 
@@ -263,6 +264,12 @@ public class Carrito extends BaseFrame {
         lblTotalText.setForeground(new java.awt.Color(255, 255, 255));
         lblTotalText.setText("Total:");
 
+        botonCupon.setBackground(new java.awt.Color(180, 0, 0));
+        botonCupon.setFont(new java.awt.Font("Helvetica Neue", 1, 15)); // NOI18N
+        botonCupon.setForeground(new java.awt.Color(255, 255, 255));
+        botonCupon.setText("Cupon de descuento");
+        botonCupon.addActionListener(this::botonCuponActionPerformed);
+
         javax.swing.GroupLayout panelResumenLayout = new javax.swing.GroupLayout(panelResumen);
         panelResumen.setLayout(panelResumenLayout);
         panelResumenLayout.setHorizontalGroup(
@@ -270,26 +277,32 @@ public class Carrito extends BaseFrame {
             .addGroup(panelResumenLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(panelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator2)
-                    .addComponent(jSeparator1)
-                    .addComponent(lblTituloResumen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(panelResumenLayout.createSequentialGroup()
-                        .addComponent(lblSubtotalTexto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblSubtotal))
-                    .addGroup(panelResumenLayout.createSequentialGroup()
-                        .addComponent(lblIvaTexto)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblIva1))
-                    .addGroup(panelResumenLayout.createSequentialGroup()
-                        .addComponent(lblTotalText)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(lblTotal)))
-                .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelResumenLayout.createSequentialGroup()
-                .addContainerGap(16, Short.MAX_VALUE)
-                .addComponent(btnPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(16, 16, 16))
+                        .addGroup(panelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator2)
+                            .addComponent(jSeparator1)
+                            .addComponent(lblTituloResumen, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(panelResumenLayout.createSequentialGroup()
+                                .addComponent(lblSubtotalTexto)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblSubtotal))
+                            .addGroup(panelResumenLayout.createSequentialGroup()
+                                .addComponent(lblIvaTexto)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblIva1))
+                            .addGroup(panelResumenLayout.createSequentialGroup()
+                                .addComponent(lblTotalText)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 132, Short.MAX_VALUE)
+                                .addComponent(lblTotal)))
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelResumenLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(14, 14, 14))))
+            .addGroup(panelResumenLayout.createSequentialGroup()
+                .addGap(67, 67, 67)
+                .addComponent(botonCupon, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         panelResumenLayout.setVerticalGroup(
             panelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -312,9 +325,11 @@ public class Carrito extends BaseFrame {
                 .addGroup(panelResumenLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblTotal)
                     .addComponent(lblTotalText))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 198, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 161, Short.MAX_VALUE)
                 .addComponent(btnPagar, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(19, 19, 19))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(botonCupon)
+                .addGap(21, 21, 21))
         );
 
         lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
@@ -400,7 +415,7 @@ public class Carrito extends BaseFrame {
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(btnEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(btnCambiarCantidad, javax.swing.GroupLayout.DEFAULT_SIZE, 35, Short.MAX_VALUE)))))
-                .addContainerGap(104, Short.MAX_VALUE))
+                .addContainerGap(113, Short.MAX_VALUE))
         );
 
         jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {btnCambiarCantidad, btnEliminar, btnVaciar});
@@ -559,6 +574,14 @@ public class Carrito extends BaseFrame {
 
     }//GEN-LAST:event_btnPagarMouseClicked
 
+    private void botonCuponActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonCuponActionPerformed
+        setEnabled(false);
+       
+        VistaCupon cupon = new VistaCupon(cupones);
+        cupon.setLocationRelativeTo(this);
+        cupon.setVisible(true);
+    }//GEN-LAST:event_botonCuponActionPerformed
+
     // Estilo de la tabla
     private void configurarTabla() {
         ((DefaultTableModel) jTable1.getModel()).setRowCount(0);
@@ -581,6 +604,7 @@ public class Carrito extends BaseFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botonCupon;
     private javax.swing.JButton btnCambiarCantidad;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnPagar;
