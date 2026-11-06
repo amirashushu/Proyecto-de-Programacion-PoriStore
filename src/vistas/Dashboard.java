@@ -63,13 +63,15 @@ public final class Dashboard extends BaseFrame {
     // Vista de carritos activos e inventario reservado
     private PanelCarritosAdmin vistaCarritos;
     private PanelVentasAdmin vistaVentas;
-    // Muestra una vista a la vez: "productos" (este Dashboard) o "carritos"
+    private PanelPedidosEstado vistaPedidos; 
+    // Muestra una vista a la vez: "productos" (este Dashboard), "carritos", "ventas" o "pedidos"
     private java.awt.CardLayout vistas;
     private javax.swing.JPanel contenedorVistas;
     // Opciones del menú 
     private final List<JLabel> menuProductos = new java.util.ArrayList<>();
     private final List<JLabel> menuCarritos = new java.util.ArrayList<>();
     private final List<JLabel> menuVentas = new java.util.ArrayList<>();
+    private final List<JLabel> menuPedidos = new java.util.ArrayList<>();
     private static final Color GRIS_MENU = new Color(150, 150, 150);
     private static final Color ROJO_MENU = new Color(255, 0, 51);
 
@@ -77,6 +79,7 @@ public final class Dashboard extends BaseFrame {
     private void configurarMenu() {
         vistaCarritos = new PanelCarritosAdmin(st);
         vistaVentas = new PanelVentasAdmin(st);
+        vistaPedidos = new PanelPedidosEstado(st);
 
         java.awt.Dimension tamañoVista = jPanel3.getSize();
         vistas = new java.awt.CardLayout();
@@ -88,6 +91,7 @@ public final class Dashboard extends BaseFrame {
         contenedorVistas.add(vistaVentas.getPanelPrincipal(), "ventas");
         contenedorVistas.add(jPanel3, "productos");
         contenedorVistas.add(vistaCarritos.getPanelPrincipal(), "carritos");
+        contenedorVistas.add(vistaPedidos.getPanelPrincipal(), "pedidos");
         pack();
         setLocationRelativeTo(null);
 
@@ -101,24 +105,36 @@ public final class Dashboard extends BaseFrame {
         conectarOpcionMenu(vistaVentas.getMenuCarritos(), "carritos");
         conectarOpcionMenu(vistaVentas.getMenuVentas(), "ventas");
 
-        // Menu centrado con el logo y con la misma separacion en los dos headers
-        alinearHeader(jPanel5, jLabel11, jLabel10, lblMenuProductos, lblMenuCarritos, lblMenuVentas);
-        alinearHeader(vistaCarritos.getHeader(), vistaCarritos.getLogo(), vistaCarritos.getTitulo(), vistaCarritos.getMenuProductos(), vistaCarritos.getMenuCarritos(), vistaCarritos.getMenuVentas());
-        alinearHeader(vistaVentas.getHeader(), vistaVentas.getLogo(), vistaVentas.getTitulo(), vistaVentas.getMenuProductos(), vistaVentas.getMenuCarritos(), vistaVentas.getMenuVentas());
+        // La opción "Pedidos" de cada menú abre la vista de pedidos
+        conectarOpcionMenu(lblMenuPedidos, "pedidos");
+        conectarOpcionMenu(vistaCarritos.getMenuPedidos(), "pedidos");
+        conectarOpcionMenu(vistaVentas.getMenuPedidos(), "pedidos");
+        conectarOpcionMenu(vistaPedidos.getMenuProductos(), "productos");
+        conectarOpcionMenu(vistaPedidos.getMenuCarritos(), "carritos");
+        conectarOpcionMenu(vistaPedidos.getMenuVentas(), "ventas");
+        conectarOpcionMenu(vistaPedidos.getMenuPedidos(), "pedidos");
+
+        // Menu centrado con el logo y con la misma separacion en todos los headers
+        alinearHeader(jPanel5, jLabel11, jLabel10, lblMenuProductos, lblMenuCarritos, lblMenuVentas, lblMenuPedidos);
+        alinearHeader(vistaCarritos.getHeader(), vistaCarritos.getLogo(), vistaCarritos.getTitulo(), vistaCarritos.getMenuProductos(), vistaCarritos.getMenuCarritos(), vistaCarritos.getMenuVentas(), vistaCarritos.getMenuPedidos());
+        alinearHeader(vistaVentas.getHeader(), vistaVentas.getLogo(), vistaVentas.getTitulo(), vistaVentas.getMenuProductos(), vistaVentas.getMenuCarritos(), vistaVentas.getMenuVentas(), vistaVentas.getMenuPedidos());
+        alinearHeader(vistaPedidos.getHeader(), vistaPedidos.getLogo(), vistaPedidos.getTitulo(), vistaPedidos.getMenuProductos(), vistaPedidos.getMenuCarritos(), vistaPedidos.getMenuVentas(), vistaPedidos.getMenuPedidos());
         mostrarVista("productos");
 
-        // Al cerrar el Dashboard se detiene la actualización automatica de los carritos
+        // Al cerrar el Dashboard se detiene la actualización automatica de los carritos y los pedidos
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosed(java.awt.event.WindowEvent e) {
                 vistaCarritos.detener();
                 vistaCarritos.dispose();
+                vistaPedidos.detener();
+                vistaPedidos.dispose();
             }
         });
     }
 
     // Acomoda un header 
-    private void alinearHeader(javax.swing.JPanel header, JLabel logo, JLabel titulo, JLabel opcion1, JLabel opcion2, JLabel opcion3) {
+    private void alinearHeader(javax.swing.JPanel header, JLabel logo, JLabel titulo, JLabel opcion1, JLabel opcion2, JLabel opcion3, JLabel opcion4) {
         java.awt.Dimension tamañoHeader = header.getSize();
 
         // Las tarjetas son los paneles del header
@@ -147,6 +163,10 @@ public final class Dashboard extends BaseFrame {
             izquierda.add(javax.swing.Box.createHorizontalStrut(30));
             izquierda.add(opcion3);
         }
+        if (opcion4 != null) {
+            izquierda.add(javax.swing.Box.createHorizontalStrut(30));
+            izquierda.add(opcion4);
+        }
 
         // Si el header del diseño es más ancho que la ventana, esa parte no se ve
         int parteOculta = Math.max(0, tamañoHeader.width - header.getParent().getWidth());
@@ -173,6 +193,8 @@ public final class Dashboard extends BaseFrame {
             menuCarritos.add(opcion);
         } else if (vista.equals("ventas")) {
             menuVentas.add(opcion);
+        } else if (vista.equals("pedidos")) {
+            menuPedidos.add(opcion);
         }
         opcion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         opcion.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -195,8 +217,11 @@ public final class Dashboard extends BaseFrame {
         for (JLabel opcion : menuCarritos) {
             marcarOpcion(opcion, carritos);
         }
-        for (JLabel opcion : menuVentas) {      
+        for (JLabel opcion : menuVentas) {
             marcarOpcion(opcion, ventas);
+        }
+        for (JLabel opcion : menuPedidos) {
+            marcarOpcion(opcion, vista.equals("pedidos"));
         }
         if (productos) {
             actualizarTabla(st.getProductos()); // el stock pudo cambiar mientras se veian los carritos
@@ -236,6 +261,7 @@ public final class Dashboard extends BaseFrame {
         lblMenuProductos = new javax.swing.JLabel();
         lblMenuCarritos = new javax.swing.JLabel();
         lblMenuVentas = new javax.swing.JLabel();
+        lblMenuPedidos = new javax.swing.JLabel();
         Formulario = new javax.swing.JPanel();
         txtId = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -458,6 +484,10 @@ public final class Dashboard extends BaseFrame {
         lblMenuVentas.setForeground(new java.awt.Color(255, 255, 255));
         lblMenuVentas.setText("Ventas");
 
+        lblMenuPedidos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMenuPedidos.setForeground(new java.awt.Color(255, 255, 255));
+        lblMenuPedidos.setText("Pedidos");
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -469,11 +499,13 @@ public final class Dashboard extends BaseFrame {
                 .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblMenuProductos)
-                .addGap(68, 68, 68)
+                .addGap(40, 40, 40)
                 .addComponent(lblMenuCarritos)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(28, 28, 28)
                 .addComponent(lblMenuVentas)
-                .addGap(53, 53, 53)
+                .addGap(30, 30, 30)
+                .addComponent(lblMenuPedidos)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(29, 29, 29)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -490,12 +522,13 @@ public final class Dashboard extends BaseFrame {
                     .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblMenuProductos)
                             .addComponent(lblMenuCarritos)
-                            .addComponent(lblMenuVentas))
-                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(lblMenuVentas)
+                            .addComponent(lblMenuPedidos))))
                 .addGap(15, 15, 15))
         );
 
@@ -1472,6 +1505,7 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lblMenuCarritos;
+    private javax.swing.JLabel lblMenuPedidos;
     private javax.swing.JLabel lblMenuProductos;
     private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JLabel lblVistaPrevia;
