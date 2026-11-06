@@ -264,6 +264,7 @@ public final class Dashboard extends BaseFrame {
         btnEliminar = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         btnVaciarInventario = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
@@ -765,6 +766,15 @@ public final class Dashboard extends BaseFrame {
         btnVaciarInventario.setPreferredSize(new java.awt.Dimension(90, 35));
         btnVaciarInventario.addActionListener(this::btnVaciarInventarioActionPerformed);
 
+        jButton1.setBackground(new java.awt.Color(255, 51, 51));
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setText("Crear cupón");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -783,7 +793,8 @@ public final class Dashboard extends BaseFrame {
                             .addGap(290, 290, 290)
                             .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(btnVaciarInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(btnVaciarInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(63, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -803,7 +814,9 @@ public final class Dashboard extends BaseFrame {
                     .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnVaciarInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(220, 220, 220))
+                .addGap(133, 133, 133)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(56, 56, 56))
         );
 
         jPanel4.setBackground(new java.awt.Color(0, 0, 0));
@@ -1296,6 +1309,14 @@ public final class Dashboard extends BaseFrame {
         }
     }//GEN-LAST:event_btnVaciarInventarioActionPerformed
 
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        CreacionCupones cupones = new CreacionCupones(st);
+        this.dispose();
+        cupones.setVisible(true);
+        cupones.setLocationRelativeTo(null);
+        
+    }//GEN-LAST:event_jButton1MouseClicked
+
     // Copia imagen a carpeta /fotos/ y retorna ruta relativa
     private String copiarImagenAProyecto(File archivoOriginal) {
         try {
@@ -1430,6 +1451,7 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JComboBox<String> cbCategoria;
     private javax.swing.JComboBox<String> cbOrden;
     private javax.swing.JComboBox<String> cbReportCategoria;
+    private javax.swing.JButton jButton1;
     private javax.swing.JFrame jFrame1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
