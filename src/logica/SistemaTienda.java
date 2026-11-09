@@ -4,9 +4,11 @@ import entidades.Administrador;
 import entidades.Carro;
 import entidades.Categorias;
 import entidades.Cliente;
+import entidades.EntregaPedido;
 import entidades.Inventario;
 import entidades.Producto;
 import entidades.Ventas;
+import entidades.Cupon;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.io.Serializable;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Locale;
 import server.Server;
@@ -30,6 +33,8 @@ public class SistemaTienda implements Serializable{
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     private final Inventario inventario;
     private ArrayList<Ventas> ventas;
+    private ArrayList<Cupon> cupones = new ArrayList<>();
+    
     public SistemaTienda() {
         this.carritos = new ArrayList<>();
         this.cuentas = new HashMap<>();
@@ -216,7 +221,7 @@ public class SistemaTienda implements Serializable{
     }
 
     // Se arma un Carro nuevo cada vez (no se modifica el anterior) para que la vista del admin no choque al leerlo
-    public void actualizarCarritoRemoto(String id, String nombreCliente, String run, String estado, String productos) {
+    public void actualizarCarritoRemoto(String id, String nombreCliente, String run, String estado, String productos, EntregaPedido e) {
         if (id == null) {
             return;
         }
@@ -239,7 +244,7 @@ public class SistemaTienda implements Serializable{
             getCarritosRemotos().remove(id);
             carro.setEstado("Pagado");
             carritos.add(carro);
-            ventas.add(new Ventas(carro, ventas.size() + 1));
+            ventas.add(new Ventas(carro, ventas.size() + 1, e));
         } else if (carro.getCarritoProductos().isEmpty()) {
             getCarritosRemotos().remove(id); // carrito vacio
         } else {
@@ -276,11 +281,11 @@ public class SistemaTienda implements Serializable{
     }
 
     // Confirmar compra de un carrito
-    public void confirmarCompra(Carro c){
+    public void confirmarCompra(Carro c, EntregaPedido metodoEntrega){
         int nuevoId = ventas.size() + 1;
         c.setEstado("Pagado");
-        hostCliente.HostCliente.notificarCarrito(c); // el admin la registra como venta y la saca de carritos activos
-        Ventas venta = new Ventas(c, nuevoId);//se guarda en la lista de ventas
+        hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
+        Ventas venta = new Ventas(c, nuevoId, metodoEntrega);//se guarda en la lista de ventas
         ventas.add(venta);
         Cliente cliente = c.getCliente();
         if (cliente != null) {
@@ -399,7 +404,48 @@ public class SistemaTienda implements Serializable{
         this.ventas = ventas;
     }
     
+    // --- GESTOR DE CUPONES ---
     
     
+
+
+    // --- AGREGAR CUPON ---
+    public boolean agregarCupon(Cupon cupon) {
+        for (Cupon c : cupones) {
+        if (c.getCodigo().equalsIgnoreCase(cupon.getCodigo())) {
+            return false; // Manejo de excepciones
+        }
+    }
+        cupones.add(cupon);
+        guardarDatos();
+        return true;
+    }
+
+   
+    public List<Cupon> getCupones() {
+        return cupones;
+    }
+    private boolean verificarVencimientoCupon(Cupon c){
+        LocalDate vencimiento=c.getCreacion().plusDays(c.getDias());
+        if (vencimiento.isAfter(LocalDate.now()) || c.getUsos() == 0){
+            cupones.remove(c);
+            return false;
+        }
+        return true;
+    }
+    public boolean verificarCuponesValidos (String codigo){
+        if(cupones.isEmpty()){
+            return false;
+        }
+        for (Cupon c : cupones) {
+            if (verificarVencimientoCupon(c)){
+                if(c.validarCupon(codigo)){
+                    return true;
+                }
+            }           
+        }
+        return false;
+    }
+   
 }
 
