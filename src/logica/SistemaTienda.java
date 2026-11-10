@@ -248,7 +248,7 @@ public class SistemaTienda implements Serializable{
             getCarritosRemotos().remove(id);
             carro.setEstado("Pagado");
             carritos.add(carro);
-            Ventas venta = new Ventas(carro, ventas.size() + 1, c, c.getCostoEnvio());
+            Ventas venta = new Ventas(carro, ventas.size() + 1, e, e.getCostoEnvio());
             ventas.add(venta);
             // Cada venta confirmada genera su pedido en estado Pendiente
             Pedido pedido = new Pedido(siguienteNumeroPedido(), venta, id);
