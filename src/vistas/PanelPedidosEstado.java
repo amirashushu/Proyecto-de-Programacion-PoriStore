@@ -1,8 +1,16 @@
 package vistas;
 
+import entidades.EstadoPedido;
+import entidades.Pedido;
+import entidades.Producto;
 import java.awt.Color;
 import java.awt.Font;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.swing.BorderFactory;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -10,10 +18,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import logica.SistemaTienda;
 
-// Vista del admi: lista de pedidos con su estado, y el detalle del pedido seleccionado para avanzarlo o cancelarlo
+// Vista del admin lista de pedidos con su estado, y el detalle del pedido seleccionado para avanzarlo o cancelarlo
 public final class PanelPedidosEstado extends BaseFrame {
 
     private final DefaultTableModel modeloPedidos;
+    // Pedidos en el mismo orden que las filas de la tabla, para saber cuál se eligió
+    private final List<Pedido> pedidosEnTabla = new ArrayList<>();
+    private boolean recargando = false;
     //Refresca los datos cada 2 segundos para ver los pedidos nuevos casi al instante
     private final Timer timerActualizar;
 
@@ -22,6 +33,13 @@ public final class PanelPedidosEstado extends BaseFrame {
         initComponents();
         this.modeloPedidos = (DefaultTableModel) tblPedidos.getModel();
         configurarTabla();
+        // Al elegir una fila se muestra su detalle a la derecha
+        tblPedidos.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && !recargando) {
+                mostrarDetalle(pedidoSeleccionado());
+            }
+        });
+        mostrarDetalle(null);
         actualizarDatos();
         timerActualizar = new Timer(2000, e -> actualizarDatos());
         timerActualizar.start();
@@ -469,15 +487,31 @@ public final class PanelPedidosEstado extends BaseFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // TODO add your handling code here:
+        // Cancelar pedido todavia no está implementado
+        JOptionPane.showMessageDialog(this, "cancelar pedido.");
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void comboxFiltrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboxFiltrarActionPerformed
-        // TODO add your handling code here:
+        // Al cambiar el filtro se vuelve a llenar la tabla solo con ese estado
+        actualizarDatos();
     }//GEN-LAST:event_comboxFiltrarActionPerformed
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        // TODO add your handling code here:
+        // Pasa el pedido elegido al estado del combo (solo deja avanzar al siguiente)
+        Pedido p = pedidoSeleccionado();
+        if (p == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona un pedido de la tabla.");
+            return;
+        }
+        // El combo tiene los estados en el mismo orden que el enum: Pendiente, En preparación, Despachado, Entregado
+        EstadoPedido nuevo = EstadoPedido.values()[comboxEstado.getSelectedIndex()];
+        String error = st.cambiarEstadoPedido(p, nuevo);
+        if (error != null) {
+            JOptionPane.showMessageDialog(this, error, "No se puede cambiar", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        actualizarDatos();
+        mostrarDetalle(p);
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -586,9 +620,95 @@ public final class PanelPedidosEstado extends BaseFrame {
         return celda;
     }
 
-    // Recarga la tabla cada 2 segundos.
+    // Recarga la tabla cada 2 segundos
     private void actualizarDatos() {
+        Pedido elegido = pedidoSeleccionado(); // para volver a marcarlo despues de recargar
+        recargando = true;
         modeloPedidos.setRowCount(0);
-        // Pendiente: llenar la tabla y las tarjetas con los pedidos
+        pedidosEnTabla.clear();
+
+        // Filtro
+        int filtro = comboxFiltrar.getSelectedIndex();
+        int pendientes = 0, preparacion = 0, despachados = 0;
+        for (Pedido p : st.getPedidos()) {
+            switch (p.getEstado()) {
+                case Pendiente -> pendientes++;
+                case Preparado -> preparacion++;
+                case Despachado -> despachados++;
+                default -> { }
+            }
+            if (filtro > 0 && p.getEstado().ordinal() != filtro - 1) {
+                continue; 
+            }
+            pedidosEnTabla.add(p);
+            modeloPedidos.addRow(new Object[]{
+                p.getNumero(),
+                p.getVenta().getCarroVenta().getNombre(),
+                fecha(p),
+                SistemaTienda.textoEstado(p.getEstado())
+            });
+        }
+        labelPendientes.setText(String.valueOf(pendientes));
+        labelPreparacion.setText(String.valueOf(preparacion));
+        labelDespachados.setText(String.valueOf(despachados));
+
+        // Si el pedido elegido sigue en la tabla se vuelve a marcar
+        int fila = pedidosEnTabla.indexOf(elegido);
+        if (fila >= 0) {
+            tblPedidos.setRowSelectionInterval(fila, fila);
+        }
+        recargando = false;
+        if (fila < 0 && elegido != null) {
+            mostrarDetalle(null); 
+        }
+    }
+
+    // Pedido de la fila elegida, o null si no hay ninguna
+    private Pedido pedidoSeleccionado() {
+        int fila = tblPedidos.getSelectedRow();
+        if (fila < 0 || fila >= pedidosEnTabla.size()) {
+            return null;
+        }
+        return pedidosEnTabla.get(fila);
+    }
+
+    // Muestra los datos del pedido en el panel de la derecha 
+    private void mostrarDetalle(Pedido p) {
+        if (p == null) {
+            jLabel1.setText("Pedido N°");
+            labelInfoCliente.setText("Cliente:");
+            labelFecha.setText("Fecha:");
+            labelEstadoActual.setText("Estado actual:");
+            labelProductos.setText("Productos:");
+            labelTotal.setText("Total:");
+            return;
+        }
+        entidades.Carro carro = p.getVenta().getCarroVenta();
+        String rut = carro.getRun() != null ? " · " + carro.getRun() : "";
+        jLabel1.setText("Pedido N° " + p.getNumero());
+        labelInfoCliente.setText("Cliente: " + carro.getNombre() + rut);
+        labelFecha.setText("Fecha: " + fecha(p) + " " + p.getVenta().getHoraFormateada());
+        labelEstadoActual.setText("Estado actual: " + SistemaTienda.textoEstado(p.getEstado()));
+
+        // Un producto por línea 
+        StringBuilder productos = new StringBuilder("<html>Productos:");
+        for (Map.Entry<Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
+            Producto prod = entrada.getKey();
+            productos.append("<br>").append(prod.getNombre()).append(" x").append(entrada.getValue())
+                     .append(" - ").append(SistemaTienda.formatoPesos(prod.getPrecio() * entrada.getValue()));
+        }
+        labelProductos.setText(productos.append("</html>").toString());
+        labelTotal.setText("Total: " + SistemaTienda.formatoPesos(carro.getTotal()));
+
+        //el siguiente estado, que es el único al que se puede avanzar
+        int siguiente = p.getEstado().ordinal() + 1;
+        if (siguiente < comboxEstado.getItemCount()) {
+            comboxEstado.setSelectedIndex(siguiente);
+        }
+    }
+
+    // Fecha de la venta del pedido en formato dd-MM-yyyy
+    private String fecha(Pedido p) {
+        return p.getVenta().getFecha().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
     }
 }

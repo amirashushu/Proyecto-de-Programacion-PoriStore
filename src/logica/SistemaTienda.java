@@ -5,7 +5,9 @@ import entidades.Carro;
 import entidades.Categorias;
 import entidades.Cliente;
 import entidades.EntregaPedido;
+import entidades.EstadoPedido;
 import entidades.Inventario;
+import entidades.Pedido;
 import entidades.Producto;
 import entidades.Ventas;
 import entidades.Cupon;
@@ -244,7 +246,12 @@ public class SistemaTienda implements Serializable{
             getCarritosRemotos().remove(id);
             carro.setEstado("Pagado");
             carritos.add(carro);
-            ventas.add(new Ventas(carro, ventas.size() + 1, e));
+            Ventas venta = new Ventas(carro, ventas.size() + 1, e);
+            ventas.add(venta);
+            // Cada venta confirmada genera su pedido en estado Pendiente
+            Pedido pedido = new Pedido(siguienteNumeroPedido(), venta, id);
+            getPedidos().add(pedido);
+            guardarDatos();
         } else if (carro.getCarritoProductos().isEmpty()) {
             getCarritosRemotos().remove(id); // carrito vacio
         } else {
@@ -403,7 +410,52 @@ public class SistemaTienda implements Serializable{
     public void setVentas(ArrayList<Ventas> ventas) {
         this.ventas = ventas;
     }
-    
+
+    // ========== PEDIDOS ==========
+
+    private ArrayList<Pedido> pedidos;
+
+    // Si el .dat no trae pedidos, entonces la lista se crea vacia la primera vez
+    public ArrayList<Pedido> getPedidos() {
+        if (pedidos == null) {
+            pedidos = new ArrayList<>();
+        }
+        return pedidos;
+    }
+
+    // Numero del proximo pedido, el mas alto + 1, asi nunca se repite
+    private int siguienteNumeroPedido() {
+        int mayor = 0;
+        for (Pedido p : getPedidos()) {
+            mayor = Math.max(mayor, p.getNumero());
+        }
+        return mayor + 1;
+    }
+
+    //Texto del estado para mostrar en pantalla 
+    public static String textoEstado(EstadoPedido e) {
+        return e == EstadoPedido.Preparado ? "En preparación" : e.toString();
+    }
+
+    // Cambia el estado del pedido, solo deja avanzar al siguiente
+    //Devuelve el motivo si no se puede
+    public String cambiarEstadoPedido(Pedido p, EstadoPedido nuevo) {
+        EstadoPedido actual = p.getEstado();
+        if (actual == EstadoPedido.Entregado || actual == EstadoPedido.Cancelado) {
+            return "El pedido ya está " + textoEstado(actual).toLowerCase() + ", no se puede cambiar.";
+        }
+        if (nuevo == actual) {
+            return "El pedido ya está en ese estado.";
+        }
+        EstadoPedido siguiente = EstadoPedido.values()[actual.ordinal() + 1];
+        if (nuevo != siguiente) {
+            return "Solo se puede avanzar al siguiente estado: " + textoEstado(siguiente) + ".";
+        }
+        p.setEstado(nuevo);
+        guardarDatos();
+        return null;
+    }
+
     // --- GESTOR DE CUPONES ---
     
     
