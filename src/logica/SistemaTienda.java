@@ -1,6 +1,7 @@
 package logica;
 
 import entidades.Administrador;
+import entidades.ApiGemini;
 import entidades.Carro;
 import entidades.Categorias;
 import entidades.Cliente;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Locale;
 import server.Server;
+
 
 public class SistemaTienda implements Serializable{
     private static final long serialVersionUID = 1L;
@@ -405,9 +407,6 @@ public class SistemaTienda implements Serializable{
     }
     
     // --- GESTOR DE CUPONES ---
-    
-    
-
 
     // --- AGREGAR CUPON ---
     public boolean agregarCupon(Cupon cupon) {
@@ -425,11 +424,20 @@ public class SistemaTienda implements Serializable{
     public List<Cupon> getCupones() {
         return cupones;
     }
+    public Cupon buscarCuponXCodigo(String codigo){
+        for (Cupon c : cupones) {
+            if(c.validarCupon(codigo)){
+                return c;
+            }                     
+        }
+        return null;
+    }
     private boolean verificarVencimientoCupon(Cupon c){
         LocalDate vencimiento=c.getCreacion().plusDays(c.getDias());
-        if (vencimiento.isAfter(LocalDate.now()) || c.getUsos() == 0){
-            cupones.remove(c);
-            return false;
+            if (vencimiento.isBefore(LocalDate.now()) || c.getUsos() == 0){
+                cupones.remove(c);
+                guardarDatos();
+                return false;
         }
         return true;
     }
@@ -437,15 +445,21 @@ public class SistemaTienda implements Serializable{
         if(cupones.isEmpty()){
             return false;
         }
-        for (Cupon c : cupones) {
-            if (verificarVencimientoCupon(c)){
-                if(c.validarCupon(codigo)){
-                    return true;
-                }
-            }           
+        Cupon cupon = buscarCuponXCodigo(codigo);
+        
+        if(cupon != null && verificarVencimientoCupon(cupon)){
+            return true;
         }
         return false;
     }
-   
+    public boolean verificarCuponPuesto(String codigo){
+        if (this.obtenerCarritoActual().getCupon() == null){
+            return false;
+        }
+        return this.obtenerCarritoActual().getCupon().getCodigo().equals(codigo);
+    }
+    public String llamadoIA(String pront) throws Exception{
+        return ApiGemini.callGeminiAPI(pront);
+    }
 }
 

@@ -31,7 +31,6 @@ public class Server {
         try (ServerSocket serverSocket = new ServerSocket()) {
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(HOST, PORT));
-            System.out.println("Servidor Java escuchando en " + HOST + ":" + PORT + " ...");
             System.out.println("Esperando conexiones de clientes...");
 
             // Un hilo por cliente: el accept() se repite para siempre

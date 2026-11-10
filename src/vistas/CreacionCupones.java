@@ -251,7 +251,7 @@ public class CreacionCupones extends BaseFrame {
 
         String comboDescuento = cmbDescuento.getSelectedItem().toString().replace("%", "").trim();
         double porcentaje = Double.parseDouble(comboDescuento);
-
+        porcentaje = porcentaje/100;
         String comboVencimiento = cmbVencimiento.getSelectedItem().toString().replace("d", "").trim();
         int dias = Integer.parseInt(comboVencimiento);
 

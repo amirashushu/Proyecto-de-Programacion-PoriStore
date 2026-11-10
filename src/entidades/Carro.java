@@ -3,18 +3,17 @@ package entidades;
 
 import hostCliente.HostCliente;
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class Carro implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String idSesion;  // ID unico para identificar el carrito 
+    private final String idSesion;  // ID unico para identificar el carrito 
     private final HashMap<Producto,Integer> carritoProductos;
     private Cliente cliente;  // Cliente dueño del carrito (null si es anónimo)
     private String estado;
+    private Cupon cupon;
 
     // Carrito empieza anónimo por defecto
     public Carro(){
@@ -22,6 +21,7 @@ public class Carro implements Serializable {
         this.carritoProductos = new HashMap<>();
         this.cliente = null;  
         this.estado = "Por pagar";
+        this.cupon = null;
     }
 
     //Logica carritoProductos
@@ -90,8 +90,6 @@ public class Carro implements Serializable {
         }
         return false;
     }
-    
-    
 
     //Calculos matemáticos
     private double calcularSubTotal(){
@@ -104,9 +102,15 @@ public class Carro implements Serializable {
         }
         return total;
     }
-
+    private double calcularDscCupon(){
+        if (cupon == null){
+            return 0.0;
+        }
+        return calcularSubTotal() * cupon.getPorcentaje();
+    }
+    
     private double calcularTotal(){
-        double total = calcularSubTotal();
+        double total = calcularSubTotal()- calcularDscCupon();
         total = total * 1.19;
         return total;
     }
@@ -167,7 +171,16 @@ public class Carro implements Serializable {
     }
 
     public double getIVA() {
-        return (int) calcularSubTotal() * 0.19;
+        return (int) (calcularSubTotal()-calcularDscCupon()) * 0.19;
+    }
+    public double getPrecioDsc() {
+        return (int) calcularDscCupon();
+    }
+    public int getDsc(){
+        if (cupon==null){
+            return 0;
+        }
+        return (int) (cupon.getPorcentaje()*100);
     }
     
     public int getTotalProductos() {
@@ -176,6 +189,15 @@ public class Carro implements Serializable {
             totalProductos += cantidad;
         }
         return totalProductos;
+    }
+
+    public Cupon getCupon() {
+       
+        return cupon;
+    }
+
+    public void setCupon(Cupon cupon) {
+        this.cupon = cupon;
     }
     
 }
