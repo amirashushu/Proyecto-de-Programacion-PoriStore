@@ -446,7 +446,6 @@ public class VistaSeleccionarEnvío extends BaseFrame {
             EntregaPedido entrega = new EntregaPedido(metodoEntrega, region, ciudad, calle, numero, tel, comentario);
             VistaPago pago = new VistaPago(carritoActual, entrega, () -> {
                 st.confirmarCompra(carritoActual, entrega );
-                System.out.println("1 ......................");
                 st.guardarDatos();
             }, () -> {
                 carro.setEnabled(true);
