@@ -295,7 +295,6 @@ public class SistemaTienda implements Serializable{
         hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
         Ventas venta = new Ventas(c, nuevoId, metodoEntrega, metodoEntrega.getCostoEnvio());//se guarda en la lista de ventas
         ventas.add(venta);
-        System.out.println("1 ............venta agregar..........");
         Cliente cliente = c.getCliente();
         if (cliente != null) {
             Carro nuevoCarro = new Carro();
