@@ -10,6 +10,7 @@ public class EntregaPedido implements Serializable{
     private String numero;
     private String cel;
     private String comentarios;
+    private int costoEnvio;
     public EntregaPedido(String metodoEntrega, String región, String ciudad, String calle, String numero, String cel, String comentarios){
         this.metodoEntrega = metodoEntrega;
         this.región = región;
@@ -18,6 +19,7 @@ public class EntregaPedido implements Serializable{
         this.numero = numero;
         this.cel = cel;
         this.comentarios = comentarios;
+        this.costoEnvio = 0;  //FALTA LO DE CALCULAR EL COSTO DE ENVIO
     }
 
     public String getMetodoEntrega() {
@@ -75,6 +77,16 @@ public class EntregaPedido implements Serializable{
     public void setCel(String cel) {
         this.cel = cel;
     }
+
+    public int getCostoEnvio() {
+        return costoEnvio;
+    }
+
+    public void setCostoEnvio(int costoEnvio) {
+        this.costoEnvio = costoEnvio;
+    }
+    
+    
     
     
     

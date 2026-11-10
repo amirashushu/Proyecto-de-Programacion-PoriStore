@@ -116,7 +116,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel24)
-                .addGap(19, 19, Short.MAX_VALUE))
+                .addGap(18, 18, Short.MAX_VALUE))
         );
 
         jPanel8.setBackground(new java.awt.Color(30, 30, 30));
@@ -150,7 +150,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jLabel28)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel27)
-                .addGap(19, 19, Short.MAX_VALUE))
+                .addGap(18, 18, Short.MAX_VALUE))
         );
 
         lblMenuProductos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -214,11 +214,11 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID Venta", "Cliente", "R.U.T", "Fecha", "Hora", "Productos", "Monto Total"
+                "ID Venta", "Cliente", "R.U.T", "Fecha", "Hora", "Productos", "Entrega", "Dirección", "Costo envío", "Monto Total"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -320,7 +320,10 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
                 v.getHoraFormateada(),
                 detalleProductos(c),             // Productos comprados (detalle de la venta)
-                logica.SistemaTienda.formatoPesos(c.getTotal())  // Monto Total
+                v.getMetodoEntrega().getMetodoEntrega(),
+                v.getMetodoEntrega().getCalle() + " " + v.getMetodoEntrega().getNumero(),
+                logica.SistemaTienda.formatoPesos(v.getCostoEnvio()),
+                logica.SistemaTienda.formatoPesos(c.getTotal() + v.getCostoEnvio())  // Monto Total
             });
         }
 
