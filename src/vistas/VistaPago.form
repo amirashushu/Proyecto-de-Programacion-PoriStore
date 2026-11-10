@@ -251,24 +251,27 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Group type="102" attributes="0">
+              <Group type="102" alignment="0" attributes="0">
                   <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
-                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                      <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
-                      <Component id="lblTituloComprobante" min="-2" max="-2" attributes="0"/>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
-                          <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                              <Component id="jScrollPane1" pref="362" max="32767" attributes="0"/>
-                              <Component id="btnCerrar" alignment="0" max="32767" attributes="0"/>
-                              <Component id="lblSubtotal" alignment="1" min="-2" max="-2" attributes="0"/>
-                              <Component id="lblIva" alignment="1" min="-2" max="-2" attributes="0"/>
-                              <Component id="lblTotal" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" groupAlignment="0" attributes="0">
+                      <Component id="lblEnvio" min="-2" max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
+                          <Component id="lblTituloComprobante" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                                  <Component id="jScrollPane1" pref="362" max="32767" attributes="0"/>
+                                  <Component id="btnCerrar" alignment="0" max="32767" attributes="0"/>
+                                  <Component id="lblSubtotal" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblIva" alignment="1" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lblTotal" alignment="1" min="-2" max="-2" attributes="0"/>
+                              </Group>
                           </Group>
+                          <Component id="lblFecha" alignment="0" max="32767" attributes="0"/>
+                          <Component id="lblCliente" alignment="0" max="32767" attributes="0"/>
+                          <Component id="lblTarjeta" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <Component id="lblFecha" alignment="0" max="32767" attributes="0"/>
-                      <Component id="lblCliente" alignment="0" max="32767" attributes="0"/>
-                      <Component id="lblTarjeta" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace pref="24" max="32767" attributes="0"/>
               </Group>
@@ -287,7 +290,9 @@
                   <Component id="lblCliente" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lblTarjeta" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace type="separate" max="-2" attributes="0"/>
+                  <EmptySpace max="-2" attributes="0"/>
+                  <Component id="lblEnvio" min="-2" max="-2" attributes="0"/>
+                  <EmptySpace pref="40" max="32767" attributes="0"/>
                   <Component id="jScrollPane1" min="-2" pref="182" max="-2" attributes="0"/>
                   <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="lblSubtotal" min="-2" max="-2" attributes="0"/>
@@ -295,9 +300,9 @@
                   <Component id="lblIva" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="lblTotal" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace max="-2" attributes="0"/>
+                  <EmptySpace type="separate" max="-2" attributes="0"/>
                   <Component id="btnCerrar" min="-2" pref="38" max="-2" attributes="0"/>
-                  <EmptySpace pref="85" max="32767" attributes="0"/>
+                  <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -446,6 +451,14 @@
               <Color blue="ff" green="ff" red="ff" type="rgb"/>
             </Property>
             <Property name="text" type="java.lang.String" value="Cerrar"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JLabel" name="lblEnvio">
+          <Properties>
+            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
+              <Color blue="ff" green="ff" red="ff" type="rgb"/>
+            </Property>
+            <Property name="text" type="java.lang.String" value="Tiempo estimado de env&#xed;o:"/>
           </Properties>
         </Component>
       </SubComponents>

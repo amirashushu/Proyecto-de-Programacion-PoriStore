@@ -3,7 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vistas;
-
+import entidades.Carro;
+import entidades.EntregaPedido;
+import entidades.Producto;
+import java.util.Map;
+import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
 /**
  *
  * @author amira
@@ -19,45 +24,53 @@ public class VistaPago extends javax.swing.JFrame {
         initComponents();
     }
 
-    private entidades.Carro carro;
-    private Runnable confirmarCompra; // registra la venta (lo entrega el Carrito)
+    private Carro carro;
+    private EntregaPedido entrega;
+    private String tiempoEnvio;
+    private Runnable confirmarCompra;
 
     // Pago simulado, confirmarCompra registra la venta y alCerrar recarga el carrito cuando se cierra la ventana
-    public VistaPago(entidades.Carro carro, Runnable confirmarCompra, Runnable alCerrar) {
-        initComponents();
-        this.carro = carro;
-        this.confirmarCompra = confirmarCompra;
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE); // cerrar solo esta ventana
-        setResizable(false);
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosed(java.awt.event.WindowEvent e) {
-                alCerrar.run();
-            }
-        });
+    public VistaPago(Carro carro, EntregaPedido entrega, String tiempoEnvio, Runnable confirmarCompra, Runnable alCerrar) {
+    initComponents();
+    this.carro = carro;
+    this.entrega = entrega;
+    this.tiempoEnvio = tiempoEnvio;
+    this.confirmarCompra = confirmarCompra;
 
-        // Las dos pantallas una sobre otra, se muestra una a la vez
-        getContentPane().removeAll();
-        getContentPane().setLayout(new java.awt.CardLayout());
-        getContentPane().add(panelPago, "pago");
-        getContentPane().add(panelComprobante, "comprobante");
-        setPreferredSize(null); 
-        pack();
+    setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+    setResizable(false);
+    addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosed(java.awt.event.WindowEvent e) {
+            alCerrar.run();
+        }
+    });
 
-        // Tabla del comprobante
-        ((javax.swing.table.DefaultTableModel) tblComprobante.getModel()).setRowCount(0);
-        tblComprobante.setDefaultEditor(Object.class, null);
-        tblComprobante.getTableHeader().setBackground(new java.awt.Color(180, 0, 0));
-        tblComprobante.getTableHeader().setForeground(java.awt.Color.WHITE);
-        tblComprobante.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
-        jScrollPane1.getViewport().setBackground(new java.awt.Color(30, 30, 30));
+    getContentPane().removeAll();
+    getContentPane().setLayout(new java.awt.CardLayout());
+    getContentPane().add(panelPago, "pago");
+    getContentPane().add(panelComprobante, "comprobante");
+    setPreferredSize(null); 
+    pack();
 
-        lblTotalPagar.setText("Total a pagar: " + plata(carro.getTotal()));
-        lblEstado.setText(" ");
-        btnPagarAhora.addActionListener(e -> pagar());
-        btnCancelar.addActionListener(e -> dispose());
-        btnCerrar.addActionListener(e -> dispose());
+    ((DefaultTableModel) tblComprobante.getModel()).setRowCount(0);
+    tblComprobante.setDefaultEditor(Object.class, null);
+    tblComprobante.getTableHeader().setBackground(new java.awt.Color(180, 0, 0));
+    tblComprobante.getTableHeader().setForeground(java.awt.Color.WHITE);
+    tblComprobante.getTableHeader().setFont(new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 12));
+    jScrollPane1.getViewport().setBackground(new java.awt.Color(30, 30, 30));
+
+    lblTotalPagar.setText("Total a pagar: " + plata(carro.getTotal()));
+    lblEstado.setText(" ");
+    
+    if (lblEnvio != null) {
+        lblEnvio.setText("Tiempo est. entrega: " + tiempoEnvio);
     }
+
+    btnPagarAhora.addActionListener(e -> pagar());
+    btnCancelar.addActionListener(e -> dispose());
+    btnCerrar.addActionListener(e -> dispose());
+}
 
     // Simula que el banco procesa el pago y luego muestra el comprobante
     private void pagar() {
@@ -76,21 +89,25 @@ public class VistaPago extends javax.swing.JFrame {
     }
 
     private void llenarComprobante() {
-        String numero = txtNumeroTarjeta.getText().replaceAll("[^0-9]", "");
-        String ultimos = numero.length() >= 4 ? numero.substring(numero.length() - 4) : numero;
-        lblFecha.setText("Fecha: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
-        lblCliente.setText("Cliente: " + carro.getNombre() + (carro.getRun() != null ? " (" + carro.getRun() + ")" : ""));
-        lblTarjeta.setText("Tarjeta: **** **** **** " + ultimos);
+    String numero = txtNumeroTarjeta.getText().replaceAll("[^0-9]", "");
+    String ultimos = numero.length() >= 4 ? numero.substring(numero.length() - 4) : numero;
+    lblFecha.setText("Fecha: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
+    lblCliente.setText("Cliente: " + carro.getNombre() + (carro.getRun() != null ? " (" + carro.getRun() + ")" : ""));
+    lblTarjeta.setText("Tarjeta: **** **** **** " + ultimos);
 
-        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tblComprobante.getModel();
-        for (java.util.Map.Entry<entidades.Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
-            entidades.Producto p = entrada.getKey();
-            modelo.addRow(new Object[]{p.getNombre(), entrada.getValue(), plata(p.getPrecio() * entrada.getValue())});
-        }
-        lblSubtotal.setText("Subtotal: " + plata(carro.getSubTotal()));
-        lblIva.setText("IVA (19%): " + plata(carro.getIVA()));
-        lblTotal.setText("Total: " + plata(carro.getTotal()));
+    if (lblEnvio != null) {
+        lblEnvio.setText("Entrega estimada: " + tiempoEnvio);
     }
+
+    DefaultTableModel modelo = (DefaultTableModel) tblComprobante.getModel();
+    for (Map.Entry<Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
+        Producto p = entrada.getKey();
+        modelo.addRow(new Object[]{p.getNombre(), entrada.getValue(), plata(p.getPrecio() * entrada.getValue())});
+    }
+    lblSubtotal.setText("Subtotal: " + plata(carro.getSubTotal()));
+    lblIva.setText("IVA (19%): " + plata(carro.getIVA()));
+    lblTotal.setText("Total: " + plata(carro.getTotal()));
+}
 
     // Formato chileno
     private String plata(double monto) {
@@ -132,6 +149,7 @@ public class VistaPago extends javax.swing.JFrame {
         lblIva = new javax.swing.JLabel();
         lblTotal = new javax.swing.JLabel();
         btnCerrar = new javax.swing.JButton();
+        lblEnvio = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -301,26 +319,31 @@ public class VistaPago extends javax.swing.JFrame {
         btnCerrar.setForeground(new java.awt.Color(255, 255, 255));
         btnCerrar.setText("Cerrar");
 
+        lblEnvio.setForeground(new java.awt.Color(255, 255, 255));
+        lblEnvio.setText("Tiempo estimado de envío:");
+
         javax.swing.GroupLayout panelComprobanteLayout = new javax.swing.GroupLayout(panelComprobante);
         panelComprobante.setLayout(panelComprobanteLayout);
         panelComprobanteLayout.setHorizontalGroup(
             panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelComprobanteLayout.createSequentialGroup()
                 .addGap(21, 21, 21)
-                .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel5)
-                    .addComponent(lblTituloComprobante)
-                    .addGroup(panelComprobanteLayout.createSequentialGroup()
-                        .addGap(1, 1, 1)
-                        .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
-                            .addComponent(btnCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(lblSubtotal, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblIva, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblTotal, javax.swing.GroupLayout.Alignment.TRAILING)))
-                    .addComponent(lblFecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblTarjeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblEnvio)
+                    .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jLabel5)
+                        .addComponent(lblTituloComprobante)
+                        .addGroup(panelComprobanteLayout.createSequentialGroup()
+                            .addGap(1, 1, 1)
+                            .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 362, Short.MAX_VALUE)
+                                .addComponent(btnCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(lblSubtotal, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(lblIva, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(lblTotal, javax.swing.GroupLayout.Alignment.TRAILING)))
+                        .addComponent(lblFecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblCliente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(lblTarjeta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
         panelComprobanteLayout.setVerticalGroup(
@@ -336,7 +359,9 @@ public class VistaPago extends javax.swing.JFrame {
                 .addComponent(lblCliente)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTarjeta)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblEnvio)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 40, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 182, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(lblSubtotal)
@@ -344,9 +369,9 @@ public class VistaPago extends javax.swing.JFrame {
                 .addComponent(lblIva)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblTotal)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGap(18, 18, 18)
                 .addComponent(btnCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(85, Short.MAX_VALUE))
+                .addGap(29, 29, 29))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -405,6 +430,7 @@ public class VistaPago extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCliente;
+    private javax.swing.JLabel lblEnvio;
     private javax.swing.JLabel lblEstado;
     private javax.swing.JLabel lblFecha;
     private javax.swing.JLabel lblIva;

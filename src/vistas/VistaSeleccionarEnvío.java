@@ -8,6 +8,8 @@ import entidades.EntregaPedido;
 import javax.swing.ButtonGroup;
 import javax.swing.JOptionPane;
 import logica.SistemaTienda;
+import entidades.Carro;
+import entidades.EntregaPedido;
 
 public class VistaSeleccionarEnvío extends BaseFrame {
     
@@ -421,37 +423,56 @@ public class VistaSeleccionarEnvío extends BaseFrame {
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
-        if(jTextField1.getText().trim().isEmpty()|| jTextField2.getText().trim().isEmpty() || jTextField3.getText().trim().isEmpty()|| jTextField3.getText().trim().isEmpty() || buttonGroup1.getSelection() == null ){
-            JOptionPane.showMessageDialog(null, "Complete los campos obligatorios porfavor", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (jRadioButton2.isSelected() && (jTextField1.getText().trim().isEmpty() || 
+        jTextField2.getText().trim().isEmpty() || jTextField3.getText().trim().isEmpty())) {
+        JOptionPane.showMessageDialog(null, "Complete los campos obligatorios por favor", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    } 
+
+    if (buttonGroup1.getSelection() == null) {
+        JOptionPane.showMessageDialog(null, "Seleccione un método de entrega", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    String metodoEntrega;
+    String region;
+    String tiempoEnvio;
+    Carro carritoActual = st.obtenerCarritoActual();
+
+    if (jRadioButton1.isSelected()) {
+        metodoEntrega = "Retiro en tienda";
+        region = "-";
+        tiempoEnvio = "Disponible en 24 hrs hábiles";
+    } else {
+        metodoEntrega = "Despacho a domicilio";
+        region = ComboBoxREGIONES.getSelectedItem().toString();
+        if (region.contains("V Región") || region.contains("VI Región")) {
+            tiempoEnvio = "2 a 3 días hábiles";
         } else {
-            String metodoEntrega;
-            String region;
-            entidades.Carro carritoActual = st.obtenerCarritoActual();
-            if(jRadioButton1.isSelected() ){
-                metodoEntrega = "Retiro en tienda";
-                region = "-";
-            } else {
-                metodoEntrega = "Despacho a domicilio";
-                region = ComboBoxREGIONES.getSelectedItem().toString();
-            }
-            String ciudad = jTextField1.getText();
-            String calle = jTextField2.getText();
-            String numero = jTextField3.getText();
-            String tel = jTextField4.getText();
-            String comentario = jTextField5.getText();
-            EntregaPedido entrega = new EntregaPedido(metodoEntrega, region, ciudad, calle, numero, tel, comentario);
-            VistaPago pago = new VistaPago(carritoActual, () -> {
-                st.confirmarCompra(carritoActual, entrega );
-                st.guardarDatos();
-            }, () -> {
-                carro.setEnabled(true);
-                carro.cargarDatosCarrito();
-                carro.toFront();
-            });
-            pago.setLocationRelativeTo(this);
-            pago.setVisible(true);
-            this.dispose();
+            tiempoEnvio = "5 a 7 días hábiles";
         }
+    }
+
+    String ciudad = jTextField1.getText();
+    String calle = jTextField2.getText();
+    String numero = jTextField3.getText();
+    String tel = jTextField4.getText();
+    String comentario = jTextField5.getText();
+
+    EntregaPedido entrega = new EntregaPedido(metodoEntrega, region, ciudad, calle, numero, tel, comentario);
+    
+    VistaPago pago = new VistaPago(carritoActual, entrega, tiempoEnvio, () -> {
+        st.confirmarCompra(carritoActual, entrega);
+        st.guardarDatos();
+    }, () -> {
+        carro.setEnabled(true);
+        carro.cargarDatosCarrito();
+        carro.toFront();
+    });
+
+    pago.setLocationRelativeTo(this);
+    pago.setVisible(true);
+    this.dispose();
     }//GEN-LAST:event_jPanel10MouseClicked
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
