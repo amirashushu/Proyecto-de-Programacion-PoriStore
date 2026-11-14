@@ -10,7 +10,7 @@ import java.util.regex.*;
 
 public class Server {
 
-    private static final String HOST = "192.168.1.6";
+    private static final String HOST = "192.168.1.8";
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
     private static vistas.Dashboard dashboardTabla;
@@ -91,6 +91,7 @@ private static void handleClient(Socket clientSocket, Inventario invent) {
                                 extractJsonField(line, "estado"),
                                 extractJsonField(line, "productos"),
                                 entrega);
+                        vistas.PanelVentasAdmin.refrescarEnVivo();
                     }
                     continue;
                 }

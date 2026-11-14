@@ -7,7 +7,7 @@ import java.net.*;
 import java.util.regex.*;
 
 public class HostCliente {
-    private static final String HOST = "192.168.1.6";
+    private static final String HOST = "192.168.1.8";
     private static final int PORT = 65432;
     private static PrintWriter serverOut;
     private static vistas.VistaPrincipal vistaPrincipalActiva;
@@ -179,6 +179,7 @@ public class HostCliente {
 
     // Método para escapar caracteres especiales en JSON
     private static String escapeJson(String text) {
+        if (text == null) return "";
         return text.replace("\\", "\\\\")
                    .replace("\"", "\\\"")
                    .replace("\n", "\\n")

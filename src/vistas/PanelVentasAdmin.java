@@ -14,13 +14,23 @@ import logica.SistemaTienda;
 public class PanelVentasAdmin extends javax.swing.JPanel {
     private SistemaTienda st;
     private TableRowSorter<DefaultTableModel> filtroVentas;
+    private static PanelVentasAdmin instanciaActiva;
 
 
     public PanelVentasAdmin(SistemaTienda st) {
         this.st = st;
+        instanciaActiva = this;
         initComponents();
         configurarPanel();
         actualizarTablaVentas();
+    }
+    
+    public static void refrescarEnVivo() {
+        if (instanciaActiva != null) {
+            java.awt.EventQueue.invokeLater(() -> {
+                instanciaActiva.actualizarTablaVentas();
+            });
+        }
     }
 
     public PanelVentasAdmin() {
@@ -314,25 +324,35 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     
-    public void actualizarTablaVentas() {
+public void actualizarTablaVentas() {
+        if (st == null) return;
+
         DefaultTableModel modelo = (DefaultTableModel) tblVentas.getModel();
-        modelo.setRowCount(0); //limpiar filas anteriores
-        for (entidades.Ventas v : st.getVentas()) {  //recorremos todas las ventas guardadas en el sistema
+        modelo.setRowCount(0);
+
+        for (entidades.Ventas v : st.getVentas()) {
             entidades.Carro c = v.getCarroVenta();
-            String rutCliente = (c.getRun() != null) ? c.getRun() : "Sin RUT";             
-            // Si el RUT es nulo (cliente anónimo), mostramos "Sin RUT"
-            
+            if (c == null) continue;
+
+            String rutCliente = (c.getRun() != null && !c.getRun().isEmpty()) ? c.getRun() : "Sin RUT";
+            String fecha = (v.getFecha() != null) ? v.getFecha().toString() : "-";
+            String hora = (v.getHoraFormateada() != null) ? v.getHoraFormateada() : "-";
+            String tipoEntrega = (v.getMetodoEntrega() != null && v.getMetodoEntrega().getMetodoEntrega() != null)
+                    ? v.getMetodoEntrega().getMetodoEntrega() : "Retiro";
+            String direccion = (v.getMetodoEntrega() != null && v.getMetodoEntrega().getCalle() != null)
+                    ? v.getMetodoEntrega().getCalle() + " " + v.getMetodoEntrega().getNumero() : "-";
+
             modelo.addRow(new Object[]{
-                v.getIdVenta(),                  // ID Venta
-                c.getNombre(),                   // Cliente
-                rutCliente,                      // R.U.T
-                v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
-                v.getHoraFormateada(),
-                detalleProductos(c),             // Productos comprados (detalle de la venta)
-                v.getMetodoEntrega().getMetodoEntrega(),
-                v.getMetodoEntrega().getCalle() + " " + v.getMetodoEntrega().getNumero(),
+                v.getIdVenta(),
+                c.getNombre(),
+                rutCliente,
+                fecha,
+                hora,
+                detalleProductos(c),
+                tipoEntrega,
+                direccion,
                 logica.SistemaTienda.formatoPesos(v.getCostoEnvio()),
-                logica.SistemaTienda.formatoPesos(c.getTotal() + v.getCostoEnvio())  // Monto Total
+                logica.SistemaTienda.formatoPesos(c.getTotal() + v.getCostoEnvio())
             });
         }
 

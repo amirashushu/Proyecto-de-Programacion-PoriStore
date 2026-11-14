@@ -58,6 +58,8 @@ public final class Dashboard extends BaseFrame {
         tblProductos.getColumnModel().getColumn(0).setPreferredWidth(70);
 
         configurarMenu();
+        server.Server.setDashboard(this);
+        server.Server.setSistema(st);
 }
 
     // Vista de carritos activos e inventario reservado
@@ -523,13 +525,13 @@ public final class Dashboard extends BaseFrame {
                     .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11)
-                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblMenuProductos)
                             .addComponent(lblMenuCarritos)
                             .addComponent(lblMenuVentas)
-                            .addComponent(lblMenuPedidos))))
+                            .addComponent(lblMenuPedidos))
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(15, 15, 15))
         );
 
