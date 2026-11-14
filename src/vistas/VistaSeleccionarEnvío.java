@@ -138,7 +138,7 @@ public class VistaSeleccionarEnvío extends BaseFrame {
         jPanel4.setForeground(new java.awt.Color(255, 255, 255));
         jPanel4.setFocusable(false);
 
-        jTextField1.setToolTipText("Comuna");
+        jTextField1.setToolTipText("");
         jTextField1.addActionListener(this::jTextField1ActionPerformed);
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -387,10 +387,10 @@ public class VistaSeleccionarEnvío extends BaseFrame {
         jTextField2.setEnabled(false);
         jTextField3.setEnabled(false);
         jTextField4.setEnabled(false);
-        ComboBoxREGIONES.setSelectedIndex(-1);
+        ComboBoxREGIONES.setSelectedIndex(6);
         ComboBoxREGIONES.setEnabled(false);
-        jTextField1.setText("-");
-        jTextField2.setText("-");
+        jTextField1.setText("Curico");
+        jTextField2.setText("UTAL SEDE LOS NICHES");
         jTextField3.setText("-");
         jTextField4.setText("-");
         java.awt.Color colorBloqueado = new java.awt.Color(204, 204, 204);
@@ -414,6 +414,10 @@ public class VistaSeleccionarEnvío extends BaseFrame {
         jTextField3.setBackground(colorHabilitado);
         jTextField4.setBackground(colorHabilitado);
         ComboBoxREGIONES.setBackground(colorHabilitado);
+        jTextField1.setText("");
+        jTextField2.setText("");
+        jTextField3.setText("");
+        jTextField4.setText("");
         
     }//GEN-LAST:event_jRadioButton2ActionPerformed
 
@@ -423,34 +427,47 @@ public class VistaSeleccionarEnvío extends BaseFrame {
     }//GEN-LAST:event_jPanel9MouseClicked
 
     private void jPanel10MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel10MouseClicked
-        if (jRadioButton2.isSelected() && (jTextField1.getText().trim().isEmpty() || 
-        jTextField2.getText().trim().isEmpty() || jTextField3.getText().trim().isEmpty())) {
-        JOptionPane.showMessageDialog(null, "Complete los campos obligatorios por favor", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        return;
-    } 
-
-    if (buttonGroup1.getSelection() == null) {
-        JOptionPane.showMessageDialog(null, "Seleccione un método de entrega", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
-
-    String metodoEntrega;
-    String region;
-    String tiempoEnvio;
-    Carro carritoActual = st.obtenerCarritoActual();
-
-    if (jRadioButton1.isSelected()) {
-        metodoEntrega = "Retiro en tienda";
-        region = "-";
-        tiempoEnvio = "Disponible en 24 hrs hábiles";
-    } else {
-        metodoEntrega = "Despacho a domicilio";
-        region = ComboBoxREGIONES.getSelectedItem().toString();
-        if (region.contains("V Región") || region.contains("VI Región")) {
-            tiempoEnvio = "2 a 3 días hábiles";
-        } else {
-            tiempoEnvio = "5 a 7 días hábiles";
+        if (buttonGroup1.getSelection() == null) {
+            JOptionPane.showMessageDialog(null, "Seleccione un método de entrega", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
         }
+
+        if (jTextField4.getText().trim().isEmpty() || (jRadioButton2.isSelected() && (jTextField1.getText().trim().isEmpty()
+                || jTextField2.getText().trim().isEmpty() || jTextField3.getText().trim().isEmpty()))) {
+            JOptionPane.showMessageDialog(null, "Complete los campos obligatorios por favor", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        String metodoEntrega;
+        String region;
+        entidades.Carro carritoActual = st.obtenerCarritoActual();
+
+        if (jRadioButton1.isSelected()) {
+            metodoEntrega = "Retiro en tienda";
+            region = "-";
+        } else {
+            metodoEntrega = "Despacho a domicilio";
+            region = ComboBoxREGIONES.getSelectedItem().toString();
+        }
+
+        String ciudad = jTextField1.getText();
+        String calle = jTextField2.getText();
+        String numero = jTextField3.getText();
+        String tel = jTextField4.getText();
+        String comentario = jTextField5.getText();
+
+        EntregaPedido entrega = new EntregaPedido(metodoEntrega, region, ciudad, calle, numero, tel, comentario);
+        VistaPago pago = new VistaPago(carritoActual, entrega, () -> {
+            st.confirmarCompra(carritoActual, entrega);
+            st.guardarDatos();
+        }, () -> {
+            carro.setEnabled(true);
+            carro.cargarDatosCarrito();
+            carro.toFront();
+        });
+        pago.setLocationRelativeTo(this);
+        pago.setVisible(true);
+        this.dispose();
     }
 
     String ciudad = jTextField1.getText();

@@ -65,6 +65,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         lblMenuProductos = new javax.swing.JLabel();
         lblMenuCarritos = new javax.swing.JLabel();
         lblMenuVentas = new javax.swing.JLabel();
+        lblMenuPedidos = new javax.swing.JLabel();
         jPanelVentas = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblVentas = new javax.swing.JTable();
@@ -116,7 +117,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel24)
-                .addGap(19, 19, Short.MAX_VALUE))
+                .addGap(18, 18, Short.MAX_VALUE))
         );
 
         jPanel8.setBackground(new java.awt.Color(30, 30, 30));
@@ -150,7 +151,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(jLabel28)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel27)
-                .addGap(19, 19, Short.MAX_VALUE))
+                .addGap(18, 18, Short.MAX_VALUE))
         );
 
         lblMenuProductos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -164,6 +165,10 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
         lblMenuVentas.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         lblMenuVentas.setForeground(new java.awt.Color(255, 255, 255));
         lblMenuVentas.setText("Ventas");
+
+        lblMenuPedidos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMenuPedidos.setForeground(new java.awt.Color(255, 255, 255));
+        lblMenuPedidos.setText("Pedidos");
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -180,7 +185,9 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 .addComponent(lblMenuCarritos)
                 .addGap(12, 12, 12)
                 .addComponent(lblMenuVentas)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 193, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblMenuPedidos)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 152, Short.MAX_VALUE)
                 .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(12, 12, 12)
                 .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -197,7 +204,8 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                     .addComponent(lblMenuCarritos)
                     .addComponent(lblMenuVentas)
                     .addComponent(jPanel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblMenuPedidos))
                 .addContainerGap())
         );
 
@@ -214,11 +222,11 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID Venta", "Cliente", "R.U.T", "Fecha", "Hora", "Productos", "Monto Total"
+                "ID Venta", "Cliente", "R.U.T", "Fecha", "Hora", "Productos", "Entrega", "Dirección", "Costo envío", "Monto Total"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -298,6 +306,7 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
     private javax.swing.JPanel jPanelVentas;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblMenuCarritos;
+    private javax.swing.JLabel lblMenuPedidos;
     private javax.swing.JLabel lblMenuProductos;
     private javax.swing.JLabel lblMenuVentas;
     private javax.swing.JTable tblVentas;
@@ -320,7 +329,10 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
                 v.getFecha().toString(),         // Fecha (YYYY-MM-DD)
                 v.getHoraFormateada(),
                 detalleProductos(c),             // Productos comprados (detalle de la venta)
-                logica.SistemaTienda.formatoPesos(c.getTotal())  // Monto Total
+                v.getMetodoEntrega().getMetodoEntrega(),
+                v.getMetodoEntrega().getCalle() + " " + v.getMetodoEntrega().getNumero(),
+                logica.SistemaTienda.formatoPesos(v.getCostoEnvio()),
+                logica.SistemaTienda.formatoPesos(c.getTotal() + v.getCostoEnvio())  // Monto Total
             });
         }
 
@@ -399,6 +411,10 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
 
     public javax.swing.JLabel getMenuVentas() {
         return lblMenuVentas;
+    }
+
+    public javax.swing.JLabel getMenuPedidos() {
+        return lblMenuPedidos;
     }
 
     public javax.swing.JPanel getHeader() {

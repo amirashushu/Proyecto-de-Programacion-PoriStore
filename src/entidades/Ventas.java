@@ -13,13 +13,15 @@ public class Ventas implements Serializable{
     private LocalDate fecha;
     private LocalTime hora;
     private EntregaPedido metodoEntrega;
+    private int costoEnvio;
     
-    public Ventas(Carro c,int idGenerado, EntregaPedido metodoEntrega){
+    public Ventas(Carro c,int idGenerado, EntregaPedido metodoEntrega, int costoEnvio){
         this.carroVenta = c;
         this.idVenta = idGenerado;
         this.fecha = LocalDate.now();
         this.hora = LocalTime.now();
         this.metodoEntrega = metodoEntrega;
+        this.costoEnvio = costoEnvio;
     }
 
     public Carro getCarroVenta() {
@@ -62,6 +64,24 @@ public class Ventas implements Serializable{
         String horaFormateada = hora.format(myFormatObj);
         return horaFormateada;
     }
+
+    public EntregaPedido getMetodoEntrega() {
+        return metodoEntrega;
+    }
+
+    public void setMetodoEntrega(EntregaPedido metodoEntrega) {
+        this.metodoEntrega = metodoEntrega;
+    }
+
+    public int getCostoEnvio() {
+        return costoEnvio;
+    }
+
+    public void setCostoEnvio(int costoEnvio) {
+        this.costoEnvio = costoEnvio;
+    }
+    
+    
     
     
     
