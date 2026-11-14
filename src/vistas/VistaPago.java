@@ -4,15 +4,21 @@
  */
 package vistas;
 
+import entidades.Carro;
 import entidades.EntregaPedido;
+import entidades.Producto;
+import java.util.Map;
+import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author amira
- */
 public class VistaPago extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(VistaPago.class.getName());
+
+    private Carro carro;
+    private EntregaPedido entrega;
+    private String tiempoEnvio;
+    private Runnable confirmarCompra; // registra la venta (lo entrega el Carrito)
 
     /**
      * Creates new form VistaPago
@@ -21,17 +27,15 @@ public class VistaPago extends javax.swing.JFrame {
         initComponents();
     }
 
-    private entidades.Carro carro;
-    private EntregaPedido entrega;
-    private Runnable confirmarCompra; // registra la venta (lo entrega el Carrito)
-
     // Pago simulado, confirmarCompra registra la venta y alCerrar recarga el carrito cuando se cierra la ventana
-    public VistaPago(entidades.Carro carro, EntregaPedido entrega, Runnable confirmarCompra, Runnable alCerrar) {
+    public VistaPago(Carro carro, EntregaPedido entrega, Runnable confirmarCompra, Runnable alCerrar) {
         initComponents();
         this.carro = carro;
         this.entrega = entrega;
+        this.tiempoEnvio = calcularTiempoEnvio(entrega);
         this.confirmarCompra = confirmarCompra;
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE); // cerrar solo esta ventana
+
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE); // cerrar solo esta ventana
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
@@ -45,11 +49,11 @@ public class VistaPago extends javax.swing.JFrame {
         getContentPane().setLayout(new java.awt.CardLayout());
         getContentPane().add(panelPago, "pago");
         getContentPane().add(panelComprobante, "comprobante");
-        setSize(450, 550); 
+        setSize(450, 550);
         setLocationRelativeTo(null);
 
         // Tabla del comprobante
-        ((javax.swing.table.DefaultTableModel) tblComprobante.getModel()).setRowCount(0);
+        ((DefaultTableModel) tblComprobante.getModel()).setRowCount(0);
         tblComprobante.setDefaultEditor(Object.class, null);
         tblComprobante.getTableHeader().setBackground(new java.awt.Color(180, 0, 0));
         tblComprobante.getTableHeader().setForeground(java.awt.Color.WHITE);
@@ -59,22 +63,34 @@ public class VistaPago extends javax.swing.JFrame {
         jLabel6.setText("Costo de envío: " + plata(entrega.getCostoEnvio()));
         lblTotalPagar.setText("Total a pagar: " + plata(carro.getTotal() + entrega.getCostoEnvio()));
         lblEstado.setText(" ");
+
         btnPagarAhora.addActionListener(e -> pagar());
         btnCancelar.addActionListener(e -> dispose());
         btnCerrar.addActionListener(e -> dispose());
+    }
+
+    private String calcularTiempoEnvio(EntregaPedido entrega) {
+        if ("Retiro en tienda".equalsIgnoreCase(entrega.getMetodoEntrega())) {
+            return "Disponible en 24 hrs hábiles";
+        }
+        String region = entrega.getRegion();
+        if (region != null && (region.contains("V Región") || region.contains("VI Región"))) {
+            return "2 a 3 días hábiles";
+        }
+        return "5 a 7 días hábiles";
     }
 
     // Simula que el banco procesa el pago y luego muestra el comprobante
     private void pagar() {
         lblEstado.setText("Procesando pago...");
         btnPagarAhora.setEnabled(false);
-        btnCancelar.setEnabled(false); 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        btnCancelar.setEnabled(false);
+        setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         javax.swing.Timer espera = new javax.swing.Timer(1500, e -> {
             confirmarCompra.run();
             llenarComprobante();
-            ((java.awt.CardLayout) getContentPane().getLayout()).show(getContentPane(), "comprobante"); 
-            setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+            ((java.awt.CardLayout) getContentPane().getLayout()).show(getContentPane(), "comprobante");
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         });
         espera.setRepeats(false);
         espera.start();
@@ -86,23 +102,23 @@ public class VistaPago extends javax.swing.JFrame {
         lblFecha.setText("Fecha: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm")));
         lblCliente.setText("Cliente: " + carro.getNombre() + (carro.getRun() != null ? " (" + carro.getRun() + ")" : ""));
         lblTarjeta.setText("Tarjeta: **** **** **** " + ultimos);
-        lblEntrega.setText("Entrega: " + entrega.getMetodoEntrega());
+        lblEntrega.setText("Entrega: " + entrega.getMetodoEntrega() + " (" + tiempoEnvio + ")");
         lblDireccion.setText("Dirección: " + entrega.getCalle());
 
-        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) tblComprobante.getModel();
-        for (java.util.Map.Entry<entidades.Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
-            entidades.Producto p = entrada.getKey();
+        DefaultTableModel modelo = (DefaultTableModel) tblComprobante.getModel();
+        for (Map.Entry<Producto, Integer> entrada : carro.getCarritoProductos().entrySet()) {
+            Producto p = entrada.getKey();
             modelo.addRow(new Object[]{p.getNombre(), entrada.getValue(), plata(p.getPrecio() * entrada.getValue())});
         }
         lblSubtotal.setText("Subtotal: " + plata(carro.getSubTotal()));
         lblIva1.setText("IVA (19%): " + plata(carro.getIVA()));
         lblTotal.setText("Total: " + plata(carro.getTotal() + entrega.getCostoEnvio()));
-        lblenviototal.setText("Envío: " + plata(entrega.getCostoEnvio()) );
+        lblenviototal.setText("Envío: " + plata(entrega.getCostoEnvio()));
     }
 
     // Formato chileno
     private String plata(double monto) {
-        return logica.SistemaTienda.formatoPesos(monto); 
+        return logica.SistemaTienda.formatoPesos(monto);
     }
 
     /**
@@ -440,11 +456,6 @@ public class VistaPago extends javax.swing.JFrame {
     private void btnPagarAhoraActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPagarAhoraActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_btnPagarAhoraActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCancelar;
