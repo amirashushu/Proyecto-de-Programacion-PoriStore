@@ -73,7 +73,7 @@ public class VistaPago extends javax.swing.JFrame {
         if ("Retiro en tienda".equalsIgnoreCase(entrega.getMetodoEntrega())) {
             return "Disponible en 24 hrs hábiles";
         }
-        String region = entrega.getRegion();
+        String region = entrega.getRegión();
         if (region != null && (region.contains("V Región") || region.contains("VI Región"))) {
             return "2 a 3 días hábiles";
         }

@@ -468,28 +468,6 @@ public class VistaSeleccionarEnvío extends BaseFrame {
         pago.setLocationRelativeTo(this);
         pago.setVisible(true);
         this.dispose();
-    }
-
-    String ciudad = jTextField1.getText();
-    String calle = jTextField2.getText();
-    String numero = jTextField3.getText();
-    String tel = jTextField4.getText();
-    String comentario = jTextField5.getText();
-
-    EntregaPedido entrega = new EntregaPedido(metodoEntrega, region, ciudad, calle, numero, tel, comentario);
-    
-    VistaPago pago = new VistaPago(carritoActual, entrega, tiempoEnvio, () -> {
-        st.confirmarCompra(carritoActual, entrega);
-        st.guardarDatos();
-    }, () -> {
-        carro.setEnabled(true);
-        carro.cargarDatosCarrito();
-        carro.toFront();
-    });
-
-    pago.setLocationRelativeTo(this);
-    pago.setVisible(true);
-    this.dispose();
     }//GEN-LAST:event_jPanel10MouseClicked
 
     private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
