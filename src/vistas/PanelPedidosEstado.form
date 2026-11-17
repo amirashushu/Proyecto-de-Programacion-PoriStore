@@ -60,7 +60,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="jPanel5" alignment="0" pref="1500" max="32767" attributes="0"/>
+              <Component id="jPanel5" alignment="0" pref="1613" max="32767" attributes="0"/>
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="jPanelPedidos" min="-2" max="-2" attributes="0"/>
@@ -111,7 +111,7 @@
                       <Component id="lblMenuVentas" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="lblMenuPedidos" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace pref="119" max="32767" attributes="0"/>
                       <Component id="panelPendientes" min="-2" max="-2" attributes="0"/>
                       <EmptySpace min="-2" pref="29" max="-2" attributes="0"/>
                       <Component id="panelPreparacion" min="-2" max="-2" attributes="0"/>

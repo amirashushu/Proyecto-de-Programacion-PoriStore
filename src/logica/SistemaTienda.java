@@ -225,11 +225,19 @@ public class SistemaTienda implements Serializable{
     }
 
     // Se arma un Carro nuevo cada vez (no se modifica el anterior) para que la vista del admin no choque al leerlo
-    public void actualizarCarritoRemoto(String id, String nombreCliente, String run, String estado, String productos, EntregaPedido e) {
+    public void actualizarCarritoRemoto(String id, String nombreCliente, String run, String estado, String productos, EntregaPedido e,
+            String codigoCupon, String porcentajeCupon) {
         if (id == null) {
             return;
         }
         Carro carro = new Carro();
+        // Si el cliente uso un cupon, el carrito del admin queda con el mismo descuento
+        if (codigoCupon != null && !codigoCupon.isEmpty() && porcentajeCupon != null && !porcentajeCupon.isEmpty()) {
+            try {
+                carro.setCupon(new Cupon(codigoCupon, Double.parseDouble(porcentajeCupon), 0, 0, LocalDate.now()));
+            } catch (NumberFormatException ex) {
+            }
+        }
         if (nombreCliente != null && !nombreCliente.equals("Anónimo")) {
             carro.setCliente(new Cliente(run == null ? "-" : run, nombreCliente, "-", ""));
         }
@@ -254,6 +262,7 @@ public class SistemaTienda implements Serializable{
             Pedido pedido = new Pedido(siguienteNumeroPedido(), venta, id);
             getPedidos().add(pedido);
             guardarDatos();
+            Server.notificarPedido(pedido); 
         } else if (carro.getCarritoProductos().isEmpty()) {
             getCarritosRemotos().remove(id); // carrito vacio
         } else {
@@ -296,6 +305,8 @@ public class SistemaTienda implements Serializable{
         hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
         Ventas venta = new Ventas(c, nuevoId, metodoEntrega, metodoEntrega.getCostoEnvio());//se guarda en la lista de ventas
         ventas.add(venta);
+        Pedido pedido = new Pedido(siguienteNumeroPedido(), venta, c.getIdSesion());
+        getPedidos().add(pedido);
         Cliente cliente = c.getCliente();
         if (cliente != null) {
             Carro nuevoCarro = new Carro();
@@ -455,6 +466,29 @@ public class SistemaTienda implements Serializable{
         }
         p.setEstado(nuevo);
         guardarDatos();
+        Server.notificarPedido(p);
+        return null;
+    }
+
+    //Cancela el pedido si todavia no se despacha y devuelve sus productos al stock
+    public String cancelarPedido(Pedido p) {
+        EstadoPedido actual = p.getEstado();
+        if (actual == EstadoPedido.Cancelado) {
+            return "El pedido ya está cancelado.";
+        }
+        if (actual == EstadoPedido.Despachado || actual == EstadoPedido.Entregado) {
+            return "No se puede cancelar un pedido que ya fue despachado.";
+        }
+        for (java.util.Map.Entry<Producto, Integer> entrada : p.getVenta().getCarroVenta().getCarritoProductos().entrySet()) {
+            Producto producto = inventario.buscarPorId(entrada.getKey().getId());
+            if (producto != null) { //si el producto se elimino del inventario, no hay stock que devolver
+                producto.setStock(producto.getStock() + entrada.getValue());
+                Server.notificarCreacion(producto);
+            }
+        }
+        p.setEstado(EstadoPedido.Cancelado);
+        guardarDatos();
+        Server.notificarPedido(p); 
         return null;
     }
 
