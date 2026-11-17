@@ -31,13 +31,13 @@ public class SistemaTienda implements Serializable{
     private static final long serialVersionUID = 1L;
 
     
-    private ArrayList<Carro> carritos;  // Múltiples carritos (compras)
+    private final ArrayList<Carro> carritos;  // Múltiples carritos (compras)
     private Carro carritoAnonimo;
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     private final Inventario inventario;
     private ArrayList<Ventas> ventas;
-    private ArrayList<Cupon> cupones = new ArrayList<>();
+    private final ArrayList<Cupon> cupones = new ArrayList<>();
     
     public SistemaTienda() {
         this.carritos = new ArrayList<>();
@@ -82,7 +82,7 @@ public class SistemaTienda implements Serializable{
                     Server.setSistema(this); // el servidor guarda aqui los carritos de los clientes
                     new Thread(() -> {
                     Server servidor = new Server();
-                    servidor.initServer(inventario);
+                    servidor.initServer(this);
                     }).start();
                 }
                 return true;
@@ -293,7 +293,7 @@ public class SistemaTienda implements Serializable{
     public void confirmarCompra(Carro c, EntregaPedido metodoEntrega){
         int nuevoId = ventas.size() + 1;
         c.setEstado("Pagado");
-        hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
+            hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
         Ventas venta = new Ventas(c, nuevoId, metodoEntrega, metodoEntrega.getCostoEnvio());//se guarda en la lista de ventas
         ventas.add(venta);
         Cliente cliente = c.getCliente();
@@ -510,8 +510,6 @@ public class SistemaTienda implements Serializable{
         }
         return this.obtenerCarritoActual().getCupon().getCodigo().equals(codigo);
     }
-    public String llamadoIA(String pront) throws Exception{
-        return ApiGemini.callGeminiAPI(pront);
-    }
+    
 }
 

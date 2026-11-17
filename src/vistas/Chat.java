@@ -4,6 +4,7 @@
  */
 package vistas;
 
+import hostCliente.HostCliente;
 import logica.SistemaTienda;
 
 /**
@@ -20,7 +21,15 @@ public class Chat extends BaseFrame {
     public Chat(SistemaTienda st) {
         super(st);
         initComponents();
-        agregarMensaje("PorIA","Hola soy PorIA tu asistente virtual, dime en que te puedo ayudar",false);
+        HostCliente.setChatActivo(this);
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                HostCliente.setChatActivo(null);
+            }
+        });
+
+        agregarMensaje("PorIA", "Hola soy PorIA tu asistente virtual, dime en que te puedo ayudar", false);
     }
 
     @SuppressWarnings("unchecked")
@@ -146,26 +155,7 @@ public class Chat extends BaseFrame {
         agregarMensaje(logica.GestorSesion.getNombreCliente(), msg, true);     
         msgText.setText("");
         btnEnviar.setEnabled(false);
-        Thread hilo = new Thread(() -> {try {
-                String respuesta = st.llamadoIA(msg);
-                javax.swing.SwingUtilities.invokeLater(()->{
-                    agregarMensaje("PorIA", respuesta, false);
-                });
-            } catch (Exception ex) {
-                javax.swing.SwingUtilities.invokeLater(()->{
-                    agregarMensaje("PorIA","Lo siento, la respuesta tardó demasiado o hubo un problema de conexión", false);
-                });
-                ex.printStackTrace();
-            }finally{
-                javax.swing.SwingUtilities.invokeLater(()->{
-                    btnEnviar.setEnabled(true);
-                    msgText.requestFocus();
-                });
-            }
-            
-        });
-        hilo.start();
-        
+        HostCliente.notificarChat(msg);
     }//GEN-LAST:event_btnEnviarActionPerformed
 
     private void msgTextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_msgTextActionPerformed
@@ -187,7 +177,7 @@ public class Chat extends BaseFrame {
     private javax.swing.JTextPane textChat;
     // End of variables declaration//GEN-END:variables
     // Método auxiliar para agregar mensajes con el estilo correcto
-    private void agregarMensaje(String remitente, String mensaje, boolean esUsuario) {
+    public void agregarMensaje(String remitente, String mensaje, boolean esUsuario) {
         try {
             javax.swing.text.StyledDocument doc = textChat.getStyledDocument();
             javax.swing.text.SimpleAttributeSet estilo = new javax.swing.text.SimpleAttributeSet();

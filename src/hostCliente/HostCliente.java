@@ -11,7 +11,11 @@ public class HostCliente {
     private static final int PORT = 65432;
     private static PrintWriter serverOut;
     private static vistas.VistaPrincipal vistaPrincipalActiva;
-    
+    private static vistas.Chat chatActivo;
+
+    public static void setChatActivo(vistas.Chat chat) {
+        chatActivo = chat;
+    }
     public static void setVistaPrincipal(vistas.VistaPrincipal vista) {
         vistaPrincipalActiva = vista;
     }
@@ -62,7 +66,12 @@ public class HostCliente {
                         } else if ("message".equals(type)) {
                             String content = extractJsonField(line, "content");
                             System.out.println("\n[Servidor]: " + content);
-                            System.out.print("Tu mensaje: ");
+                            
+                            if (chatActivo != null){
+                                java.awt.EventQueue.invokeLater(() -> {
+                                chatActivo.agregarMensaje("PorIA", content, false);
+                            });
+                            }
                             
                         }else if ("get_producto".equals(type)){
                             String idStr = extractJsonField(line, "id");
@@ -125,7 +134,9 @@ public class HostCliente {
     public static void notificarPeticion (int id, int cant){
         broadcast(createJsonData(cant, String.valueOf(id)));
     }
-
+    public static void notificarChat(String msg){
+        broadcast(createJsonMessage(msg));
+    }
     // Envia al servidor el carrito completo para que el admin lo vea en "Carritos activos" y calcule lo reservado
     // Productos van como "idProducto x cantidad" separados por coma, por ejemplo "1x2,3x1"
     public static void notificarCarrito(entidades.Carro carro, entidades.EntregaPedido entrega) {
@@ -190,7 +201,7 @@ public class HostCliente {
     // Método simple para extraer campos de JSON (sin librerías externas)
     private static String extractJsonField(String json, String fieldName) {
         // Para campos de texto (string)
-        Pattern stringPattern = Pattern.compile("\"" + fieldName + "\"\\s*:\\s*\"([^\"]*)\"");
+        Pattern stringPattern = Pattern.compile("\"" + fieldName + "\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\"");
         Matcher stringMatcher = stringPattern.matcher(json);
         if (stringMatcher.find()) {
             return unescapeJson(stringMatcher.group(1));
@@ -205,7 +216,9 @@ public class HostCliente {
 
         return null;
     }
-
+    private static String createJsonMessage(String content) {
+        return "{\"type\": \"message\", \"content\": \"" + escapeJson(content) + "\"}";
+    }
     // Método para desescapar caracteres JSON
     private static String unescapeJson(String text) {
         return text.replace("\\\"", "\"")

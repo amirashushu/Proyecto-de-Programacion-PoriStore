@@ -1,5 +1,6 @@
 package server;
 
+import entidades.ApiGemini;
 import entidades.Inventario;
 import entidades.Producto;
 import java.io.*;
@@ -7,14 +8,15 @@ import java.net.*;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.*;
+import logica.SistemaTienda;
 
 public class Server {
 
     private static final String HOST = "192.168.1.8";
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
+    private static PrintWriter clienteActual;
     private static vistas.Dashboard dashboardTabla;
-   
     
     public static void setDashboard(vistas.Dashboard d) {
         dashboardTabla = d;
@@ -27,7 +29,7 @@ public class Server {
         sistemaAdmin = st;
     }
     
-    public boolean initServer(Inventario invent) {
+    public boolean initServer(SistemaTienda st) {
         try (ServerSocket serverSocket = new ServerSocket()) {
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(HOST, PORT));
@@ -36,7 +38,7 @@ public class Server {
             // Un hilo por cliente: el accept() se repite para siempre
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                Thread clientThread = new Thread(() -> handleClient(clientSocket, invent));
+                Thread clientThread = new Thread(() -> handleClient(clientSocket, st));
                 clientThread.start();
             }
         } catch (IOException e) {
@@ -45,12 +47,14 @@ public class Server {
         }
     }
 
-private static void handleClient(Socket clientSocket, Inventario invent) {
+    private static void handleClient(Socket clientSocket, SistemaTienda st) {
         System.out.println("[+] Conectado por " + clientSocket.getInetAddress());
         PrintWriter out = null;
+        Inventario invent = st.getInventario();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
             PrintWriter temp = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
             out = temp;
+            clienteActual = out;
             clientesConectados.add(out);
 
             //sincronizar al cliente enviándole los productos existentes en el servidor
@@ -141,6 +145,16 @@ private static void handleClient(Socket clientSocket, Inventario invent) {
                         
                     } catch (NumberFormatException e) {
                         out.println(createJsonMessage("La cantidad y el id deben ser enteros válidos."));
+                    }
+                }
+                if ("message".equals(type)) {
+                    String msg = extractJsonField(line, "content");
+                    try {
+                        String respuesta = ApiGemini.callGeminiAPI(msg);
+                        out.println(createJsonMessage(respuesta));
+                    } catch (Exception e) {
+                        System.err.println("Error al consultar IA: " + e.getMessage());
+                        out.println(createJsonMessage("Lo siento, ocurrió un error al procesar tu solicitud, pruebe la conexión"));
                     }
                 }
             }
