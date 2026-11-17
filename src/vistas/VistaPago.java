@@ -44,6 +44,7 @@ public class VistaPago extends javax.swing.JFrame {
             }
         });
 
+        
         // Las dos pantallas una sobre otra, se muestra una a la vez
         getContentPane().removeAll();
         getContentPane().setLayout(new java.awt.CardLayout());
@@ -52,6 +53,11 @@ public class VistaPago extends javax.swing.JFrame {
         setSize(450, 550);
         setLocationRelativeTo(null);
 
+        //Antes de todo, calcula el precio del envio y lo setea (si es mayor a 100mil el envio es free)
+        if(carro.calcularTotal() < 100000  && "Despacho a domicilio".equals(entrega.getMetodoEntrega())){
+            entrega.setCostoEnvio(entrega.calcularCostoEnvio());
+        }
+             
         // Tabla del comprobante
         ((DefaultTableModel) tblComprobante.getModel()).setRowCount(0);
         tblComprobante.setDefaultEditor(Object.class, null);
