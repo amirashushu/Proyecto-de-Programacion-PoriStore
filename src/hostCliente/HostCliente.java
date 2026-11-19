@@ -95,6 +95,14 @@ public class HostCliente {
                             int id = Integer.parseInt(idStr.trim());
                             invent.eliminarProducto(id);
                             System.out.println("[Cliente] Producto eliminado (ID " + id + ")");
+                        }else if ("pedido".equals(type)){
+                            String numero = extractJsonField(line, "numero");
+                            String estado = extractJsonField(line, "estado");
+                            String texto = "Pendiente".equals(estado)
+                                    ? "¡Compra confirmada! Tu pedido N° " + numero + " quedó Pendiente."
+                                    : "Tu pedido N° " + numero + " ahora está: " + estado;
+                            java.awt.EventQueue.invokeLater(() -> javax.swing.JOptionPane.showMessageDialog(
+                                    null, texto, "Estado de tu pedido", javax.swing.JOptionPane.INFORMATION_MESSAGE));
                         }
 
                         // Refrescar automáticamente la pantalla del catálogo si la vista está abierta
@@ -146,6 +154,8 @@ public class HostCliente {
         String numero = (entrega != null && entrega.getNumero() != null) ? entrega.getNumero() : "";
         String cel = (entrega != null && entrega.getCel() != null) ? entrega.getCel() : "";
         String comentarios = (entrega != null && entrega.getComentarios() != null) ? entrega.getComentarios() : "";
+        String cupon = carro.getCupon() != null ? carro.getCupon().getCodigo() : "";
+        String cuponPorcentaje = carro.getCupon() != null ? String.valueOf(carro.getCupon().getPorcentaje()) : "";
 
         String json = "{\"type\": \"carrito\", \"id\": \"" + escapeJson(carro.getIdSesion()) + "\", "
                 + "\"cliente\": \"" + escapeJson(carro.getNombre()) + "\", "
@@ -158,7 +168,9 @@ public class HostCliente {
                 + "\"calle\": \"" + escapeJson(calle) + "\", "
                 + "\"numero\": \"" + escapeJson(numero) + "\", "
                 + "\"cel\": \"" + escapeJson(cel) + "\", "
-                + "\"comentarios\": \"" + escapeJson(comentarios) + "\"}";
+                + "\"comentarios\": \"" + escapeJson(comentarios) + "\", "
+                + "\"cupon\": \"" + escapeJson(cupon) + "\", "
+                + "\"cupon_porcentaje\": \"" + cuponPorcentaje + "\"}";
         broadcast(json);
     }
     

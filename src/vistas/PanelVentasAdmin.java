@@ -232,11 +232,11 @@ public class PanelVentasAdmin extends javax.swing.JPanel {
 
             },
             new String [] {
-                "ID Venta", "Cliente", "R.U.T", "Fecha", "Hora", "Productos", "Entrega", "Dirección", "Costo envío", "Monto Total"
+                "ID Venta", "Cliente", "R.U.T", "Fecha", "Hora", "Productos", "Entrega", "Dirección", "Costo envío", "Cupón", "Descuento", "Monto Total"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -352,6 +352,8 @@ public void actualizarTablaVentas() {
                 tipoEntrega,
                 direccion,
                 logica.SistemaTienda.formatoPesos(v.getCostoEnvio()),
+                c.getCupon() != null ? c.getCupon().getCodigo() + " (" + c.getDsc() + "%)" : "-",
+                c.getCupon() != null ? "-" + logica.SistemaTienda.formatoPesos(c.getPrecioDsc()) : "-",
                 logica.SistemaTienda.formatoPesos(c.getTotal() + v.getCostoEnvio())
             });
         }

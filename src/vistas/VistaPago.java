@@ -117,6 +117,13 @@ public class VistaPago extends javax.swing.JFrame {
             modelo.addRow(new Object[]{p.getNombre(), entrada.getValue(), plata(p.getPrecio() * entrada.getValue())});
         }
         lblSubtotal.setText("Subtotal: " + plata(carro.getSubTotal()));
+        boolean tieneCupon = carro.getCupon() != null;
+        lblCupon.setVisible(tieneCupon);
+        lblDescuento.setVisible(tieneCupon);
+        if (tieneCupon) {
+            lblCupon.setText("Cupón: " + carro.getCupon().getCodigo() + " (" + carro.getDsc() + "%)");
+            lblDescuento.setText("Descuento: -" + plata(carro.getPrecioDsc()));
+        }
         lblIva1.setText("IVA (19%): " + plata(carro.getIVA()));
         lblTotal.setText("Total: " + plata(carro.getTotal() + entrega.getCostoEnvio()));
         lblenviototal.setText("Envío: " + plata(entrega.getCostoEnvio()));
@@ -166,6 +173,8 @@ public class VistaPago extends javax.swing.JFrame {
         lblEntrega = new javax.swing.JLabel();
         lblDireccion = new javax.swing.JLabel();
         lblIva1 = new javax.swing.JLabel();
+        lblCupon = new javax.swing.JLabel();
+        lblDescuento = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -247,7 +256,7 @@ public class VistaPago extends javax.swing.JFrame {
                             .addComponent(txtCVV, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4)
                             .addComponent(btnPagarAhora, javax.swing.GroupLayout.PREFERRED_SIZE, 175, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(67, Short.MAX_VALUE))
         );
         panelPagoLayout.setVerticalGroup(
             panelPagoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -358,6 +367,16 @@ public class VistaPago extends javax.swing.JFrame {
         lblIva1.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         lblIva1.setText("IVA (19%): $0");
 
+        lblCupon.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        lblCupon.setForeground(new java.awt.Color(170, 170, 170));
+        lblCupon.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblCupon.setText("Cupón:");
+
+        lblDescuento.setFont(new java.awt.Font("Segoe UI", 0, 13)); // NOI18N
+        lblDescuento.setForeground(new java.awt.Color(170, 170, 170));
+        lblDescuento.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
+        lblDescuento.setText("Descuento:");
+
         javax.swing.GroupLayout panelComprobanteLayout = new javax.swing.GroupLayout(panelComprobante);
         panelComprobante.setLayout(panelComprobanteLayout);
         panelComprobanteLayout.setHorizontalGroup(
@@ -372,9 +391,15 @@ public class VistaPago extends javax.swing.JFrame {
                         .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(lblTotal)
                             .addComponent(lblenviototal)
-                            .addComponent(lblIva1)
-                            .addComponent(lblSubtotal)
-                            .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addGroup(panelComprobanteLayout.createSequentialGroup()
+                                    .addComponent(lblDescuento)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblIva1))
+                                .addGroup(panelComprobanteLayout.createSequentialGroup()
+                                    .addComponent(lblCupon)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(lblSubtotal))
                                 .addComponent(lblDireccion, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(lblEntrega, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(lblTarjeta, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -405,9 +430,13 @@ public class VistaPago extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(lblSubtotal)
+                .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblSubtotal)
+                    .addComponent(lblCupon))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblIva1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelComprobanteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblIva1, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDescuento))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblenviototal, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -425,7 +454,7 @@ public class VistaPago extends javax.swing.JFrame {
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(panelComprobante, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+                    .addComponent(panelComprobante, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addContainerGap()))
         );
         layout.setVerticalGroup(
@@ -434,7 +463,7 @@ public class VistaPago extends javax.swing.JFrame {
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(panelComprobante, javax.swing.GroupLayout.PREFERRED_SIZE, 550, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(panelComprobante, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addContainerGap()))
         );
 
@@ -475,6 +504,8 @@ public class VistaPago extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCliente;
+    private javax.swing.JLabel lblCupon;
+    private javax.swing.JLabel lblDescuento;
     private javax.swing.JLabel lblDireccion;
     private javax.swing.JLabel lblEntrega;
     private javax.swing.JLabel lblEstado;
