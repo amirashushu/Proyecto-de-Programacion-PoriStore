@@ -28,7 +28,7 @@ public class Chat extends BaseFrame {
                 HostCliente.setChatActivo(null);
             }
         });
-
+        
         agregarMensaje("PorIA", "Hola soy PorIA tu asistente virtual, dime en que te puedo ayudar", false);
     }
 
@@ -191,7 +191,8 @@ public class Chat extends BaseFrame {
             }
 
             doc.insertString(doc.getLength(), remitente + ": " + mensaje + "\n", estilo);
-
+            textChat.setCaretPosition(doc.getLength());
+            btnEnviar.setEnabled(true);
         } catch (Exception e) {
             e.printStackTrace();
         }

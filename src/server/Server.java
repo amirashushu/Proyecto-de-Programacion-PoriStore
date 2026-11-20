@@ -5,6 +5,7 @@ import entidades.Inventario;
 import entidades.Producto;
 import java.io.*;
 import java.net.*;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.*;
@@ -12,7 +13,7 @@ import logica.SistemaTienda;
 
 public class Server {
 
-    private static final String HOST = "192.168.1.8";
+    private static final String HOST = "192.168.1.11";
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
     private static PrintWriter clienteActual;
@@ -149,8 +150,49 @@ public class Server {
                 }
                 if ("message".equals(type)) {
                     String msg = extractJsonField(line, "content");
+                    
                     try {
-                        String respuesta = ApiGemini.callGeminiAPI(msg);
+                        String infoProducto = "";
+                        
+                        // Buscamos si el mensaje menciona algún producto (sin distinguir mayúsculas/minúsculas)
+                        for (Producto p : st.getProductos()) {
+                            if (msg != null && msg.toLowerCase().contains(p.getNombre().toLowerCase())) {
+                                String nombre = p.getNombre();
+                                int stock = p.getStock();
+                                int precio = (int) p.getPrecio();
+                                infoProducto = "\nDATO DE INVENTARIO: El producto " + nombre 
+                                             + " cuesta $" + precio + " y quedan " + stock + " unidades en stock.\n";
+                                break;
+                            }
+                        }   
+
+                        // Construir el prompt completo para PorIA
+                        String promptFinal = prontContexto() + "\n"
+                                           + infoProducto + "\n"
+                                           + "Mensaje del cliente: " + msg;
+
+                        String respuesta = ApiGemini.callGeminiAPI(promptFinal);
+
+                        if (respuesta != null && respuesta.contains("[AGREGAR:")) {
+                            System.out.println("Server: Solicitud de carrito detectada en IA: " + respuesta);
+                            Pattern regex = Pattern.compile("\\[AGREGAR:\\s*([^,]+),\\s*(\\d+)\\]");
+                            Matcher matcher = regex.matcher(respuesta);
+                            if (matcher.find()) {
+                                String nombreProducto = matcher.group(1).trim(); 
+                                int cantidad = Integer.parseInt(matcher.group(2).trim());
+                                System.out.println("[Server] Producto a agregar: " + nombreProducto + " | Cantidad: " + cantidad);  
+                                List<Producto> encontrados = invent.buscarPorNombre(nombreProducto);
+                                
+                                if (!encontrados.isEmpty()) {
+                                    Producto prod = encontrados.get(0);
+                                    System.out.println("[Server] Encontrado: " + prod.getNombre() + " con ID: " + prod.getId());
+                                    out.println("{\"type\": \"agregar_carro\", \"id\": " + prod.getId() + ", \"cantidad\": " + cantidad + "}");
+                                }
+                            }
+                            respuesta = respuesta.replaceAll("\\[AGREGAR:.*?\\]", "").trim();
+                        }
+
+                        System.out.println("Mensaje enviado. En espera...");
                         out.println(createJsonMessage(respuesta));
                     } catch (Exception e) {
                         System.err.println("Error al consultar IA: " + e.getMessage());
@@ -254,5 +296,15 @@ public class Server {
                    .replace("\\n", "\n")
                    .replace("\\r", "\r")
                    .replace("\\t", "\t");
+    }
+    private static String prontContexto() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Eres PorIA, el asistente virtual oficial de PoriStore.\n");
+        sb.append("Responde en español de forma amable, breve y profesional.\n");
+        sb.append("Solo puedes responder consultas sobre la tienda, productos, precios y disponibilidad.\n\n");
+        sb.append("REGLA ESTRICTA DE INVENTARIO: Solo puedes confirmar los precios y stock que se te entreguen explícitamente en el 'DATO DE INVENTARIO'. Si te preguntan por un producto que no está o tiene stock 0, indícalo amablemente sin inventar.\n\n");
+        sb.append("REGLA DE COMPRA: Si el cliente te pide explícitamente agregar un producto al carrito, responde confirmando cordialmente y escribe al final de tu mensaje: [AGREGAR: nombre_del_producto, cantidad]. Si no lo pide, NO agregues esa etiqueta.");
+        
+        return sb.toString();
     }
 }

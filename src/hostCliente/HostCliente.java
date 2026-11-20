@@ -5,9 +5,11 @@ import entidades.Producto;
 import java.io.*;
 import java.net.*;
 import java.util.regex.*;
+import javax.swing.JOptionPane;
+import logica.SistemaTienda;
 
 public class HostCliente {
-    private static final String HOST = "192.168.1.8";
+    private static final String HOST = "192.168.1.11";
     private static final int PORT = 65432;
     private static PrintWriter serverOut;
     private static vistas.VistaPrincipal vistaPrincipalActiva;
@@ -20,12 +22,12 @@ public class HostCliente {
         vistaPrincipalActiva = vista;
     }
     
-    public void initHost(Inventario inv){
+    public void initHost(SistemaTienda st){
         while (true) {
             try (Socket socket = new Socket()) {
                 socket.connect(new InetSocketAddress(HOST, PORT));
                 System.out.println("[+] Conectado exitosamente al servidor.");
-                handleConnection(socket, inv);
+                handleConnection(socket, st);
             } catch (ConnectException e) {
                 System.err.println("[!] Servidor no disponible en " + HOST + ":" + PORT + ". Reintentando en 3 segundos...");
             } catch (IOException e) {
@@ -38,7 +40,8 @@ public class HostCliente {
             }
         }
     }
-    private static void handleConnection(Socket socket, Inventario invent) {
+    private static void handleConnection(Socket socket, SistemaTienda st) {
+        Inventario invent = st.getInventario();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true)) {
             serverOut = out; 
@@ -104,7 +107,39 @@ public class HostCliente {
                             int id = Integer.parseInt(idStr.trim());
                             invent.eliminarProducto(id);
                             System.out.println("[Cliente] Producto eliminado (ID " + id + ")");
+                        }else if ("agregar_carro".equals(type)) {
+                            int id = Integer.parseInt(extractJsonField(line, "id"));
+                            int cantidad = Integer.parseInt(extractJsonField(line, "cantidad"));
+
+                            java.awt.EventQueue.invokeLater(() -> {
+                                Producto p = invent.buscarPorId(id);
+                                if (p != null && chatActivo != null) {
+                                    // Desactivar alwaysOnTop para que el JOptionPane no bugee la vista en Mac
+                                    chatActivo.setAlwaysOnTop(false);
+                                    
+                                    int confirmar = JOptionPane.showConfirmDialog(
+                                        chatActivo, 
+                                        "¿Desea agregar " + cantidad + " unidad(es) de " + p.getNombre() + " al carrito?",
+                                        "Agregar al Carrito", 
+                                        JOptionPane.YES_NO_OPTION, 
+                                        JOptionPane.QUESTION_MESSAGE
+                                    );
+                                    if (confirmar == JOptionPane.YES_OPTION) {
+                                        boolean exito = st.obtenerCarritoActual().agregarProCarrito(p, cantidad);
+                                        if (exito) {
+                                            st.guardarDatos();
+                                            JOptionPane.showMessageDialog(chatActivo, "¡" + p.getNombre() + " agregado al carrito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                        } else {
+                                            JOptionPane.showMessageDialog(chatActivo, "No hay stock suficiente disponible.", "Sin stock", JOptionPane.WARNING_MESSAGE);
+                                        }
+                                    }
+                                    
+                                    // Reactivar alwaysOnTop después de cerrar el diálogo
+                                    chatActivo.setAlwaysOnTop(true);
+                                }
+                            });
                         }
+                           
 
                         // Refrescar automáticamente la pantalla del catálogo si la vista está abierta
                         if (vistaPrincipalActiva != null) {
