@@ -17,6 +17,9 @@ public class Server {
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
     private static PrintWriter clienteActual;
+
+    private static final java.util.Map<String, PrintWriter> clientePorCarrito = new java.util.concurrent.ConcurrentHashMap<>();
+
     private static vistas.Dashboard dashboardTabla;
     
     public static void setDashboard(vistas.Dashboard d) {
@@ -74,6 +77,10 @@ public class Server {
 
                 //Un cliente avisa como quedo su carrito, el admin lo muestra en "Carritos activos" y en "Reservado"
                 if ("carrito".equals(type)) {
+                    String idCarrito = extractJsonField(line, "id");
+                    if (idCarrito != null) {
+                        clientePorCarrito.put(idCarrito, out); //se guarda el dueño del carrito
+                    }
                     if (sistemaAdmin != null) {
                         // Extraemos los datos de envío del JSON
                         String metodo = extractJsonField(line, "metodo_entrega");
@@ -95,7 +102,9 @@ public class Server {
                                 extractJsonField(line, "run"),
                                 extractJsonField(line, "estado"),
                                 extractJsonField(line, "productos"),
-                                entrega);
+                                entrega,
+                                extractJsonField(line, "cupon"),
+                                extractJsonField(line, "cupon_porcentaje"));
                         vistas.PanelVentasAdmin.refrescarEnVivo();
                     }
                     continue;
@@ -206,6 +215,7 @@ public class Server {
         } finally {
             if (out != null) {
                 clientesConectados.remove(out);
+                clientePorCarrito.values().remove(out); // ya no se le pueden mandar avisos de pedido
             }
             try {
                 clientSocket.close();
@@ -217,7 +227,17 @@ public class Server {
     }
     
     public static void notificarCreacion (Producto p){
-        broadcast(createJsonProducto(p));    
+        broadcast(createJsonProducto(p));
+    }
+    //Le avisa al cliente dueño del pedido su numero y estado (si sigue conectado)
+    public static void notificarPedido(entidades.Pedido p) {
+        PrintWriter clienteOut = clientePorCarrito.get(p.getIdCarritoCliente());
+        if (clienteOut == null || !clientesConectados.contains(clienteOut)) {
+            return; //el cliente se desconecto
+        }
+        clienteOut.println("{\"type\": \"pedido\", \"numero\": " + p.getNumero()
+                + ", \"estado\": \"" + escapeJson(logica.SistemaTienda.textoEstado(p.getEstado())) + "\"}");
+        clienteOut.flush();
     }
     public static void notificarEliminacion (int id){
         String json = "{\"type\": \"eliminar\", \"id\": " + id + "}";

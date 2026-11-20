@@ -109,7 +109,7 @@ public class Carro implements Serializable {
         return calcularSubTotal() * cupon.getPorcentaje();
     }
     
-    private double calcularTotal(){
+    public double calcularTotal(){
         double total = calcularSubTotal()- calcularDscCupon();
         total = total * 1.19;
         return total;

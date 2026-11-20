@@ -487,8 +487,25 @@ public final class PanelPedidosEstado extends BaseFrame {
     }//GEN-LAST:event_formWindowClosing
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-        // Cancelar pedido todavia no está implementado
-        JOptionPane.showMessageDialog(this, "cancelar pedido.");
+        //Cancela el pedido elegido (solo si no se ha despachado) y devuelve su stock
+        Pedido p = pedidoSeleccionado();
+        if (p == null) {
+            JOptionPane.showMessageDialog(this, "Selecciona un pedido de la tabla.");
+            return;
+        }
+        int opcion = JOptionPane.showConfirmDialog(this, "¿Cancelar el pedido N° " + p.getNumero() + "?\nLos productos vuelven al stock.",
+                "Cancelar pedido", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (opcion != JOptionPane.YES_OPTION) {
+            return;
+        }
+        String error = st.cancelarPedido(p);
+        if (error != null) {
+            JOptionPane.showMessageDialog(this, error, "No se puede cancelar", JOptionPane.WARNING_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Pedido N° " + p.getNumero() + " cancelado. El stock volvió al inventario.");
+        }
+        actualizarDatos();
+        mostrarDetalle(p);
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void comboxFiltrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboxFiltrarActionPerformed

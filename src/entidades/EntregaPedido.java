@@ -21,6 +21,26 @@ public class EntregaPedido implements Serializable{
         this.comentarios = comentarios;
         this.costoEnvio = 0;  //FALTA LO DE CALCULAR EL COSTO DE ENVIO
     }
+    
+    public int calcularCostoEnvio(){
+        int costo;
+        if(this.región == "Región del Maule"){
+            costo = 2000;
+            return costo;
+        } else if (this.región == "Región de Ñuble" || this.región == "Región del Biobío" || this.región == "Región del Libertador General Bernardo O'Higgins" || this.región == "Región Metropolitana de Santiago"){
+            costo = 3000;
+            return costo;
+        } else if (this.región == "Región de Atacama" || this.región == "Región de Coquimbo" || this.región == "Región de Valparaíso" || this.región == "Región de La Araucanía" || this.región == "Región de Los Ríos" || this.región == "Región de Los Lagos"){
+            costo = 5000;
+            return costo;
+        } else if (this.región == "Región de Tarapacá" || this.región == "Región de Antofagasta" || this.región == "Región de Aysén del General Carlos Ibáñez del Campo"){
+            costo = 8000;
+            return costo;
+        } else{
+            costo = 10000;
+            return costo;
+        }   
+    }
 
     public String getMetodoEntrega() {
         return metodoEntrega;
