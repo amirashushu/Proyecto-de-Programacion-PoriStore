@@ -5,13 +5,14 @@ import hostCliente.HostCliente;
 import javax.swing.*;
 import java.awt.*;
 import logica.SistemaTienda;
+import vistas.DialogoAviso;
 
 public class GestorReserva {
     private static Timer timer;
     private static int segundosRestantes;
     private static int minutosAdmin = 2;
     private static boolean avisoAbierto = false;
-    private static JDialog dialogAviso;
+    private static DialogoAviso dialogoAviso;
     private static JLabel lblContador;
 
     // llamar al agregar el primer producto al carro
@@ -20,21 +21,19 @@ public class GestorReserva {
         if (timer != null && timer.isRunning()) {
             return;
         }
-
         segundosRestantes = minutosAdmin * 60;
         avisoAbierto = false;
-
         timer = new Timer(1000, e -> {
             segundosRestantes--;
-
             // 1. cuando queda 1 minuto (60s), abre la alerta encima de la ventana activa
             if (segundosRestantes <= 60 && segundosRestantes > 0) {
                 if (!avisoAbierto) {
                     mostrarAlertaGlobal(carro, st);
                     avisoAbierto = true;
                 }
-                if (lblContador != null) {
-                    lblContador.setText("Tu carrito expirará en: " + segundosRestantes + "s");
+                if (dialogoAviso != null) {
+                    
+                    dialogoAviso.actualizarContador(segundosRestantes);
                 }
             }
             // 2. si llega a 0, detiene todo y libera el stock
@@ -51,10 +50,11 @@ public class GestorReserva {
         if (timer != null) {
             timer.stop();
         }
-        if (dialogAviso != null) {
-            dialogAviso.dispose();
-            dialogAviso = null;
+        if (dialogoAviso != null) {
+            dialogoAviso.dispose();
+            dialogoAviso = null;
         }
+
         avisoAbierto = false;
     }
 
@@ -63,44 +63,52 @@ public class GestorReserva {
     }
 
     private static void mostrarAlertaGlobal(Carro carro, SistemaTienda st) {
-        // detecta automáticamente cuál JFrame está usando el cliente ahora mismo
-        Window ventanaActual = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
-
-        dialogAviso = new JDialog(ventanaActual, "Aviso de expiración", Dialog.ModalityType.MODELESS);
-        dialogAviso.setSize(330, 140);
-        dialogAviso.setAlwaysOnTop(true); // fuerza a que salga encima de cualquier interfaz
-        dialogAviso.setLocationRelativeTo(ventanaActual);
-        dialogAviso.setLayout(new BorderLayout(10, 10));
-
-        lblContador = new JLabel("Tu carrito expirará en: 60s", SwingConstants.CENTER);
-        dialogAviso.add(lblContador, BorderLayout.CENTER);
-
-        JPanel panelBotones = new JPanel();
-        JButton btnContinuar = new JButton("Continuar");
-        JButton btnCerrar = new JButton("Cerrar");
-
-        // boton continuar: reinicia el tiempo y cierra el aviso
-        btnContinuar.addActionListener(ev -> {
-            segundosRestantes = minutosAdmin * 60;
-            avisoAbierto = false;
-            dialogAviso.dispose();
-        });
-
-        // boton cerrar: corta el timer y libera el stock de inmediato
-        btnCerrar.addActionListener(ev -> {
-            detener();
-            liberarTodo(carro, st);
-        });
-
-        panelBotones.add(btnContinuar);
-        panelBotones.add(btnCerrar);
-        dialogAviso.add(panelBotones, BorderLayout.SOUTH);
-        dialogAviso.setVisible(true);
+        Window ventanaActual = KeyboardFocusManager .getCurrentKeyboardFocusManager() .getActiveWindow(); //detecta la ventana abierta
+        dialogoAviso = new DialogoAviso(carro, st);
+        dialogoAviso.setLocationRelativeTo(ventanaActual);
+        dialogoAviso.setAlwaysOnTop(true);
+        dialogoAviso.setVisible(true);
     }
 
-    private static void liberarTodo(Carro carro, SistemaTienda st) {
+    public static void liberarTodo(Carro carro, SistemaTienda st) {
         st.cancelarCompra(carro);
         Window ventanaActual = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
         JOptionPane.showMessageDialog(ventanaActual, "El tiempo expiró. Se vació tu carrito y se liberó el stock.");
     }
+
+    public static Timer getTimer() {
+        return timer;
+    }
+
+    public static void setTimer(Timer timer) {
+        GestorReserva.timer = timer;
+    }
+
+    public static int getSegundosRestantes() {
+        return segundosRestantes;
+    }
+
+    public static void setSegundosRestantes(int segundosRestantes) {
+        GestorReserva.segundosRestantes = segundosRestantes;
+    }
+
+    public static boolean isAvisoAbierto() {
+        return avisoAbierto;
+    }
+
+    public static void setAvisoAbierto(boolean avisoAbierto) {
+        GestorReserva.avisoAbierto = avisoAbierto;
+    }
+
+    public static JLabel getLblContador() {
+        return lblContador;
+    }
+
+    public static void setLblContador(JLabel lblContador) {
+        GestorReserva.lblContador = lblContador;
+    }
+
+    public static int getMinutosAdmin() {
+        return minutosAdmin;
+    } 
 }
