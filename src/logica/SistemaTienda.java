@@ -491,6 +491,77 @@ public class SistemaTienda implements Serializable{
         Server.notificarPedido(p); 
         return null;
     }
+// ========== OFERTAS ==========
+
+    private String validarOferta(double porcentaje, int dias) {
+        if (porcentaje < 1 || porcentaje > 99) {
+            return "El descuento debe estar entre 1 y 99 %.";
+        }
+        if (dias < 1) {
+            return "La oferta debe durar al menos 1 día.";
+        }
+        return null;
+    }
+    public String aplicarOfertaProducto(Producto p, double porcentaje, int dias) {
+        String error = validarOferta(porcentaje, dias);
+        if (error != null) {
+            return error;
+        }
+        p.setOferta(porcentaje, LocalDate.now().plusDays(dias));
+        guardarDatos();
+        Server.notificarCreacion(p); 
+        return null;
+    }
+    
+    public String aplicarOfertaCategoria(Categorias categoria, double porcentaje, int dias) {
+        String error = validarOferta(porcentaje, dias);
+        if (error != null) {
+            return error;
+        }
+        int cantidad = 0;
+        for (Producto p : inventario.getProductos()) {
+            if (p.getCategoria() == categoria) {
+                p.setOferta(porcentaje, LocalDate.now().plusDays(dias));
+                Server.notificarCreacion(p);
+                cantidad++;
+            }
+        }
+        if (cantidad == 0) {
+            return "No hay productos en esa categoría.";
+        }
+        guardarDatos();
+        return null;
+    }
+    public void quitarOferta(Producto p) {
+        p.quitarOferta();
+        guardarDatos();
+        Server.notificarCreacion(p);
+    }
+    //Quita la oferta de todos los productos de una categoria, devuelve cuantos tenian oferta
+    public int quitarOfertaCategoria(Categorias categoria) {
+        int cantidad = 0;
+        for (Producto p : inventario.getProductos()) {
+            if (p.getCategoria() == categoria && p.tieneOferta()) {
+                p.quitarOferta();
+                Server.notificarCreacion(p);
+                cantidad++;
+            }
+        }
+        if (cantidad > 0) {
+            guardarDatos();
+        }
+        return cantidad;
+    }
+
+    public ArrayList<Producto> getProductosConOferta() {
+        ArrayList<Producto> conOferta = new ArrayList<>();
+        for (Producto p : inventario.getProductos()) {
+            if (p.tieneOferta()) {
+                conOferta.add(p);
+            }
+        }
+        return conOferta;
+    }
 
     // --- GESTOR DE CUPONES ---
 

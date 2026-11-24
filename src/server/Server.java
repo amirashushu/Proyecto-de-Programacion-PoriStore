@@ -278,6 +278,8 @@ public class Server {
         json.append("\"categoria\": \"").append(escapeJson(p.getCategoriaStr())).append("\", ");
         json.append("\"stock\": ").append(p.getStock()).append(", ");
         json.append("\"rutaImagen\": \"").append(escapeJson(p.getRutaImagen())).append("\"");
+        json.append("\"oferta\": \"").append(p.getOfertaPorcentaje() > 0 ? String.valueOf(p.getOfertaPorcentaje()) : "").append("\", ");
+        json.append("\"oferta_hasta\": \"").append(p.getOfertaHasta() != null ? p.getOfertaHasta().toString() : "").append("\"");
         json.append("}");
         return json.toString();
     }
