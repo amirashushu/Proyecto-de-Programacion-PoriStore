@@ -12,12 +12,16 @@ public PanelProducto(Producto p) {
     this.setBackground(new Color(30, 30, 30));
     this.setBorder(BorderFactory.createLineBorder(new Color(200, 0, 0), 1));
     this.setPreferredSize(new Dimension(160, 210));
+    this.setMaximumSize(new Dimension(160, 245));
+    this.setPreferredSize(new Dimension(160, 245));
 
     // DECLARACIÓN GENERAL DE COMPONENTES (Para que sirvan en todo el método)
     JLabel lblImagen = new JLabel();
     JLabel lblNombre;
     JLabel lblPrecio;
     JButton btnAgregar = new JButton("Agregar");
+    
+    
 
     // IMGAEN
     lblImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
