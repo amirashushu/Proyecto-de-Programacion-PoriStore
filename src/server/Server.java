@@ -5,6 +5,7 @@ import entidades.Inventario;
 import entidades.Producto;
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -16,11 +17,10 @@ public class Server {
     private static final String HOST = "192.168.1.11";
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
-    private static PrintWriter clienteActual;
-
+    private static final HashMap<PrintWriter, StringBuilder> historialCliente= new HashMap<>();
     private static final java.util.Map<String, PrintWriter> clientePorCarrito = new java.util.concurrent.ConcurrentHashMap<>();
-
     private static vistas.Dashboard dashboardTabla;
+
     
     public static void setDashboard(vistas.Dashboard d) {
         dashboardTabla = d;
@@ -58,7 +58,8 @@ public class Server {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
             PrintWriter temp = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
             out = temp;
-            clienteActual = out;
+            StringBuilder sb = new StringBuilder("Historial{");
+            historialCliente.put(out, sb);
             clientesConectados.add(out);
 
             //sincronizar al cliente enviándole los productos existentes en el servidor
@@ -176,12 +177,18 @@ public class Server {
                         }   
 
                         // Construir el prompt completo para PorIA
+                        
                         String promptFinal = prontContexto() + "\n"
                                            + infoProducto + "\n"
-                                           + "Mensaje del cliente: " + msg;
-
+                                           + "Mensaje del cliente: " + msg
+                                           + historialCliente.get(out).append("}");
+                        
                         String respuesta = ApiGemini.callGeminiAPI(promptFinal);
-
+                        
+                        historialCliente.replace(out,historialCliente.get(out).append("Usuario: ").append(promptFinal).append("IA: ").append(respuesta));
+                       
+                        
+                        sb.append(respuesta);
                         if (respuesta != null && respuesta.contains("[AGREGAR:")) {
                             System.out.println("Server: Solicitud de carrito detectada en IA: " + respuesta);
                             Pattern regex = Pattern.compile("\\[AGREGAR:\\s*([^,]+),\\s*(\\d+)\\]");
@@ -215,6 +222,7 @@ public class Server {
         } finally {
             if (out != null) {
                 clientesConectados.remove(out);
+                historialCliente.remove(out);
                 clientePorCarrito.values().remove(out); // ya no se le pueden mandar avisos de pedido
             }
             try {
@@ -322,9 +330,11 @@ public class Server {
         sb.append("Eres PorIA, el asistente virtual oficial de PoriStore.\n");
         sb.append("Responde en español de forma amable, breve y profesional.\n");
         sb.append("Solo puedes responder consultas sobre la tienda, productos, precios y disponibilidad.\n\n");
-        sb.append("REGLA ESTRICTA DE INVENTARIO: Solo puedes confirmar los precios y stock que se te entreguen explícitamente en el 'DATO DE INVENTARIO'. Si te preguntan por un producto que no está o tiene stock 0, indícalo amablemente sin inventar.\n\n");
-        sb.append("REGLA DE COMPRA: Si el cliente te pide explícitamente agregar un producto al carrito, responde confirmando cordialmente y escribe al final de tu mensaje: [AGREGAR: nombre_del_producto, cantidad]. Si no lo pide, NO agregues esa etiqueta.");
-        
+        sb.append("REGLA ESTRICTA DE INVENTARIO: Solo puedes confirmar los precios y stock que se te entreguen explícitamente ");
+        sb.append("en el 'DATO DE INVENTARIO'. Si te preguntan por un producto que no está o tiene stock 0, indícalo amablemente sin inventar.\n\n");
+        sb.append("REGLA DE COMPRA: Si el cliente te pide explícitamente agregar un producto al carrito, responde confirmando cordialmente y"); 
+        sb.append("escribe al final de tu mensaje: [AGREGAR: nombre_del_producto, cantidad]. Si no lo pide, NO agregues esa etiqueta.");
+        sb.append("Todo lo que este dentro de las llaves despues de historial, es la conversación que se ha tenido, asi que leela y responde segun el contexto del chat ");
         return sb.toString();
     }
 }

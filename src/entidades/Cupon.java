@@ -42,7 +42,9 @@ public class Cupon implements Serializable {
     public void setUsos(int usos) {
         this.usos = usos;
     }
-    
+    public LocalDate getVencimiento(){
+        return creacion.plusDays(dias);
+    }
     public boolean validarCupon(String c){
         return this.codigo.equals(c);
     }

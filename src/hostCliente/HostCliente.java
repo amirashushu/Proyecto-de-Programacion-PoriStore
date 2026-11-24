@@ -14,7 +14,7 @@ public class HostCliente {
     private static PrintWriter serverOut;
     private static vistas.VistaPrincipal vistaPrincipalActiva;
     private static vistas.Chat chatActivo;
-
+    
     public static void setChatActivo(vistas.Chat chat) {
         chatActivo = chat;
     }

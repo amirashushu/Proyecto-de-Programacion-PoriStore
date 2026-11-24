@@ -400,7 +400,7 @@ public final class Dashboard extends BaseFrame {
                 .addComponent(jLabel23)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(12, Short.MAX_VALUE))
         );
 
         jPanel7.setBackground(new java.awt.Color(30, 30, 30));
@@ -438,7 +438,7 @@ public final class Dashboard extends BaseFrame {
                 .addComponent(jLabel25)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel24)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         jPanel8.setBackground(new java.awt.Color(30, 30, 30));
@@ -472,7 +472,7 @@ public final class Dashboard extends BaseFrame {
                 .addComponent(jLabel28)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel27)
-                .addContainerGap(12, Short.MAX_VALUE))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         lblMenuProductos.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -809,6 +809,7 @@ public final class Dashboard extends BaseFrame {
                 jButton1MouseClicked(evt);
             }
         });
+        jButton1.addActionListener(this::jButton1ActionPerformed);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -1345,12 +1346,30 @@ public final class Dashboard extends BaseFrame {
     }//GEN-LAST:event_btnVaciarInventarioActionPerformed
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        
+        
+        setEnabled(false);
         CreacionCupones cupones = new CreacionCupones(st);
-        this.dispose();
+        cupones.setDefaultCloseOperation(
+        javax.swing.WindowConstants.DISPOSE_ON_CLOSE
+        );
+        cupones.setAlwaysOnTop(true);
+        cupones.addWindowListener(new java.awt.event.WindowAdapter() {
+        @Override
+        public void windowClosed(java.awt.event.WindowEvent e) {
+            Dashboard.this.setEnabled(true);
+            Dashboard.this.toFront();
+        }
+        });
+        
+        cupones.setLocationRelativeTo(this);
         cupones.setVisible(true);
-        cupones.setLocationRelativeTo(null);
         
     }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Copia imagen a carpeta /fotos/ y retorna ruta relativa
     private String copiarImagenAProyecto(File archivoOriginal) {
