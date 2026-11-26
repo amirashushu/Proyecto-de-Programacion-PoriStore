@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vistas;
+import entidades.Carro;
 import javax.swing.*;
 import java.awt.*;
 import logica.SistemaTienda;
@@ -296,6 +297,11 @@ public class VistaPrincipal extends BaseFrame {
     }//GEN-LAST:event_LblJoinMouseClicked
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        Carro carro = st.obtenerCarritoActual();
+        if (carro != null && !carro.getCarritoProductos().isEmpty()) { //si el cliente cierra el programa, libera stock
+            GestorReserva.detener();
+            st.cancelarCompra(carro);
+        }
         st.guardarDatos();
         System.exit(0);
     }//GEN-LAST:event_formWindowClosing

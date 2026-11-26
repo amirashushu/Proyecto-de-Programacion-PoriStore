@@ -34,7 +34,7 @@ public class DialogoAviso extends javax.swing.JFrame {
         btnContinuar = new javax.swing.JButton();
         lblContador = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(0, 0, 0));
 
@@ -116,7 +116,7 @@ public class DialogoAviso extends javax.swing.JFrame {
 
     private void btnContinuarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnContinuarActionPerformed
         int segundos;
-        segundos = GestorReserva.getMinutosAdmin() + 60;
+        segundos = GestorReserva.getMinutosAdmin()*60; //renueva el tiempo
         GestorReserva.setSegundosRestantes(segundos);
         GestorReserva.setAvisoAbierto(false);
         this.dispose();

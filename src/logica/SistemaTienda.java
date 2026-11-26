@@ -12,6 +12,7 @@ import entidades.Pedido;
 import entidades.Producto;
 import entidades.Ventas;
 import entidades.Cupon;
+import hostCliente.HostCliente;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -322,6 +323,7 @@ public class SistemaTienda implements Serializable{
     public void cancelarCompra(Carro c){
         c.vaciarCarrito();
         carritos.remove(c);
+        HostCliente.notificarCarrito(c, null);
     }
     
 

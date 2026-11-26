@@ -5,6 +5,7 @@ import hostCliente.HostCliente;
 import javax.swing.*;
 import java.awt.*;
 import logica.SistemaTienda;
+import vistas.Carrito;
 import vistas.DialogoAviso;
 
 public class GestorReserva {
@@ -15,7 +16,7 @@ public class GestorReserva {
     private static DialogoAviso dialogoAviso;
     private static JLabel lblContador;
 
-    // llamar al agregar el primer producto al carro
+    //llamar al agregar el primer producto al carro
     public static void iniciar(Carro carro, SistemaTienda st) {
         // si ya está corriendo, no lo reiniciamos
         if (timer != null && timer.isRunning()) {
@@ -25,18 +26,17 @@ public class GestorReserva {
         avisoAbierto = false;
         timer = new Timer(1000, e -> {
             segundosRestantes--;
-            // 1. cuando queda 1 minuto (60s), abre la alerta encima de la ventana activa
+            //cuando queda 1 minuto (60s), abre la alerta encima de la ventana activa
             if (segundosRestantes <= 60 && segundosRestantes > 0) {
                 if (!avisoAbierto) {
                     mostrarAlertaGlobal(carro, st);
                     avisoAbierto = true;
                 }
-                if (dialogoAviso != null) {
-                    
+                if (dialogoAviso != null) { 
                     dialogoAviso.actualizarContador(segundosRestantes);
                 }
             }
-            // 2. si llega a 0, detiene todo y libera el stock
+            //si llega a 0, detiene todo y libera el stock
             if (segundosRestantes <= 0) {
                 detener();
                 liberarTodo(carro, st);
@@ -45,7 +45,7 @@ public class GestorReserva {
         timer.start();
     }
 
-    // llamar cuando el cliente termina de pagar o vacía su carrito manualmente
+    //llamar cuando el cliente termina de pagar o vacía su carrito manualmente
     public static void detener() {
         if (timer != null) {
             timer.stop();
@@ -54,7 +54,6 @@ public class GestorReserva {
             dialogoAviso.dispose();
             dialogoAviso = null;
         }
-
         avisoAbierto = false;
     }
 
@@ -72,7 +71,12 @@ public class GestorReserva {
 
     public static void liberarTodo(Carro carro, SistemaTienda st) {
         st.cancelarCompra(carro);
-        Window ventanaActual = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+        for (Window ventana : Window.getWindows()) {
+        if (ventana instanceof Carrito && ventana.isVisible()) {  //si y SOLO si la ventana abierta es instancia de vistacarrito, actualiza la visual de este
+            ((Carrito) ventana).cargarDatosCarrito();
+            }
+        }
+        Window ventanaActual = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow(); //detecta ventana abierta
         JOptionPane.showMessageDialog(ventanaActual, "El tiempo expiró. Se vació tu carrito y se liberó el stock.");
     }
 
