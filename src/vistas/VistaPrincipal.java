@@ -3,13 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vistas;
-import logica.SistemaTienda;
 import javax.swing.*;
 import java.awt.*;
 import logica.SistemaTienda;
 import entidades.Producto;
 import entidades.Cliente;
-import entidades.Producto;
+import logica.GestorReserva;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -479,6 +478,7 @@ public class VistaPrincipal extends BaseFrame {
             } else if (st.obtenerCarritoActual().agregarProCarrito(p, cantidad)) {
                 st.guardarDatos();
                 JOptionPane.showMessageDialog(this, "Agregado al carrito: " + p.getNombre() + " x" + cantidad);
+                GestorReserva.iniciar(st.obtenerCarritoActual(), st);
             } else {
                 JOptionPane.showMessageDialog(this, "No hay stock suficiente (disponibles: " + p.getStock() + ").", "Sin stock", JOptionPane.WARNING_MESSAGE);
             }
