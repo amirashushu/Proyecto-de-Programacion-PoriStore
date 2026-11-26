@@ -3,13 +3,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package vistas;
-import logica.SistemaTienda;
 import javax.swing.*;
 import java.awt.*;
 import logica.SistemaTienda;
 import entidades.Producto;
 import entidades.Cliente;
 import logica.GestorReserva;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import logica.GestorSesion;
 
 /**
  *
@@ -339,21 +346,21 @@ public class VistaPrincipal extends BaseFrame {
 
 
 
-    public class PanelProducto extends JPanel {
+   public class PanelProducto extends JPanel {
 
-           public PanelProducto(Producto p) {
-           this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-           this.setBackground(new Color(30, 30, 30)); // Color de la tarjeta
-           this.setOpaque(true); // <--- OBLIGATORIO PARA QUE PINTE EL FONDO OSCURO
-           this.setBorder(BorderFactory.createLineBorder(new Color(200, 0, 0), 1));
-           this.setMaximumSize(new Dimension(160, 210));
-           this.setPreferredSize(new Dimension(160, 210));
+        public PanelProducto(Producto p) {
+            this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            this.setBackground(new Color(30, 30, 30)); // Color de la tarjeta
+            this.setOpaque(true); // <--- OBLIGATORIO PARA QUE PINTE EL FONDO OSCURO
+            this.setBorder(BorderFactory.createLineBorder(new Color(200, 0, 0), 1));
+            this.setMaximumSize(new Dimension(160, 245));
+            this.setPreferredSize(new Dimension(160, 245));
 
-            
             JLabel lblImagen = new JLabel();
             JLabel lblNombre;
             JLabel lblPrecio;
             JButton btnAgregar = new JButton("Agregar");
+            JButton btnDeseos = new JButton("♡ DESEOS");
 
             // IMAGEN
             lblImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -406,24 +413,33 @@ public class VistaPrincipal extends BaseFrame {
             lblPrecio.setForeground(new Color(255, 50, 50));
             lblPrecio.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-            // BOTON
+            // BOTON AGREGAR
             btnAgregar.setFont(new Font("Segoe UI", Font.BOLD, 10));
             btnAgregar.setBackground(new Color(180, 0, 0));
             btnAgregar.setForeground(Color.WHITE);
             btnAgregar.setFocusPainted(false);
             btnAgregar.setAlignmentX(Component.CENTER_ALIGNMENT);
-            //al hacer click pide la cantidad y agrega el producto al carrito actual
             btnAgregar.addActionListener(e -> agregarAlCarrito(p));
 
-            // COMPONENTES PARA EL PANEL
+            // BOTON DESEOS
+            btnDeseos.setFont(new Font("Segoe UI", Font.BOLD, 10));
+            btnDeseos.setBackground(new Color(45, 45, 45));
+            btnDeseos.setForeground(Color.WHITE);
+            btnDeseos.setFocusPainted(false);
+            btnDeseos.setAlignmentX(Component.CENTER_ALIGNMENT);
+            btnDeseos.addActionListener(e -> gestionarDeseos(p));
+
+            // COMPONENTES PARA EL PANEL (en estricto orden vertical)
             add(Box.createVerticalStrut(10));
             add(lblImagen);
-            add(Box.createVerticalStrut(10));
+            add(Box.createVerticalStrut(8));
             add(lblNombre);
-            add(Box.createVerticalStrut(10));
+            add(Box.createVerticalStrut(8));
             add(lblPrecio);
-            add(Box.createVerticalStrut(10));
+            add(Box.createVerticalStrut(8));
             add(btnAgregar);
+            add(Box.createVerticalStrut(5));
+            add(btnDeseos);
             add(Box.createVerticalStrut(10));
         }
     }
@@ -470,6 +486,31 @@ public class VistaPrincipal extends BaseFrame {
             JOptionPane.showMessageDialog(this, "Ingrese un número entero válido.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+ private void gestionarDeseos(Producto p) {
+    if (!logica.GestorSesion.haySesionActiva()) {
+        JOptionPane.showMessageDialog(this, "Debes iniciar sesión para usar la lista de deseos.", "Inicia sesión", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    if (!(logica.GestorSesion.getClienteActual()instanceof entidades.Cliente)) {
+        JOptionPane.showMessageDialog(this, "Solo los clientes pueden tener lista de deseos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    entidades.Cliente cliente = (entidades.Cliente) logica.GestorSesion.getClienteActual();
+
+    if (cliente.agregarADeseos(p.getNombre())) {
+        st.guardarDatos();
+        JOptionPane.showMessageDialog(this, "Añadido a tu lista de deseos: " + p.getNombre());
+    } else {
+        int resp = JOptionPane.showConfirmDialog(this, "Ya está en tu lista de deseos. ¿Quitarlo?", "Lista de deseos", JOptionPane.YES_NO_OPTION);
+        if (resp == JOptionPane.YES_OPTION) {
+            cliente.quitarDeDeseos(p.getNombre());
+            st.guardarDatos();
+            JOptionPane.showMessageDialog(this, "Eliminado de tu lista de deseos.");
+        }
+    }
+}
 
 
    
