@@ -4,6 +4,8 @@ package vistas;
 import java.time.LocalDate;
 import logica.SistemaTienda;
 import entidades.Cupon;
+import java.util.List;
+import javax.swing.table.DefaultTableModel;
 
 
 public class CreacionCupones extends BaseFrame {
@@ -12,9 +14,9 @@ public class CreacionCupones extends BaseFrame {
     public CreacionCupones(SistemaTienda st) {
         super(st);
         initComponents();
-        this.dispose();
         setVisible(true);
         setLocationRelativeTo(null);
+        this.actualizarTabla(st.getCupones());
     }
 
 
@@ -31,7 +33,7 @@ public class CreacionCupones extends BaseFrame {
         jList1 = new javax.swing.JList<>();
         jPanel4 = new javax.swing.JPanel();
         lblNombre = new javax.swing.JLabel();
-        lblTitulo = new javax.swing.JLabel();
+        lblTitulo1 = new javax.swing.JLabel();
         txtNombre = new javax.swing.JTextField();
         cmbDescuento = new javax.swing.JComboBox<>();
         lblDescuento = new javax.swing.JLabel();
@@ -41,6 +43,10 @@ public class CreacionCupones extends BaseFrame {
         lblVencimiento = new javax.swing.JLabel();
         cmbVencimiento = new javax.swing.JComboBox<>();
         jSeparator1 = new javax.swing.JSeparator();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tablaCupones = new javax.swing.JTable();
+        lblTitulo2 = new javax.swing.JLabel();
+        jSeparator2 = new javax.swing.JSeparator();
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -102,9 +108,9 @@ public class CreacionCupones extends BaseFrame {
         lblNombre.setForeground(new java.awt.Color(255, 255, 255));
         lblNombre.setText("Nombre del cupón: ");
 
-        lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
-        lblTitulo.setForeground(new java.awt.Color(255, 51, 51));
-        lblTitulo.setText("Crear Cupón");
+        lblTitulo1.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblTitulo1.setForeground(new java.awt.Color(255, 51, 51));
+        lblTitulo1.setText("Cupones creados");
 
         cmbDescuento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "5%", "10%", "15%", "20%" }));
         cmbDescuento.addActionListener(this::cmbDescuentoActionPerformed);
@@ -137,6 +143,30 @@ public class CreacionCupones extends BaseFrame {
         cmbVencimiento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1d", "3d", "7d", "14d", "28d" }));
         cmbVencimiento.addActionListener(this::cmbVencimientoActionPerformed);
 
+        tablaCupones.setBackground(new java.awt.Color(0, 0, 0));
+        tablaCupones.setForeground(new java.awt.Color(255, 255, 255));
+        tablaCupones.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Nombre", "Dsc total", "Cant. de usos", "Fecha de creación", "Vencimiento"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
+        jScrollPane2.setViewportView(tablaCupones);
+
+        lblTitulo2.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
+        lblTitulo2.setForeground(new java.awt.Color(255, 51, 51));
+        lblTitulo2.setText("Crear Cupón");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -144,41 +174,64 @@ public class CreacionCupones extends BaseFrame {
             .addComponent(jSeparator1)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 232, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(82, 82, 82))
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblVencimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblUsos, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(299, 299, 299))
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(lblUsos, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(lblDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(lblNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtNombre)
-                                    .addComponent(cmbDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtUsos, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addComponent(lblVencimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cmbVencimiento, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(169, 169, 169)
+                        .addComponent(lblTitulo2))
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGap(24, 24, 24)
-                        .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(29, Short.MAX_VALUE))
+                        .addContainerGap()
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator2)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGap(6, 6, 6)
+                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 573, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGap(274, 274, 274)
+                                        .addComponent(cmbVencimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGap(273, 273, 273)
+                                        .addComponent(txtUsos, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGap(273, 273, 273)
+                                        .addComponent(cmbDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel4Layout.createSequentialGroup()
+                                        .addGap(273, 273, 273)
+                                        .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 6, Short.MAX_VALUE)))))
+                .addContainerGap())
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(121, 121, 121)
+                        .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(135, 135, 135)
+                        .addComponent(lblTitulo1)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(lblTitulo1, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 310, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblTitulo2, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(39, 39, 39)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -186,7 +239,7 @@ public class CreacionCupones extends BaseFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbDescuento, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblUsos, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtUsos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -194,26 +247,20 @@ public class CreacionCupones extends BaseFrame {
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblVencimiento, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cmbVencimiento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnCrear, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addGap(16, 16, 16))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -260,26 +307,22 @@ public class CreacionCupones extends BaseFrame {
 
         if (st.agregarCupon(nuevoCupon)) {
             javax.swing.JOptionPane.showMessageDialog(this, "¡Cupón \"" + codigo.toUpperCase() + "\" creado exitosamente!");
-            VistaPrincipal principal = new VistaPrincipal(st);
-            this.dispose();
-            principal.setVisible(true);
-            principal.setLocationRelativeTo(null);
+
         } else {
             javax.swing.JOptionPane.showMessageDialog(this, "Ya existe un cupón con ese nombre.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
         }
 
         } catch (NumberFormatException e) {
         javax.swing.JOptionPane.showMessageDialog(this, "La cantidad de usos debe ser un número entero válido.", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
-    }
+        }finally{
+            actualizarTabla(st.getCupones());
+        }
     
     
     }//GEN-LAST:event_btnCrearMouseClicked
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-    VistaPrincipal principal = new VistaPrincipal(st);
-    this.dispose();
-    principal.setVisible(true);
-    principal.setLocationRelativeTo(null);
+        this.dispose();
     }//GEN-LAST:event_formWindowClosing
 
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
@@ -307,13 +350,31 @@ public class CreacionCupones extends BaseFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lblDescuento;
     private javax.swing.JLabel lblNombre;
-    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JLabel lblTitulo1;
+    private javax.swing.JLabel lblTitulo2;
     private javax.swing.JLabel lblUsos;
     private javax.swing.JLabel lblVencimiento;
+    private javax.swing.JTable tablaCupones;
     private javax.swing.JTextField txtNombre;
     private javax.swing.JTextField txtUsos;
     // End of variables declaration//GEN-END:variables
+    public void actualizarTabla(List<Cupon> cupones) {    
+        DefaultTableModel modeloTabla = (DefaultTableModel) tablaCupones.getModel();
+        modeloTabla.setRowCount(0);
+        for ( Cupon c : cupones ) {
+            // Cargar imagen en miniatura (60x60)
+            modeloTabla.addRow(new Object[]{
+                c.getCodigo(),
+                c.getPorcentaje()*100+"%",
+                c.getUsos(),
+                c.getCreacion(),
+                c.getVencimiento()
+            });
+        }
+    }
 }

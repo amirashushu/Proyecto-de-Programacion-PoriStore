@@ -5,11 +5,13 @@ import java.time.LocalDate;
 
 public class Cupon implements Serializable {
     
+    private static final long serialVersionUID = 1L;
     private final String codigo;
     private final double porcentaje;
     private int usos;
     private final LocalDate creacion;
     private final int dias;
+    
 
     public Cupon(String codigo, double porcentaje, int usos, int dias, LocalDate creacion) {
         this.codigo = codigo;
@@ -42,7 +44,9 @@ public class Cupon implements Serializable {
     public void setUsos(int usos) {
         this.usos = usos;
     }
-    
+    public LocalDate getVencimiento(){
+        return creacion.plusDays(dias);
+    }
     public boolean validarCupon(String c){
         return this.codigo.equals(c);
     }

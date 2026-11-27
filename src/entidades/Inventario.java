@@ -6,6 +6,8 @@ import java.util.List;
 import server.Server;
 
 public class Inventario implements Serializable{
+    
+    private static final long serialVersionUID = 1L;
     private final ArrayList<Producto> inventario;
 
     public Inventario() {

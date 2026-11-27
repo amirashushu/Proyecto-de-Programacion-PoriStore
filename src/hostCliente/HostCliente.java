@@ -14,7 +14,7 @@ public class HostCliente {
     private static PrintWriter serverOut;
     private static vistas.VistaPrincipal vistaPrincipalActiva;
     private static vistas.Chat chatActivo;
-
+    
     public static void setChatActivo(vistas.Chat chat) {
         chatActivo = chat;
     }
@@ -125,7 +125,6 @@ public class HostCliente {
                             java.awt.EventQueue.invokeLater(() -> {
                                 Producto p = invent.buscarPorId(id);
                                 if (p != null && chatActivo != null) {
-                                    // Desactivar alwaysOnTop para que el JOptionPane no bugee la vista en Mac
                                     chatActivo.setAlwaysOnTop(false);
                                     
                                     int confirmar = JOptionPane.showConfirmDialog(
@@ -190,6 +189,11 @@ public class HostCliente {
         broadcast(createJsonData(cant, String.valueOf(id)));
     }
     public static void notificarChat(String msg){
+        if (serverOut==null && chatActivo!=null){
+            java.awt.EventQueue.invokeLater(() -> {
+                chatActivo.agregarMensaje("Server", "Error de conexión, verifique su conexión con el servidor", false);
+            });
+        }
         broadcast(createJsonMessage(msg));
     }
     // Envia al servidor el carrito completo para que el admin lo vea en "Carritos activos" y calcule lo reservado

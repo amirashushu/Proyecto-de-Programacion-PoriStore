@@ -8,7 +8,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 public class ApiGemini {
-    private static final String API_KEY = "AQ.Ab8RN6IKTAZ_dL9tgH8swYyK2rHVkfe2iNt2v9byXbn4TBN4Zg"; // Reemplaza con tu API key
+    private static final String API_KEY = Configuracion.get("API_KEY"); // Reemplaza con tu API key
     private static final String API_URL = "https://generativelanguage.googleapis.com/v1/models/gemini-3.1-flash-lite:generateContent?key=" + API_KEY;
 
     
@@ -36,18 +36,25 @@ public class ApiGemini {
 
         // Respuesta
         int responseCode = connection.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
+        switch (responseCode) {
+            case HttpURLConnection.HTTP_OK:
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    return extractTextFromResponse(response.toString());
                 }
-                return extractTextFromResponse(response.toString());
-            }
-        } else {
-            throw new RuntimeException("Error en la API: " + responseCode);
+            case 401:
+            case 403:
+            case 400:
+                throw new SecurityException("API_KEY_INVALIDA");
+            case 429:
+                throw new IllegalStateException("LIMITE_EXCEDIDO");
+            default:
+                throw new RuntimeException("Error en la API: " + responseCode);
         }
     }
 
