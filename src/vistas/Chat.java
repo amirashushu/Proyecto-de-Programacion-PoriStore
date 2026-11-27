@@ -68,6 +68,7 @@ public class Chat extends BaseFrame {
 
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 
+        textChat.setEditable(false);
         textChat.setBackground(new java.awt.Color(0, 0, 0));
         textChat.setFont(new java.awt.Font("Helvetica Neue", 0, 15)); // NOI18N
         jScrollPane1.setViewportView(textChat);
@@ -151,10 +152,14 @@ public class Chat extends BaseFrame {
 
     private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
         String msg = msgText.getText().trim();
+        if (!btnEnviar.isEnabled()) return;
+        
         if (msg.isEmpty()) return;
         agregarMensaje(logica.GestorSesion.getNombreCliente(), msg, true);     
         msgText.setText("");
         btnEnviar.setEnabled(false);
+            msgText.setEnabled(false);
+        
         HostCliente.notificarChat(msg);
     }//GEN-LAST:event_btnEnviarActionPerformed
 
@@ -193,6 +198,8 @@ public class Chat extends BaseFrame {
             doc.insertString(doc.getLength(), remitente + ": " + mensaje + "\n", estilo);
             textChat.setCaretPosition(doc.getLength());
             btnEnviar.setEnabled(true);
+            msgText.setEnabled(true);
+            msgText.requestFocusInWindow();
         } catch (Exception e) {
             e.printStackTrace();
         }

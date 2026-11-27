@@ -58,7 +58,7 @@ public class Server {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
             PrintWriter temp = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
             out = temp;
-            StringBuilder sb = new StringBuilder("Historial{");
+            StringBuilder sb = new StringBuilder();
             historialCliente.put(out, sb);
             clientesConectados.add(out);
 
@@ -164,7 +164,7 @@ public class Server {
                     try {
                         String infoProducto = "";
                         
-                        // Buscamos si el mensaje menciona algún producto (sin distinguir mayúsculas/minúsculas)
+                        // Buscamos si el mensaje menciona algún producto
                         for (Producto p : st.getProductos()) {
                             if (msg != null && msg.toLowerCase().contains(p.getNombre().toLowerCase())) {
                                 String nombre = p.getNombre();
@@ -179,17 +179,22 @@ public class Server {
                         // Construir el prompt completo para PorIA
                         
                         String promptFinal = prontContexto() + "\n"
+                                           + "Historial{\n"
+                                           + historialCliente.get(out)
+                                           + "\n}"
                                            + infoProducto + "\n"
-                                           + "Mensaje del cliente: " + msg
-                                           + historialCliente.get(out).append("}");
-                        
+                                           + "Mensaje del cliente: " + msg +"\n";
+                                           
                         String respuesta = ApiGemini.callGeminiAPI(promptFinal);
                         
-                        historialCliente.replace(out,historialCliente.get(out).append("Usuario: ").append(promptFinal).append("IA: ").append(respuesta));
-                       
                         
-                        sb.append(respuesta);
+                        historialCliente.replace(out,historialCliente.get(out).append("\nUsuario: ").append(msg).
+                                append("\nInformacion dada: ").append(infoProducto).append("\nIA: ").append(respuesta));
+                        
+                        System.out.println("Historial de conversacion con IA: "+ historialCliente.get(out));
+                        
                         if (respuesta != null && respuesta.contains("[AGREGAR:")) {
+                            
                             System.out.println("Server: Solicitud de carrito detectada en IA: " + respuesta);
                             Pattern regex = Pattern.compile("\\[AGREGAR:\\s*([^,]+),\\s*(\\d+)\\]");
                             Matcher matcher = regex.matcher(respuesta);
@@ -210,9 +215,26 @@ public class Server {
 
                         System.out.println("Mensaje enviado. En espera...");
                         out.println(createJsonMessage(respuesta));
+                        
+                    } catch (java.net.SocketTimeoutException e) {
+                        System.err.println("Timeout IA: " + e.getMessage());
+                        out.println(createJsonMessage("Tiempo de espera agotado: la IA tardó demasiado en responder. Intenta nuevamente."));
+
+                    } catch (java.net.UnknownHostException | java.net.ConnectException e) {
+                        System.err.println("Sin conexión IA: " + e.getMessage());
+                        out.println(createJsonMessage("Sin conexión a internet: no se pudo contactar al servicio de IA."));
+
+                    } catch (SecurityException e) {
+                        System.err.println("Error API Key: " + e.getMessage());
+                        out.println(createJsonMessage("Error de autenticación: la API Key de la IA es inválida."));
+
+                    } catch (IllegalStateException e) {
+                        System.err.println("Límite cuota: " + e.getMessage());
+                        out.println(createJsonMessage("Límite de solicitudes excedido: por favor espera unos momentos antes de volver a preguntar."));
+
                     } catch (Exception e) {
-                        System.err.println("Error al consultar IA: " + e.getMessage());
-                        out.println(createJsonMessage("Lo siento, ocurrió un error al procesar tu solicitud, pruebe la conexión"));
+                        System.err.println("Error inesperado IA: " + e.getMessage());
+                        out.println(createJsonMessage("Lo siento, ocurrió un error al procesar tu solicitud."));
                     }
                 }
             }
@@ -327,14 +349,12 @@ public class Server {
     }
     private static String prontContexto() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Eres PorIA, el asistente virtual oficial de PoriStore.\n");
+        sb.append("Eres PorIA, el asistente virtual oficial de PoriStore. Ya te presente, no es necesario que saludes o te presentes cuando te hablen, si y solo si te saluden primero\n");
         sb.append("Responde en español de forma amable, breve y profesional.\n");
         sb.append("Solo puedes responder consultas sobre la tienda, productos, precios y disponibilidad.\n\n");
-        sb.append("REGLA ESTRICTA DE INVENTARIO: Solo puedes confirmar los precios y stock que se te entreguen explícitamente ");
-        sb.append("en el 'DATO DE INVENTARIO'. Si te preguntan por un producto que no está o tiene stock 0, indícalo amablemente sin inventar.\n\n");
-        sb.append("REGLA DE COMPRA: Si el cliente te pide explícitamente agregar un producto al carrito, responde confirmando cordialmente y"); 
-        sb.append("escribe al final de tu mensaje: [AGREGAR: nombre_del_producto, cantidad]. Si no lo pide, NO agregues esa etiqueta.");
-        sb.append("Todo lo que este dentro de las llaves despues de historial, es la conversación que se ha tenido, asi que leela y responde segun el contexto del chat ");
+        sb.append("REGLA DE INVENTARIO: Solo puedes hablar de precios y stock según lo que se indique en 'DATO DE INVENTARIO' o lo que ya se informó en el HISTORIAL.\n\n");
+        sb.append("REGLA DE CONTEXTO: Si el cliente no nombra el producto explícitamente (por ejemplo dice 'quiero comprar 10', 'agrégalo', 'cuánto vale?'), revisa el HISTORIAL para saber de qué producto habla y responde usando ese contexto.\n\n");
+        sb.append("REGLA DE COMPRA: Si el cliente pide comprar o agregar un producto al carrito, responde cordialmente y escribe al final exactamente: [AGREGAR: nombre_del_producto, cantidad]. Si no lo pide, NO agregues esa etiqueta.");
         return sb.toString();
     }
 }

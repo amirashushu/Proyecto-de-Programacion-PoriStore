@@ -10,6 +10,7 @@ public class Cupon implements Serializable {
     private int usos;
     private final LocalDate creacion;
     private final int dias;
+    
 
     public Cupon(String codigo, double porcentaje, int usos, int dias, LocalDate creacion) {
         this.codigo = codigo;

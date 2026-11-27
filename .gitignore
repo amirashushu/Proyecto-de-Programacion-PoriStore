@@ -1,4 +1,11 @@
-/build/
-/dist/
+# Archivos con claves y secretos
+config.properties
+
+# Archivos de compilación de NetBeans
+build/
+dist/
 nbproject/private/
+
+# Archivos ocultos de macOS
 .DS_Store
+**/.DS_Store
