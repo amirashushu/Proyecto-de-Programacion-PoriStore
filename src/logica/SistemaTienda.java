@@ -34,6 +34,7 @@ public class SistemaTienda implements Serializable{
     
     private final ArrayList<Carro> carritos;  // Múltiples carritos (compras)
     private Carro carritoAnonimo;
+    private static boolean servidorEncendido = false;
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     private final Inventario inventario;
@@ -77,7 +78,6 @@ public class SistemaTienda implements Serializable{
 
     // Valida las credenciales de un administrador
     public boolean iniciarSesion(String correo, String contraseña){
-        boolean servidorEncendido = false;
         if (cuentas.containsKey(correo)){
             if(cuentas.get(correo).validarContraseña(contraseña)){
                 if (esAdmin(correo, contraseña) && !servidorEncendido){
@@ -516,9 +516,14 @@ public class SistemaTienda implements Serializable{
         if (error != null) {
             return error;
         }
+        double precioAnterior = p.getPrecio();
         p.setOferta(porcentaje, LocalDate.now().plusDays(dias));
         guardarDatos();
         Server.notificarCreacion(p); 
+        double precioNuevo = p.getPrecio();
+        if (precioNuevo < precioAnterior) {
+            Server.notificarBajaPrecio(p.getId(), precioAnterior, precioNuevo);
+        }
         return null;
     }
     
@@ -530,8 +535,13 @@ public class SistemaTienda implements Serializable{
         int cantidad = 0;
         for (Producto p : inventario.getProductos()) {
             if (p.getCategoria() == categoria) {
+                double precioAnterior = p.getPrecio();
                 p.setOferta(porcentaje, LocalDate.now().plusDays(dias));
                 Server.notificarCreacion(p);
+                double precioNuevo = p.getPrecio();
+                if (precioNuevo < precioAnterior) {
+                    Server.notificarBajaPrecio(p.getId(), precioAnterior, precioNuevo);
+                }
                 cantidad++;
             }
         }

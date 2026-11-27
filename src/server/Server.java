@@ -255,7 +255,12 @@ public class Server {
             System.out.println("[-] El cliente se ha desconectado.");   
         }
     }
-    
+    public static void notificarDeseo(int id, int stock){
+        broadcast(createJsonDeseo(id, stock));
+    }
+    public static void notificarBajaPrecio(int id, double precioAnterior, double precioNuevo) {
+        broadcast(createJsonBajaPrecio(id, precioAnterior, precioNuevo));
+    }
     public static void notificarCreacion (Producto p){
         broadcast(createJsonProducto(p));
     }
@@ -295,7 +300,12 @@ public class Server {
     private static String createJsonData(int numero, String texto) {
         return "{\"type\": \"data_exchange\", \"numero\": " + numero + ", \"texto\": \"" + escapeJson(texto) + "\"}";
     }
-    
+    private static String createJsonDeseo(int id, int stock) {
+        return "{\"type\": \"deseo\", \"id\": " + id + ", \"stock\": \"" + stock + "\"}";
+    }
+    private static String createJsonBajaPrecio(int id, double precioAnterior, double precioNuevo) {
+        return "{\"type\": \"baja_precio\", \"id\": " + id + ", \"precioAnterior\": \"" + (int)precioAnterior + "\", \"precioNuevo\": \"" + (int)precioNuevo + "\"}";
+    }
     // Método para crear el JSON de un solo producto con todos sus datos
     private static String createJsonProducto(Producto p) {
         StringBuilder json = new StringBuilder();

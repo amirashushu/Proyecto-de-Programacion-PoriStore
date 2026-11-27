@@ -25,6 +25,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import logica.SistemaTienda;
+import server.Server;
 
 
 public final class Dashboard extends BaseFrame {
@@ -1135,6 +1136,15 @@ public final class Dashboard extends BaseFrame {
             }else{
                 String strId = txtId.getText();
                 int id = Integer.parseInt(strId);
+                Producto pActual = st.buscarPorId(id);
+                if (pActual != null) {
+                    if (pActual.getStock() == 0 && stock > 0) {
+                        Server.notificarDeseo(id, stock);
+                    }
+                    if (precio < pActual.getPrecio()) {
+                        Server.notificarBajaPrecio(id, pActual.getPrecio(), precio);
+                    }
+                }
                 int filaSeleccionada = tblProductos.getSelectedRow();
                 st.actualizarProducto(nombre, desc, precio, stock, cat, id, rutaImagen);
                 st.guardarDatos(); // Guardado automatico
@@ -1177,7 +1187,7 @@ public final class Dashboard extends BaseFrame {
         int idProducto = Integer.parseInt(id);
         Producto productoCompleto = st.buscarPorId(idProducto);
         String rutaImagen = (productoCompleto != null) ? productoCompleto.getRutaImagen() : "/fotos/producto.png";
-
+        
         txtId.setText(id);
         txtNombre.setText(nombre);
         txtDescripcion.setText(desc);

@@ -6,6 +6,7 @@ import java.io.*;
 import java.net.*;
 import java.util.regex.*;
 import javax.swing.JOptionPane;
+import logica.GestorSesion;
 import logica.SistemaTienda;
 
 public class HostCliente {
@@ -157,8 +158,50 @@ public class HostCliente {
                                     : "Tu pedido N° " + numero + " ahora está: " + estado;
                             java.awt.EventQueue.invokeLater(() -> javax.swing.JOptionPane.showMessageDialog(
                                     null, texto, "Estado de tu pedido", javax.swing.JOptionPane.INFORMATION_MESSAGE));
-                        }
-                           
+                        
+                         }else if ("deseo".equals(type)) {
+                            try {
+                                String idStr = extractJsonField(line, "id");
+                                String stockStr = extractJsonField(line, "stock");
+                                int id = Integer.parseInt(idStr);
+                                Producto prod = st.buscarPorId(id);
+                                entidades.Cliente cliente = GestorSesion.getClienteActual();
+
+                                if (prod != null && cliente != null) {
+                                    String nombre = prod.getNombre();
+                                
+                                    if (cliente.tieneEnDeseos(nombre) || cliente.tieneEnDeseos(idStr)) {
+                                        java.awt.EventQueue.invokeLater(() -> javax.swing.JOptionPane.showMessageDialog(
+                                            null, "¡Ha vuelto tu producto preferido " + nombre + "! Se han agregado " + stockStr + " unidades.", 
+                                            "Lista de deseos", javax.swing.JOptionPane.INFORMATION_MESSAGE));
+                                    }
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Error procesando notificación de reposición: " + e.getMessage());
+                            }
+                         } else if ("baja_precio".equals(type)) {
+                            try {
+                                String idStr = extractJsonField(line, "id");
+                                String anteriorStr = extractJsonField(line, "precioAnterior");
+                                String nuevoStr = extractJsonField(line, "precioNuevo");
+                                int id = Integer.parseInt(idStr);
+                                Producto prod = st.buscarPorId(id);
+                                entidades.Cliente cliente = GestorSesion.getClienteActual();
+
+                                if (prod != null && cliente != null) {
+                                    String nombre = prod.getNombre();
+                                    if (cliente.tieneEnDeseos(nombre) || cliente.tieneEnDeseos(idStr)) {
+                                        String aviso = "El producto \"" + nombre + "\" que tienes en tu lista de deseos ha bajado de precio:\n\n"
+                                                     + "Precio anterior: $" + anteriorStr + "\n"
+                                                     + "Precio nuevo: $" + nuevoStr;
+                                        java.awt.EventQueue.invokeLater(() -> javax.swing.JOptionPane.showMessageDialog(
+                                            null, aviso, "Rebaja de precio", javax.swing.JOptionPane.INFORMATION_MESSAGE));
+                                    }
+                                }
+                            } catch (Exception e) {
+                                System.err.println("Error procesando aviso de baja de precio: " + e.getMessage());
+                            }
+                         }
 
                         // Refrescar automáticamente la pantalla del catálogo si la vista está abierta
                         if (vistaPrincipalActiva != null) {
@@ -185,6 +228,7 @@ public class HostCliente {
             }
         }
     }
+   
     public static void notificarPeticion (int id, int cant){
         broadcast(createJsonData(cant, String.valueOf(id)));
     }
@@ -250,6 +294,7 @@ public class HostCliente {
     private static String createJsonData(int numero, String texto) {
         return "{\"type\": \"data_exchange\", \"numero\": " + numero + ", \"texto\": \"" + escapeJson(texto) + "\"}";
     }
+ 
 
     // Método para escapar caracteres especiales en JSON
     private static String escapeJson(String text) {
