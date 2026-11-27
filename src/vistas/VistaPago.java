@@ -10,6 +10,7 @@ import entidades.Producto;
 import java.util.Map;
 import javax.swing.WindowConstants;
 import javax.swing.table.DefaultTableModel;
+import logica.GestorReserva;
 
 public class VistaPago extends javax.swing.JFrame {
 
@@ -95,6 +96,7 @@ public class VistaPago extends javax.swing.JFrame {
         javax.swing.Timer espera = new javax.swing.Timer(1500, e -> {
             confirmarCompra.run();
             llenarComprobante();
+            GestorReserva.detener();
             ((java.awt.CardLayout) getContentPane().getLayout()).show(getContentPane(), "comprobante");
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         });

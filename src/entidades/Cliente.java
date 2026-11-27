@@ -23,6 +23,31 @@ public class Cliente implements Serializable {
         this.carritoActual = new Carro();
         this.carritoActual.setCliente(this);
     }
+    
+    private java.util.List<String> listaDeseos = new java.util.ArrayList<>();
+    
+    public java.util.List<String> getListaDeseos() {
+    if (listaDeseos == null) {
+        listaDeseos = new java.util.ArrayList<>();
+    }
+    return listaDeseos;
+    }
+    
+    public boolean agregarADeseos(String idProducto) {
+    if (!getListaDeseos().contains(idProducto)) {
+        getListaDeseos().add(idProducto);
+        return true;
+    }
+    return false; 
+    }
+    
+    public boolean quitarDeDeseos(String idProducto) {
+    return getListaDeseos().remove(idProducto);
+    }
+
+    public boolean tieneEnDeseos(String idProducto) {
+    return getListaDeseos().contains(idProducto);
+    }
 
     public String getRut() {
         return rut;
@@ -76,6 +101,8 @@ public class Cliente implements Serializable {
     public void setCarritoActual(Carro carritoActual) {
         this.carritoActual = carritoActual;
     }
+    
+    
     
     
 }
