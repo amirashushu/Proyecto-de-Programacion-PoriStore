@@ -274,10 +274,12 @@ public class Server {
         json.append("\"id\": ").append(p.getId()).append(", ");
         json.append("\"nombre\": \"").append(escapeJson(p.getNombre())).append("\", ");
         json.append("\"descripcion\": \"").append(escapeJson(p.getDescripcion())).append("\", ");
-        json.append("\"precio\": ").append(p.getPrecio()).append(", ");
+        json.append("\"precio\": ").append(p.getPrecioBase()).append(", "); 
         json.append("\"categoria\": \"").append(escapeJson(p.getCategoriaStr())).append("\", ");
         json.append("\"stock\": ").append(p.getStock()).append(", ");
-        json.append("\"rutaImagen\": \"").append(escapeJson(p.getRutaImagen())).append("\"");
+        json.append("\"rutaImagen\": \"").append(escapeJson(p.getRutaImagen())).append("\", ");
+        json.append("\"oferta\": \"").append(p.getOfertaPorcentaje() > 0 ? String.valueOf(p.getOfertaPorcentaje()) : "").append("\", ");
+        json.append("\"oferta_hasta\": \"").append(p.getOfertaHasta() != null ? p.getOfertaHasta().toString() : "").append("\"");
         json.append("}");
         return json.toString();
     }
