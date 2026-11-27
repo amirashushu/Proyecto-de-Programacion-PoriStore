@@ -5,23 +5,29 @@ import entidades.Producto;
 import java.io.*;
 import java.net.*;
 import java.util.regex.*;
+import javax.swing.JOptionPane;
+import logica.SistemaTienda;
 
 public class HostCliente {
-    private static final String HOST = "192.168.1.8";
+    private static final String HOST = "192.168.1.11";
     private static final int PORT = 65432;
     private static PrintWriter serverOut;
     private static vistas.VistaPrincipal vistaPrincipalActiva;
-    
+    private static vistas.Chat chatActivo;
+
+    public static void setChatActivo(vistas.Chat chat) {
+        chatActivo = chat;
+    }
     public static void setVistaPrincipal(vistas.VistaPrincipal vista) {
         vistaPrincipalActiva = vista;
     }
     
-    public void initHost(Inventario inv){
+    public void initHost(SistemaTienda st){
         while (true) {
             try (Socket socket = new Socket()) {
                 socket.connect(new InetSocketAddress(HOST, PORT));
                 System.out.println("[+] Conectado exitosamente al servidor.");
-                handleConnection(socket, inv);
+                handleConnection(socket, st);
             } catch (ConnectException e) {
                 System.err.println("[!] Servidor no disponible en " + HOST + ":" + PORT + ". Reintentando en 3 segundos...");
             } catch (IOException e) {
@@ -34,7 +40,8 @@ public class HostCliente {
             }
         }
     }
-    private static void handleConnection(Socket socket, Inventario invent) {
+    private static void handleConnection(Socket socket, SistemaTienda st) {
+        Inventario invent = st.getInventario();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             PrintWriter out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true)) {
             serverOut = out; 
@@ -62,7 +69,12 @@ public class HostCliente {
                         } else if ("message".equals(type)) {
                             String content = extractJsonField(line, "content");
                             System.out.println("\n[Servidor]: " + content);
-                            System.out.print("Tu mensaje: ");
+                            
+                            if (chatActivo != null){
+                                java.awt.EventQueue.invokeLater(() -> {
+                                chatActivo.agregarMensaje("PorIA", content, false);
+                            });
+                            }
                             
                         }else if ("get_producto".equals(type)){
                             String idStr = extractJsonField(line, "id");
@@ -89,13 +101,56 @@ public class HostCliente {
                             }else{
                                 invent.reCrearProducto(id, nombre, descripcion, precio, stock, Categorias.valueOf(categoria), rutaImagen);
                                 System.out.println("[Cliente] Producto agregado al inventario: " + nombre + " (ID " + id + ")");
-                            }    
+                            }   
+                            Producto conOferta = invent.buscarPorId(id);
+                            String ofertaStr = extractJsonField(line, "oferta");
+                            String ofertaHasta = extractJsonField(line, "oferta_hasta");
+                            if (conOferta != null) {
+                                if (ofertaStr != null && !ofertaStr.isEmpty() && ofertaHasta != null && !ofertaHasta.isEmpty()) {
+                                    conOferta.setOferta(Double.parseDouble(ofertaStr), java.time.LocalDate.parse(ofertaHasta));
+                                } else {
+                                    conOferta.quitarOferta();
+                                }
+                            }
                         }else if ("eliminar".equals(type)){
                             String idStr = extractJsonField(line, "id");
                             int id = Integer.parseInt(idStr.trim());
                             invent.eliminarProducto(id);
                             System.out.println("[Cliente] Producto eliminado (ID " + id + ")");
-                        }else if ("pedido".equals(type)){
+
+                        }else if ("agregar_carro".equals(type)) {
+                            int id = Integer.parseInt(extractJsonField(line, "id"));
+                            int cantidad = Integer.parseInt(extractJsonField(line, "cantidad"));
+
+                            java.awt.EventQueue.invokeLater(() -> {
+                                Producto p = invent.buscarPorId(id);
+                                if (p != null && chatActivo != null) {
+                                    // Desactivar alwaysOnTop para que el JOptionPane no bugee la vista en Mac
+                                    chatActivo.setAlwaysOnTop(false);
+                                    
+                                    int confirmar = JOptionPane.showConfirmDialog(
+                                        chatActivo, 
+                                        "¿Desea agregar " + cantidad + " unidad(es) de " + p.getNombre() + " al carrito?",
+                                        "Agregar al Carrito", 
+                                        JOptionPane.YES_NO_OPTION, 
+                                        JOptionPane.QUESTION_MESSAGE
+                                    );
+                                    if (confirmar == JOptionPane.YES_OPTION) {
+                                        boolean exito = st.obtenerCarritoActual().agregarProCarrito(p, cantidad);
+                                        if (exito) {
+                                            st.guardarDatos();
+                                            JOptionPane.showMessageDialog(chatActivo, "¡" + p.getNombre() + " agregado al carrito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                                        } else {
+                                            JOptionPane.showMessageDialog(chatActivo, "No hay stock suficiente disponible.", "Sin stock", JOptionPane.WARNING_MESSAGE);
+                                        }
+                                    }
+                                    
+                                    // Reactivar alwaysOnTop después de cerrar el diálogo
+                                    chatActivo.setAlwaysOnTop(true);
+                                }
+                            });
+
+                         }else if ("pedido".equals(type)){
                             String numero = extractJsonField(line, "numero");
                             String estado = extractJsonField(line, "estado");
                             String texto = "Pendiente".equals(estado)
@@ -104,6 +159,7 @@ public class HostCliente {
                             java.awt.EventQueue.invokeLater(() -> javax.swing.JOptionPane.showMessageDialog(
                                     null, texto, "Estado de tu pedido", javax.swing.JOptionPane.INFORMATION_MESSAGE));
                         }
+                           
 
                         // Refrescar automáticamente la pantalla del catálogo si la vista está abierta
                         if (vistaPrincipalActiva != null) {
@@ -133,7 +189,9 @@ public class HostCliente {
     public static void notificarPeticion (int id, int cant){
         broadcast(createJsonData(cant, String.valueOf(id)));
     }
-
+    public static void notificarChat(String msg){
+        broadcast(createJsonMessage(msg));
+    }
     // Envia al servidor el carrito completo para que el admin lo vea en "Carritos activos" y calcule lo reservado
     // Productos van como "idProducto x cantidad" separados por coma, por ejemplo "1x2,3x1"
     public static void notificarCarrito(entidades.Carro carro, entidades.EntregaPedido entrega) {
@@ -202,7 +260,7 @@ public class HostCliente {
     // Método simple para extraer campos de JSON (sin librerías externas)
     private static String extractJsonField(String json, String fieldName) {
         // Para campos de texto (string)
-        Pattern stringPattern = Pattern.compile("\"" + fieldName + "\"\\s*:\\s*\"([^\"]*)\"");
+        Pattern stringPattern = Pattern.compile("\"" + fieldName + "\"\\s*:\\s*\"((?:\\\\.|[^\"\\\\])*)\"");
         Matcher stringMatcher = stringPattern.matcher(json);
         if (stringMatcher.find()) {
             return unescapeJson(stringMatcher.group(1));
@@ -217,7 +275,9 @@ public class HostCliente {
 
         return null;
     }
-
+    private static String createJsonMessage(String content) {
+        return "{\"type\": \"message\", \"content\": \"" + escapeJson(content) + "\"}";
+    }
     // Método para desescapar caracteres JSON
     private static String unescapeJson(String text) {
         return text.replace("\\\"", "\"")

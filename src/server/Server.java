@@ -1,21 +1,26 @@
 package server;
 
+import entidades.ApiGemini;
 import entidades.Inventario;
 import entidades.Producto;
 import java.io.*;
 import java.net.*;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.*;
+import logica.SistemaTienda;
 
 public class Server {
 
-    private static final String HOST = "192.168.1.8";
+    private static final String HOST = "192.168.1.11";
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
+    private static PrintWriter clienteActual;
+
     private static final java.util.Map<String, PrintWriter> clientePorCarrito = new java.util.concurrent.ConcurrentHashMap<>();
+
     private static vistas.Dashboard dashboardTabla;
-   
     
     public static void setDashboard(vistas.Dashboard d) {
         dashboardTabla = d;
@@ -28,7 +33,7 @@ public class Server {
         sistemaAdmin = st;
     }
     
-    public boolean initServer(Inventario invent) {
+    public boolean initServer(SistemaTienda st) {
         try (ServerSocket serverSocket = new ServerSocket()) {
             serverSocket.setReuseAddress(true);
             serverSocket.bind(new InetSocketAddress(HOST, PORT));
@@ -37,7 +42,7 @@ public class Server {
             // Un hilo por cliente: el accept() se repite para siempre
             while (true) {
                 Socket clientSocket = serverSocket.accept();
-                Thread clientThread = new Thread(() -> handleClient(clientSocket, invent));
+                Thread clientThread = new Thread(() -> handleClient(clientSocket, st));
                 clientThread.start();
             }
         } catch (IOException e) {
@@ -46,12 +51,14 @@ public class Server {
         }
     }
 
-private static void handleClient(Socket clientSocket, Inventario invent) {
+    private static void handleClient(Socket clientSocket, SistemaTienda st) {
         System.out.println("[+] Conectado por " + clientSocket.getInetAddress());
         PrintWriter out = null;
+        Inventario invent = st.getInventario();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), "UTF-8"));
             PrintWriter temp = new PrintWriter(new OutputStreamWriter(clientSocket.getOutputStream(), "UTF-8"), true)) {
             out = temp;
+            clienteActual = out;
             clientesConectados.add(out);
 
             //sincronizar al cliente enviándole los productos existentes en el servidor
@@ -150,6 +157,57 @@ private static void handleClient(Socket clientSocket, Inventario invent) {
                         out.println(createJsonMessage("La cantidad y el id deben ser enteros válidos."));
                     }
                 }
+                if ("message".equals(type)) {
+                    String msg = extractJsonField(line, "content");
+                    
+                    try {
+                        String infoProducto = "";
+                        
+                        // Buscamos si el mensaje menciona algún producto (sin distinguir mayúsculas/minúsculas)
+                        for (Producto p : st.getProductos()) {
+                            if (msg != null && msg.toLowerCase().contains(p.getNombre().toLowerCase())) {
+                                String nombre = p.getNombre();
+                                int stock = p.getStock();
+                                int precio = (int) p.getPrecio();
+                                infoProducto = "\nDATO DE INVENTARIO: El producto " + nombre 
+                                             + " cuesta $" + precio + " y quedan " + stock + " unidades en stock.\n";
+                                break;
+                            }
+                        }   
+
+                        // Construir el prompt completo para PorIA
+                        String promptFinal = prontContexto() + "\n"
+                                           + infoProducto + "\n"
+                                           + "Mensaje del cliente: " + msg;
+
+                        String respuesta = ApiGemini.callGeminiAPI(promptFinal);
+
+                        if (respuesta != null && respuesta.contains("[AGREGAR:")) {
+                            System.out.println("Server: Solicitud de carrito detectada en IA: " + respuesta);
+                            Pattern regex = Pattern.compile("\\[AGREGAR:\\s*([^,]+),\\s*(\\d+)\\]");
+                            Matcher matcher = regex.matcher(respuesta);
+                            if (matcher.find()) {
+                                String nombreProducto = matcher.group(1).trim(); 
+                                int cantidad = Integer.parseInt(matcher.group(2).trim());
+                                System.out.println("[Server] Producto a agregar: " + nombreProducto + " | Cantidad: " + cantidad);  
+                                List<Producto> encontrados = invent.buscarPorNombre(nombreProducto);
+                                
+                                if (!encontrados.isEmpty()) {
+                                    Producto prod = encontrados.get(0);
+                                    System.out.println("[Server] Encontrado: " + prod.getNombre() + " con ID: " + prod.getId());
+                                    out.println("{\"type\": \"agregar_carro\", \"id\": " + prod.getId() + ", \"cantidad\": " + cantidad + "}");
+                                }
+                            }
+                            respuesta = respuesta.replaceAll("\\[AGREGAR:.*?\\]", "").trim();
+                        }
+
+                        System.out.println("Mensaje enviado. En espera...");
+                        out.println(createJsonMessage(respuesta));
+                    } catch (Exception e) {
+                        System.err.println("Error al consultar IA: " + e.getMessage());
+                        out.println(createJsonMessage("Lo siento, ocurrió un error al procesar tu solicitud, pruebe la conexión"));
+                    }
+                }
             }
 
         } catch (IOException e) {
@@ -220,6 +278,8 @@ private static void handleClient(Socket clientSocket, Inventario invent) {
         json.append("\"categoria\": \"").append(escapeJson(p.getCategoriaStr())).append("\", ");
         json.append("\"stock\": ").append(p.getStock()).append(", ");
         json.append("\"rutaImagen\": \"").append(escapeJson(p.getRutaImagen())).append("\"");
+        json.append("\"oferta\": \"").append(p.getOfertaPorcentaje() > 0 ? String.valueOf(p.getOfertaPorcentaje()) : "").append("\", ");
+        json.append("\"oferta_hasta\": \"").append(p.getOfertaHasta() != null ? p.getOfertaHasta().toString() : "").append("\"");
         json.append("}");
         return json.toString();
     }
@@ -258,5 +318,15 @@ private static void handleClient(Socket clientSocket, Inventario invent) {
                    .replace("\\n", "\n")
                    .replace("\\r", "\r")
                    .replace("\\t", "\t");
+    }
+    private static String prontContexto() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Eres PorIA, el asistente virtual oficial de PoriStore.\n");
+        sb.append("Responde en español de forma amable, breve y profesional.\n");
+        sb.append("Solo puedes responder consultas sobre la tienda, productos, precios y disponibilidad.\n\n");
+        sb.append("REGLA ESTRICTA DE INVENTARIO: Solo puedes confirmar los precios y stock que se te entreguen explícitamente en el 'DATO DE INVENTARIO'. Si te preguntan por un producto que no está o tiene stock 0, indícalo amablemente sin inventar.\n\n");
+        sb.append("REGLA DE COMPRA: Si el cliente te pide explícitamente agregar un producto al carrito, responde confirmando cordialmente y escribe al final de tu mensaje: [AGREGAR: nombre_del_producto, cantidad]. Si no lo pide, NO agregues esa etiqueta.");
+        
+        return sb.toString();
     }
 }

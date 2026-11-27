@@ -65,7 +65,8 @@ public final class Dashboard extends BaseFrame {
     // Vista de carritos activos e inventario reservado
     private PanelCarritosAdmin vistaCarritos;
     private PanelVentasAdmin vistaVentas;
-    private PanelPedidosEstado vistaPedidos; 
+    private PanelPedidosEstado vistaPedidos;
+    private VistaOfertas vistaOfertas;
     // Muestra una vista a la vez: "productos" (este Dashboard), "carritos", "ventas" o "pedidos"
     private java.awt.CardLayout vistas;
     private javax.swing.JPanel contenedorVistas;
@@ -293,6 +294,7 @@ public final class Dashboard extends BaseFrame {
         jLabel1 = new javax.swing.JLabel();
         btnVaciarInventario = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        btnOfertas = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
@@ -810,6 +812,16 @@ public final class Dashboard extends BaseFrame {
             }
         });
 
+        btnOfertas.setBackground(new java.awt.Color(255, 51, 51));
+        btnOfertas.setForeground(new java.awt.Color(255, 255, 255));
+        btnOfertas.setText("Ofertas");
+        btnOfertas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnOfertasMouseClicked(evt);
+            }
+        });
+        btnOfertas.addActionListener(this::btnOfertasActionPerformed);
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -829,7 +841,8 @@ public final class Dashboard extends BaseFrame {
                             .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 570, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(btnVaciarInventario, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(63, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -849,7 +862,9 @@ public final class Dashboard extends BaseFrame {
                     .addComponent(btnEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnVaciarInventario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(133, 133, 133)
+                .addGap(90, 90, 90)
+                .addComponent(btnOfertas, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(56, 56, 56))
         );
@@ -1352,6 +1367,18 @@ public final class Dashboard extends BaseFrame {
         
     }//GEN-LAST:event_jButton1MouseClicked
 
+    private void btnOfertasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnOfertasMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnOfertasMouseClicked
+
+    private void btnOfertasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOfertasActionPerformed
+        if (vistaOfertas == null || !vistaOfertas.isDisplayable()) {
+            vistaOfertas = new VistaOfertas(st);
+        }
+        vistaOfertas.setVisible(true);
+        vistaOfertas.toFront();
+    }//GEN-LAST:event_btnOfertasActionPerformed
+
     // Copia imagen a carpeta /fotos/ y retorna ruta relativa
     private String copiarImagenAProyecto(File archivoOriginal) {
         try {
@@ -1480,6 +1507,7 @@ public final class Dashboard extends BaseFrame {
     private javax.swing.JButton btnFiltroCat;
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
+    private javax.swing.JButton btnOfertas;
     private javax.swing.JButton btnRestablecer;
     private javax.swing.JButton btnSeleccionarImg;
     private javax.swing.JButton btnVaciarInventario;
@@ -1669,7 +1697,7 @@ public final class Dashboard extends BaseFrame {
                 p.getId(),
                 p.getNombre(),
                 p.getDescripcion(),
-                formatoCLP.format(p.getPrecio()),
+                formatoCLP.format(p.getPrecioBase()),
                 p.getStock(),
                 p.getCategoria()
             });
