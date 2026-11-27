@@ -5,20 +5,16 @@ import javax.swing.UIManager;
 import logica.SistemaTienda;
 import vistas.VistaPrincipal;
 
-public class ProyectoPoriStore {
+/** Inicia la aplicación de tienda en modo cliente (host). */
+public final class HostApp {
+    private HostApp() { }
 
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        System.setProperty("poristore.data", "datosPoriStore-host.dat");
+        configurarInterfaz();
         SistemaTienda sistema = SistemaTienda.cargarDatos();
-        Thread hiloCliente = new Thread(() -> {
-            HostCliente hc = new HostCliente();
-            hc.initHost(sistema);
-        });
+
+        Thread hiloCliente = new Thread(() -> new HostCliente().initHost(sistema), "poristore-host");
         hiloCliente.setDaemon(true);
         hiloCliente.start();
 
@@ -28,5 +24,13 @@ public class ProyectoPoriStore {
             vista.setLocationRelativeTo(null);
             vista.setVisible(true);
         });
+    }
+
+    static void configurarInterfaz() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -10,6 +10,17 @@
 <project name="ProyectoPoringa" default="default" basedir=".">
     <description>Builds, tests, and runs the project ProyectoPoringa.</description>
     <import file="nbproject/build-impl.xml"/>
+    <!-- Genera dos JAR ejecutables desde las mismas clases compiladas. -->
+    <target name="build-ejecutables" depends="compile">
+        <antcall target="jar">
+            <param name="main.class" value="proyectoporinga.ServerApp"/>
+            <param name="dist.jar" value="${dist.dir}/PoriStore-Servidor.jar"/>
+        </antcall>
+        <antcall target="jar">
+            <param name="main.class" value="proyectoporinga.HostApp"/>
+            <param name="dist.jar" value="${dist.dir}/PoriStore-Host.jar"/>
+        </antcall>
+    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 

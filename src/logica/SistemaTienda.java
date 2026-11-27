@@ -34,7 +34,6 @@ public class SistemaTienda implements Serializable{
     
     private final ArrayList<Carro> carritos;  // Múltiples carritos (compras)
     private Carro carritoAnonimo;
-    private static boolean servidorEncendido = false;
     private final HashMap<String,Administrador> cuentas;
     private final HashMap<String,Cliente> clientes;  // Clientes registrados 
     private final Inventario inventario;
@@ -80,13 +79,9 @@ public class SistemaTienda implements Serializable{
     public boolean iniciarSesion(String correo, String contraseña){
         if (cuentas.containsKey(correo)){
             if(cuentas.get(correo).validarContraseña(contraseña)){
-                if (esAdmin(correo, contraseña) && !servidorEncendido){
-                    servidorEncendido=true;
-                    Server.setSistema(this); // el servidor guarda aqui los carritos de los clientes
-                    new Thread(() -> {
-                    Server servidor = new Server();
-                    servidor.initServer(this);
-                    }).start();
+                if (esAdmin(correo, contraseña)) {
+                    return Boolean.getBoolean("poristore.server.mode")
+                            && Server.iniciarEnSegundoPlano(this);
                 }
                 return true;
             }
@@ -387,7 +382,7 @@ public class SistemaTienda implements Serializable{
     public void guardarDatos() {
     try {
         ObjectOutputStream salida = new ObjectOutputStream(
-                new FileOutputStream("datosPoriStore.dat"));
+                new FileOutputStream(System.getProperty("poristore.data", "datosPoriStore.dat")));
 
         salida.writeObject(this);
         salida.close();
@@ -401,7 +396,7 @@ public class SistemaTienda implements Serializable{
     public static SistemaTienda cargarDatos() {
     try {
         ObjectInputStream entrada = new ObjectInputStream(
-                new FileInputStream("datosPoriStore.dat"));
+                new FileInputStream(System.getProperty("poristore.data", "datosPoriStore.dat")));
 
         SistemaTienda sistema = (SistemaTienda) entrada.readObject();
 
