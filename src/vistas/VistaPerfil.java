@@ -198,7 +198,14 @@ public class VistaPerfil extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCerrarActionPerformed
 
     private void btnListaDeseosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListaDeseosActionPerformed
-        // TODO add your handling code here:
+        // Abre la lista de deseos del cliente y cierra el perfil
+        if (st == null) {
+            return;
+        }
+        vistaListaDeseos lista = new vistaListaDeseos(st, ventanaOrigen);
+        lista.setLocationRelativeTo(ventanaOrigen);
+        lista.setVisible(true);
+        dispose();
     }//GEN-LAST:event_btnListaDeseosActionPerformed
 
 
