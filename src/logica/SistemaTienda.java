@@ -76,9 +76,11 @@ public class SistemaTienda implements Serializable{
 
     // Valida las credenciales de un administrador
     public boolean iniciarSesion(String correo, String contraseña){
+        boolean servidorEncendido = false;
         if (cuentas.containsKey(correo)){
             if(cuentas.get(correo).validarContraseña(contraseña)){
-                if (esAdmin(correo, contraseña)){
+                if (esAdmin(correo, contraseña) && !servidorEncendido){
+                    servidorEncendido=true;
                     Server.setSistema(this); // el servidor guarda aqui los carritos de los clientes
                     new Thread(() -> {
                     Server servidor = new Server();
@@ -302,7 +304,12 @@ public class SistemaTienda implements Serializable{
     public void confirmarCompra(Carro c, EntregaPedido metodoEntrega){
         int nuevoId = ventas.size() + 1;
         c.setEstado("Pagado");
-            hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
+        Cupon cuponCarro = c.getCupon();
+        if (cuponCarro!= null){
+            cuponCarro.setUsos(cuponCarro.getUsos()-1);
+            this.verificarVencimientoCupon(cuponCarro);
+        }
+        hostCliente.HostCliente.notificarCarrito(c, metodoEntrega); // el admin la registra como venta y la saca de carritos activos
         Ventas venta = new Ventas(c, nuevoId, metodoEntrega, metodoEntrega.getCostoEnvio());//se guarda en la lista de ventas
         ventas.add(venta);
         Pedido pedido = new Pedido(siguienteNumeroPedido(), venta, c.getIdSesion());

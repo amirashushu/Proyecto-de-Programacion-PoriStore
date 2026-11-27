@@ -5,6 +5,7 @@ import java.time.LocalDate;
 
 public class Cupon implements Serializable {
     
+    private static final long serialVersionUID = 1L;
     private final String codigo;
     private final double porcentaje;
     private int usos;

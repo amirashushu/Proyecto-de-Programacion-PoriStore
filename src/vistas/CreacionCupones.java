@@ -14,7 +14,6 @@ public class CreacionCupones extends BaseFrame {
     public CreacionCupones(SistemaTienda st) {
         super(st);
         initComponents();
-        this.dispose();
         setVisible(true);
         setLocationRelativeTo(null);
         this.actualizarTabla(st.getCupones());
