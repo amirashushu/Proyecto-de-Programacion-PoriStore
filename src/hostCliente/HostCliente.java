@@ -101,7 +101,17 @@ public class HostCliente {
                             }else{
                                 invent.reCrearProducto(id, nombre, descripcion, precio, stock, Categorias.valueOf(categoria), rutaImagen);
                                 System.out.println("[Cliente] Producto agregado al inventario: " + nombre + " (ID " + id + ")");
-                            }    
+                            }   
+                            Producto conOferta = invent.buscarPorId(id);
+                            String ofertaStr = extractJsonField(line, "oferta");
+                            String ofertaHasta = extractJsonField(line, "oferta_hasta");
+                            if (conOferta != null) {
+                                if (ofertaStr != null && !ofertaStr.isEmpty() && ofertaHasta != null && !ofertaHasta.isEmpty()) {
+                                    conOferta.setOferta(Double.parseDouble(ofertaStr), java.time.LocalDate.parse(ofertaHasta));
+                                } else {
+                                    conOferta.quitarOferta();
+                                }
+                            }
                         }else if ("eliminar".equals(type)){
                             String idStr = extractJsonField(line, "id");
                             int id = Integer.parseInt(idStr.trim());

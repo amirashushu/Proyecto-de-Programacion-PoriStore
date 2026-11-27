@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 
 public class Producto implements Serializable{
-
-    private static final long serialVersionUID = 1L;
+    
+    private static final long serialVersionUID = 491618266471120506L;
     private int id;
     private String nombre;
     private String descripcion;
@@ -13,6 +13,8 @@ public class Producto implements Serializable{
     private int stock;
     private Categorias categoria;
     private String rutaImagen;
+    private double ofertaPorcentaje; // % de descuento de la oferta (0 = sin oferta)
+    private java.time.LocalDate ofertaHasta; 
 
 
     public Producto(int id, String nombre, String descripcion, double precio, int stock, Categorias categoria, String rutaImagen) {
@@ -38,8 +40,37 @@ public class Producto implements Serializable{
         return descripcion;
     }
 
+    //Precio que paga el cliente, el de oferta mientras la oferta este vigente, si no el normal
     public double getPrecio() {
+        if (tieneOferta()) {
+            return Math.round(precio * (1 - ofertaPorcentaje / 100));
+        }
         return precio;
+    }   
+    public double getPrecioBase(){
+        return precio;
+    }
+    //La oferta esta vigente hasta el final del dia de ofertaHasta, despues se apaga sola
+    public boolean tieneOferta() {
+        return ofertaPorcentaje > 0 && ofertaHasta != null && !java.time.LocalDate.now().isAfter(ofertaHasta);
+    }
+
+    public double getOfertaPorcentaje() {
+        return ofertaPorcentaje;
+    }
+
+    public java.time.LocalDate getOfertaHasta() {
+        return ofertaHasta;
+    }
+
+    public void setOferta(double porcentaje, java.time.LocalDate hasta) {
+        this.ofertaPorcentaje = porcentaje;
+        this.ofertaHasta = hasta;
+    }
+
+    public void quitarOferta() {
+        this.ofertaPorcentaje = 0;
+        this.ofertaHasta = null;
     }
 
     public int getStock() {

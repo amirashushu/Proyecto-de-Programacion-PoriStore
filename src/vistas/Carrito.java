@@ -16,6 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
+import logica.GestorReserva;
 
 /**
  *
@@ -502,6 +503,9 @@ public final class Carrito extends BaseFrame {
             if (opcion == 0){
                 st.obtenerCarritoActual().eliminarProductoCarrito(id);
                 JOptionPane.showMessageDialog(null, "Producto eliminado con éxito!.");
+                if (st.obtenerCarritoActual().getCarritoProductos().isEmpty()) { // o .getProductos().isEmpty()
+                        GestorReserva.detener();
+                }
             }
             
             cargarDatosCarrito();
@@ -550,6 +554,11 @@ public final class Carrito extends BaseFrame {
                     if (nuevaCantidad != cantidadActual) {
                         st.obtenerCarritoActual().actualizarCantidad(pro.getId(), nuevaCantidad);
                         JOptionPane.showMessageDialog(this, "Cantidad actualizada a " + nuevaCantidad + " unidades.");
+                        // después de eliminar el producto o restar cantidad
+                        if (st.obtenerCarritoActual().getCarritoProductos().isEmpty()) { // o .getProductos().isEmpty()
+                            GestorReserva.detener();
+                        }
+
                     }
             }
         }
@@ -574,6 +583,7 @@ public final class Carrito extends BaseFrame {
         st.obtenerCarritoActual().vaciarCarrito();
         JOptionPane.showMessageDialog(this, "Se ha vaciado el carrito correctamente.");
         cargarDatosCarrito();
+        GestorReserva.detener();
         }
     }//GEN-LAST:event_btnVaciarMouseClicked
 

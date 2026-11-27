@@ -23,6 +23,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import logica.SistemaTienda;
+import entidades.Cliente;
+import logica.GestorSesion;
 
 /**
  *
@@ -109,6 +111,32 @@ public class VistaCategorias extends BaseFrame {
     contenedorCategorias.revalidate();
     contenedorCategorias.repaint();
 }
+    
+    private void gestionarDeseos(Producto p) {
+    if (!GestorSesion.haySesionActiva()) {
+        JOptionPane.showMessageDialog(this, "Debes iniciar sesión para usar la lista de deseos.", "Inicia sesión", JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    if (!(GestorSesion.getClienteActual()instanceof Cliente)) {
+        JOptionPane.showMessageDialog(this, "Solo los clientes pueden tener lista de deseos.", "Aviso", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
+
+    Cliente cliente = (Cliente) GestorSesion.getClienteActual();
+
+    if (cliente.agregarADeseos(p.getNombre())) {
+        st.guardarDatos();
+        JOptionPane.showMessageDialog(this, "Añadido a tu lista de deseos: " + p.getNombre());
+    } else {
+        int resp = JOptionPane.showConfirmDialog(this, "Ya está en tu lista de deseos. ¿Quitarlo?", "Lista de deseos", JOptionPane.YES_NO_OPTION);
+        if (resp == JOptionPane.YES_OPTION) {
+            cliente.quitarDeDeseos(p.getNombre());
+            st.guardarDatos();
+            JOptionPane.showMessageDialog(this, "Eliminado de tu lista de deseos.");
+        }
+    }
+}
 
 private JPanel crearTarjetaProducto(Producto p) {
     JPanel card = new JPanel();
@@ -116,8 +144,8 @@ private JPanel crearTarjetaProducto(Producto p) {
     card.setBackground(new Color(30, 30, 30));
     card.setOpaque(true);
     card.setBorder(BorderFactory.createLineBorder(new Color(200, 0, 0), 1));
-    card.setPreferredSize(new Dimension(160, 210));
-    card.setMaximumSize(new Dimension(160, 210));
+    card.setPreferredSize(new Dimension(160, 245));
+    card.setMaximumSize(new Dimension(160, 245));
 
     JLabel lblImagen = new JLabel();
     lblImagen.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -171,14 +199,24 @@ private JPanel crearTarjetaProducto(Producto p) {
     btnAgregar.setAlignmentX(Component.CENTER_ALIGNMENT);
     btnAgregar.addActionListener(e -> agregarAlCarrito(p));
 
+    JButton btnDeseos = new JButton("♡ Deseos");
+    btnDeseos.setFont(new Font("Segoe UI", Font.BOLD, 10));
+    btnDeseos.setBackground(new Color(45, 45, 45));
+    btnDeseos.setForeground(Color.WHITE);
+    btnDeseos.setFocusPainted(false);
+    btnDeseos.setAlignmentX(Component.CENTER_ALIGNMENT);
+    btnDeseos.addActionListener(e -> gestionarDeseos(p));
+
     card.add(Box.createVerticalStrut(10));
     card.add(lblImagen);
-    card.add(Box.createVerticalStrut(10));
+    card.add(Box.createVerticalStrut(8));
     card.add(lblNombre);
-    card.add(Box.createVerticalStrut(10));
+    card.add(Box.createVerticalStrut(6));
     card.add(lblPrecio);
-    card.add(Box.createVerticalStrut(10));
+    card.add(Box.createVerticalStrut(8));
     card.add(btnAgregar);
+    card.add(Box.createVerticalStrut(5));
+    card.add(btnDeseos);
     card.add(Box.createVerticalStrut(10));
 
     return card;
