@@ -30,6 +30,17 @@ Pasos a ejecutar para la inicialización del entorno:
 Posteriormente, para inicializar la aplicación:  
 Seleccionar el archivo `ProyectoPori.java` o presionar `F6`.
 
+## Ejecutar servidor y host en instancias separadas
+
+Desde la carpeta del proyecto, ejecutar `ant build-ejecutables`. Se crearán dos JAR ejecutables dentro de `dist/`:
+
+* `PoriStore-Servidor.jar`: carga los datos de la tienda y deja el servidor escuchando; inicia sesión con la cuenta administradora desde esta ventana.
+* `PoriStore-Host.jar`: inicia la tienda como cliente y se conecta al servidor. En el mismo computador se conecta automáticamente por `localhost`.
+
+Se pueden abrir ambos JAR al mismo tiempo. En otro computador de la red, iniciar el host indicando la dirección IP del computador servidor, por ejemplo: `java -Dporistore.server.host=192.168.1.11 -jar PoriStore-Host.jar`.
+
+El servidor usa `datosPoriStore.dat` y el host usa `datosPoriStore-host.dat`, para que las dos instancias no se sobrescriban los datos.
+
 ## 👥 Integrantes
 
 * 🧩 **Amira Casanova** = @amirashushu 

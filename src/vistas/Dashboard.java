@@ -1317,10 +1317,8 @@ public final class Dashboard extends BaseFrame {
     }//GEN-LAST:event_btnFiltroCatActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        VistaPrincipal vista = new VistaPrincipal(st);
-        this.dispose();
-        vista.setVisible(true);
-        vista.setLocationRelativeTo(null);
+        st.guardarDatos();
+        System.exit(0);
     }//GEN-LAST:event_formWindowClosing
 
     // Evento del botón Seleccionar Imagen: Abre explorador para elegir imagen

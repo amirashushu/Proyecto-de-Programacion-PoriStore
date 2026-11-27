@@ -253,7 +253,13 @@ public class VistaLogin extends BaseFrame {
 
         // Verificar si es admin
         if (st.esAdmin(correo, contraseña)) {
-            st.iniciarSesion(correo, contraseña);
+            if (!st.iniciarSesion(correo, contraseña)) {
+                String aviso = Boolean.getBoolean("poristore.server.mode")
+                        ? "Ya hay otra instancia del servidor con una sesión de administrador activa."
+                        : "Inicie sesión como administrador desde la instancia servidor.";
+                javax.swing.JOptionPane.showMessageDialog(this, aviso, "Administrador activo", javax.swing.JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             javax.swing.JOptionPane.showMessageDialog(this, "Bienvenido Administrador");
 
             // Redirigir a Dashboard (modo ADMIN)

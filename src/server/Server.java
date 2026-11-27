@@ -5,6 +5,11 @@ import entidades.Inventario;
 import entidades.Producto;
 import java.io.*;
 import java.net.*;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -14,12 +19,58 @@ import logica.SistemaTienda;
 
 public class Server {
 
-    private static final String HOST = "192.168.1.11";
+    private static final String HOST = System.getProperty("poristore.server.bind", "0.0.0.0");
     private static final int PORT = 65432;
     private static final Set<PrintWriter> clientesConectados = new CopyOnWriteArraySet<>();
     private static final HashMap<PrintWriter, StringBuilder> historialCliente= new HashMap<>();
     private static final java.util.Map<String, PrintWriter> clientePorCarrito = new java.util.concurrent.ConcurrentHashMap<>();
     private static vistas.Dashboard dashboardTabla;
+    private static boolean servidorIniciado;
+    private static FileChannel canalBloqueoAdmin;
+    private static FileLock bloqueoAdmin;
+
+    public static synchronized boolean iniciarEnSegundoPlano(SistemaTienda sistema) {
+        if (servidorIniciado) {
+            return true;
+        }
+        try {
+            java.nio.file.Path archivoBloqueo = Paths.get(System.getProperty("java.io.tmpdir"), "poristore-admin-" + PORT + ".lock");
+            canalBloqueoAdmin = FileChannel.open(archivoBloqueo, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+            bloqueoAdmin = canalBloqueoAdmin.tryLock();
+            if (bloqueoAdmin == null) {
+                canalBloqueoAdmin.close();
+                canalBloqueoAdmin = null;
+                return false;
+            }
+        } catch (IOException | OverlappingFileLockException e) {
+            cerrarBloqueoAdmin();
+            return false;
+        }
+        servidorIniciado = true;
+        setSistema(sistema);
+        Thread hiloServidor = new Thread(() -> {
+            if (!new Server().initServer(sistema)) {
+                synchronized (Server.class) {
+                    servidorIniciado = false;
+                    cerrarBloqueoAdmin();
+                }
+            }
+        }, "poristore-server");
+        hiloServidor.setDaemon(true);
+        hiloServidor.start();
+        return true;
+    }
+
+    private static void cerrarBloqueoAdmin() {
+        try {
+            if (bloqueoAdmin != null) bloqueoAdmin.release();
+        } catch (IOException ignored) { }
+        try {
+            if (canalBloqueoAdmin != null) canalBloqueoAdmin.close();
+        } catch (IOException ignored) { }
+        bloqueoAdmin = null;
+        canalBloqueoAdmin = null;
+    }
 
     
     public static void setDashboard(vistas.Dashboard d) {

@@ -10,7 +10,7 @@ import logica.GestorSesion;
 import logica.SistemaTienda;
 
 public class HostCliente {
-    private static final String HOST = "192.168.1.11";
+    private static final String HOST = System.getProperty("poristore.server.host", "127.0.0.1");
     private static final int PORT = 65432;
     private static PrintWriter serverOut;
     private static vistas.VistaPrincipal vistaPrincipalActiva;
